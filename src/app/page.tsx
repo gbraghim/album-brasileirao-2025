@@ -1,8 +1,10 @@
-import RegisterForm from '@/components/RegisterForm';
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800">
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800">
       <div className="container mx-auto px-4 py-16 flex flex-col lg:flex-row items-center justify-between">
         {/* Lado esquerdo - Texto e CTA */}
         <div className="lg:w-1/2 text-white space-y-8 mb-12 lg:mb-0">
@@ -38,7 +40,55 @@ export default function Home() {
 
         {/* Lado direito - Formulário de registro */}
         <div className="lg:w-5/12">
-          <RegisterForm />
+          <div className="bg-white p-8 rounded-lg shadow-xl">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Comece sua coleção agora
+            </h2>
+            <form className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Seu nome completo"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="seu@email.com"
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Senha</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Sua senha"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-200 font-medium"
+              >
+                Criar minha conta
+              </button>
+            </form>
+            <p className="mt-4 text-sm text-gray-600 text-center">
+              Já tem uma conta?{' '}
+              <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+                Faça login
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
