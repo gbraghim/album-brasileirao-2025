@@ -1,8 +1,51 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function Home() {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      password: formData.get('password'),
+    };
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Login automático após o registro
+        const signInResult = await signIn('credentials', {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (signInResult?.ok) {
+          router.push('/dashboard'); // Redireciona para o dashboard após o login
+        }
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      alert('Erro ao criar conta. Tente novamente.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800">
       <div className="container mx-auto px-4 py-16 flex flex-col lg:flex-row items-center justify-between">
@@ -44,7 +87,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Comece sua coleção agora
             </h2>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
                 <input
@@ -53,6 +96,7 @@ export default function Home() {
                   name="name"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Seu nome completo"
+                  required
                 />
               </div>
               <div>
@@ -63,6 +107,7 @@ export default function Home() {
                   name="email"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="seu@email.com"
+                  required
                 />
               </div>
               <div>
@@ -73,6 +118,7 @@ export default function Home() {
                   name="password"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Sua senha"
+                  required
                 />
               </div>
               <button

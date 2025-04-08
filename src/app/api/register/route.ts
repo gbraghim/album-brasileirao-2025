@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { signIn } from 'next-auth/react';
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +41,14 @@ export async function POST(request: Request) {
     // Remover a senha do objeto retornado
     const { password: _, ...userWithoutPassword } = user;
 
-    return NextResponse.json(userWithoutPassword, { status: 201 });
+    return NextResponse.json(
+      { 
+        ...userWithoutPassword,
+        message: 'Usuário criado com sucesso',
+        status: 'success'
+      }, 
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Erro ao criar usuário:', error);
     return NextResponse.json(
