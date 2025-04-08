@@ -127,11 +127,11 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Side - Registration Form */}
+          {/* Right Side - Login/Registration Form */}
           <div className="lg:w-5/12">
             <div className="bg-white p-8 rounded-xl shadow-2xl">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                Comece sua Coleção
+                Acesse seu Álbum
               </h2>
               {error && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -139,17 +139,6 @@ export default function Home() {
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                    placeholder="Seu nome completo"
-                  />
-                </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                   <input
@@ -177,20 +166,20 @@ export default function Home() {
                   disabled={loading}
                   className={`w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition duration-200 font-medium ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {loading ? 'Criando conta...' : 'Criar minha conta'}
+                  {loading ? 'Entrando...' : 'Entrar'}
                 </button>
               </form>
               <p className="mt-4 text-sm text-gray-600 text-center">
-                Já tem uma conta?{' '}
-                <Link href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
-                  Faça login
+                Ainda não tem uma conta?{' '}
+                <Link href="/register" className="text-purple-600 hover:text-purple-800 font-medium">
+                  Cadastre-se
                 </Link>
               </p>
             </div>
 
             <div className="mt-6 bg-green-500/10 backdrop-blur-lg rounded-xl p-4 text-white">
               <p className="text-sm">
-                🎁 Ao se registrar agora, você ganha um pacote com 5 figurinhas especiais para começar sua coleção!
+                🎁 Novos usuários ganham um pacote com 5 figurinhas especiais ao se cadastrar!
               </p>
             </div>
           </div>
