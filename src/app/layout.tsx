@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Álbum Brasileirão 2025",
-  description: "Colecione e troque figurinhas do Brasileirão 2025",
+  description: "Monte seu álbum digital do Brasileirão! Colecione, troque figurinhas e complete seu álbum.",
 };
 
 export default function RootLayout({
