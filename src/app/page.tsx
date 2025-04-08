@@ -51,7 +51,7 @@ export default function Home() {
                   type="text"
                   id="name"
                   name="name"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                   placeholder="Seu nome completo"
                 />
               </div>
@@ -61,7 +61,7 @@ export default function Home() {
                   type="email"
                   id="email"
                   name="email"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                   placeholder="seu@email.com"
                 />
               </div>
@@ -71,20 +71,20 @@ export default function Home() {
                   type="password"
                   id="password"
                   name="password"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                   placeholder="Sua senha"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-200 font-medium"
+                className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition duration-200 font-medium"
               >
                 Criar minha conta
               </button>
             </form>
             <p className="mt-4 text-sm text-gray-600 text-center">
               Já tem uma conta?{' '}
-              <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
                 Faça login
               </Link>
             </p>
