@@ -37,7 +37,6 @@ export default function Home() {
         throw new Error(result.message || 'Erro ao criar conta');
       }
 
-      // Redireciona para o login após o registro bem-sucedido
       router.push('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta');
@@ -48,99 +47,161 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800">
-      <div className="container mx-auto px-4 py-16 flex flex-col lg:flex-row items-center justify-between">
-        {/* Lado esquerdo - Texto e CTA */}
-        <div className="lg:w-1/2 text-white space-y-8 mb-12 lg:mb-0">
-          <h1 className="text-5xl font-bold leading-tight">
-            Álbum Brasileirão 2025
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold text-white mb-6">
+            Álbum Digital Brasileirão 2025
           </h1>
-          <p className="text-xl text-gray-300 max-w-lg">
-            Monte seu álbum digital do Brasileirão! Colecione, troque figurinhas e complete seu álbum com outros torcedores apaixonados pelo futebol brasileiro.
+          <p className="text-2xl text-gray-200 max-w-3xl mx-auto">
+            Complete seu álbum com as estrelas do futebol brasileiro. Colecione, troque e compartilhe figurinhas dos seus jogadores favoritos!
           </p>
-          <div className="space-y-4">
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3">
-                <svg className="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Colecione figurinhas digitais dos seus jogadores favoritos</span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <svg className="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Troque figurinhas com outros colecionadores</span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <svg className="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Acompanhe seu progresso em tempo real</span>
-              </li>
-            </ul>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-white">
+            <div className="text-4xl mb-4">⚽</div>
+            <h3 className="text-xl font-bold mb-2">20 Times da Série A</h3>
+            <p>Todos os clubes do Brasileirão 2025 com seus elencos completos e atualizados.</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-white">
+            <div className="text-4xl mb-4">🌟</div>
+            <h3 className="text-xl font-bold mb-2">Figurinhas Especiais</h3>
+            <p>Encontre figurinhas raras dos craques e momentos históricos do campeonato.</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-white">
+            <div className="text-4xl mb-4">🔄</div>
+            <h3 className="text-xl font-bold mb-2">Sistema de Trocas</h3>
+            <p>Troque suas figurinhas repetidas com outros colecionadores de todo o Brasil.</p>
           </div>
         </div>
 
-        {/* Lado direito - Formulário de registro */}
-        <div className="lg:w-5/12">
-          <div className="bg-white p-8 rounded-lg shadow-xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Comece sua coleção agora
-            </h2>
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+          {/* Left Side - Features */}
+          <div className="lg:w-1/2">
+            <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 text-white">
+              <h2 className="text-3xl font-bold mb-6">Por que colecionar?</h2>
+              <ul className="space-y-4">
+                <li className="flex items-center space-x-3">
+                  <svg className="h-6 w-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Mais de 600 figurinhas para colecionar</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <svg className="h-6 w-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Figurinhas exclusivas dos artilheiros do campeonato</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <svg className="h-6 w-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Escudos e uniformes históricos dos clubes</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <svg className="h-6 w-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Estatísticas atualizadas dos jogadores</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <svg className="h-6 w-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Sistema de conquistas e recompensas</span>
+                </li>
+              </ul>
+
+              <div className="mt-8 p-4 bg-yellow-400/10 rounded-lg">
+                <h3 className="text-xl font-bold mb-2 text-yellow-400">🏆 Times Participantes</h3>
+                <p className="text-gray-200">
+                  Flamengo, Palmeiras, Grêmio, São Paulo, Fluminense, Atlético-MG, Corinthians, Internacional, 
+                  Athletico-PR, Vasco, Botafogo, Santos, Cruzeiro, Bahia, Fortaleza, Red Bull Bragantino, 
+                  Cuiabá, Atlético-GO, Vitória, Juventude
+                </p>
               </div>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="Seu nome completo"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="seu@email.com"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Senha</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="Sua senha"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition duration-200 font-medium ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {loading ? 'Criando conta...' : 'Criar minha conta'}
-              </button>
-            </form>
-            <p className="mt-4 text-sm text-gray-600 text-center">
-              Já tem uma conta?{' '}
-              <Link href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
-                Faça login
-              </Link>
-            </p>
+            </div>
           </div>
+
+          {/* Right Side - Registration Form */}
+          <div className="lg:w-5/12">
+            <div className="bg-white p-8 rounded-xl shadow-2xl">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Comece sua Coleção
+              </h2>
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Seu nome completo"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="seu@email.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Senha</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Sua senha"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition duration-200 font-medium ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {loading ? 'Criando conta...' : 'Criar minha conta'}
+                </button>
+              </form>
+              <p className="mt-4 text-sm text-gray-600 text-center">
+                Já tem uma conta?{' '}
+                <Link href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
+                  Faça login
+                </Link>
+              </p>
+            </div>
+
+            <div className="mt-6 bg-green-500/10 backdrop-blur-lg rounded-xl p-4 text-white">
+              <p className="text-sm">
+                🎁 Ao se registrar agora, você ganha um pacote com 5 figurinhas especiais para começar sua coleção!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="container mx-auto px-4 py-8 mt-16 border-t border-white/10">
+        <div className="text-center text-gray-300 text-sm">
+          <p>© 2025 Álbum Digital Brasileirão. Todos os direitos reservados.</p>
+          <p className="mt-2">Todas as marcas e escudos são propriedades de seus respectivos donos.</p>
         </div>
       </div>
     </div>
