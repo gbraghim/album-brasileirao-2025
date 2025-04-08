@@ -17,13 +17,12 @@ export default function Home() {
 
     const formData = new FormData(e.currentTarget);
     const data = {
-      name: formData.get('name'),
       email: formData.get('email'),
       password: formData.get('password'),
     };
 
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,12 +33,13 @@ export default function Home() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Erro ao criar conta');
+        throw new Error(result.message || 'Erro ao fazer login');
       }
 
-      router.push('/login');
+      // Redireciona para o dashboard após login bem-sucedido
+      router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar conta');
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {
       setLoading(false);
     }
