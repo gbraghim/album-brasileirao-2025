@@ -4,7 +4,8 @@ const nextConfig = {
   swcMinify: true,
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client']
-  }
+  },
+  distDir: '.next'
 }
 
 module.exports = nextConfig 
