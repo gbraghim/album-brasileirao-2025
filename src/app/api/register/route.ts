@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { signIn } from 'next-auth/react';
 
 export async function POST(request: Request) {
   try {
@@ -42,11 +41,7 @@ export async function POST(request: Request) {
     const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json(
-      { 
-        ...userWithoutPassword,
-        message: 'Usuário criado com sucesso',
-        status: 'success'
-      }, 
+      { message: 'Usuário criado com sucesso', user: userWithoutPassword },
       { status: 201 }
     );
   } catch (error) {
