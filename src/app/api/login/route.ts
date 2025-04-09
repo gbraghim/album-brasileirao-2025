@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { signIn } from 'next-auth/react';
 
 interface LoginRequest {
   email: string;
@@ -54,23 +53,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Usar o NextAuth para autenticação
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      return NextResponse.json(
-        { message: result.error },
-        { status: 401 }
-      );
-    }
-
+    // Retorna os dados do usuário para o cliente fazer o login
     return NextResponse.json(
       { 
-        message: 'Login realizado com sucesso',
+        message: 'Credenciais válidas',
         user: {
           id: user.id,
           email: user.email,
