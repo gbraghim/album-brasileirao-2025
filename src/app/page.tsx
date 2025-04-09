@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { CloudinaryImage } from '@/lib/cloudinary';
 
 export default function Home() {
   const router = useRouter();
@@ -52,6 +52,54 @@ export default function Home() {
           <p className="text-2xl text-gray-200 max-w-3xl mx-auto">
             Complete seu álbum com as estrelas do futebol brasileiro. Colecione, troque e compartilhe figurinhas dos seus jogadores favoritos!
           </p>
+        </div>
+
+        {/* Featured Players */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-48 relative mb-4">
+              <CloudinaryImage
+                src="album-brasileirao-players/arrascaeta_cveoqs"
+                alt="Arrascaeta"
+                width={128}
+                height={192}
+              />
+            </div>
+            <p className="text-white font-medium">Arrascaeta</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-48 relative mb-4">
+              <CloudinaryImage
+                src="album-brasileirao-players/veiga_pnl0nc"
+                alt="Veiga"
+                width={128}
+                height={192}
+              />
+            </div>
+            <p className="text-white font-medium">Veiga</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-48 relative mb-4">
+              <CloudinaryImage
+                src="album-brasileirao-players/gabigol_crcdci"
+                alt="Gabigol"
+                width={128}
+                height={192}
+              />
+            </div>
+            <p className="text-white font-medium">Gabigol</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-48 relative mb-4">
+              <CloudinaryImage
+                src="album-brasileirao-players/endrick_s2p8ws"
+                alt="Endrick"
+                width={128}
+                height={192}
+              />
+            </div>
+            <p className="text-white font-medium">Endrick</p>
+          </div>
         </div>
 
         {/* Login Form */}
@@ -115,69 +163,6 @@ export default function Home() {
             <div className="text-4xl mb-4">🔄</div>
             <h3 className="text-xl font-bold mb-2">Sistema de Trocas</h3>
             <p>Troque suas figurinhas repetidas com outros colecionadores de todo o Brasil.</p>
-          </div>
-        </div>
-
-        {/* Players Showcase */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Estrelas do Campeonato</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden">
-              <div className="relative h-64">
-                <Image
-                  src="/players/endrick.jpg"
-                  alt="Endrick"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4 text-white">
-                <h3 className="font-bold">Endrick</h3>
-                <p className="text-sm text-gray-300">Palmeiras</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden">
-              <div className="relative h-64">
-                <Image
-                  src="/players/veiga.jpg"
-                  alt="Raphael Veiga"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4 text-white">
-                <h3 className="font-bold">Raphael Veiga</h3>
-                <p className="text-sm text-gray-300">Palmeiras</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden">
-              <div className="relative h-64">
-                <Image
-                  src="/players/gabigol.jpg"
-                  alt="Gabigol"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4 text-white">
-                <h3 className="font-bold">Gabigol</h3>
-                <p className="text-sm text-gray-300">Flamengo</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden">
-              <div className="relative h-64">
-                <Image
-                  src="/players/arrascaeta.jpg"
-                  alt="Arrascaeta"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4 text-white">
-                <h3 className="font-bold">Arrascaeta</h3>
-                <p className="text-sm text-gray-300">Flamengo</p>
-              </div>
-            </div>
           </div>
         </div>
 
