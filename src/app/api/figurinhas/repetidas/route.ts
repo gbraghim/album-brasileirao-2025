@@ -14,30 +14,42 @@ export async function GET() {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        pacotes: {
-          include: {
-            figurinhas: {
-              where: {
-                repetida: true
-              }
-            }
+    // Busca todas as figurinhas do usuário
+    const figurinhas = await prisma.figurinha.findMany({
+      where: {
+        pacote: {
+          user: {
+            email: session.user.email
           }
         }
       }
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      );
-    }
+    // Conta quantas vezes cada jogador aparece
+    const contagemJogadores = figurinhas.reduce((acc, figurinha) => {
+      const jogadorId = figurinha.jogadorId;
+      acc[jogadorId] = (acc[jogadorId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-    // Extrai todas as figurinhas repetidas dos pacotes
-    const figurinhasRepetidas = user.pacotes.flatMap(pacote => pacote.figurinhas);
+    // Filtra apenas os jogadores que aparecem mais de uma vez
+    const jogadoresRepetidos = Object.entries(contagemJogadores)
+      .filter(([_, count]) => count > 1)
+      .map(([jogadorId]) => jogadorId);
+
+    // Busca as figurinhas dos jogadores repetidos
+    const figurinhasRepetidas = await prisma.figurinha.findMany({
+      where: {
+        jogadorId: {
+          in: jogadoresRepetidos
+        },
+        pacote: {
+          user: {
+            email: session.user.email
+          }
+        }
+      }
+    });
 
     return NextResponse.json(figurinhasRepetidas);
   } catch (error) {
