@@ -9,6 +9,7 @@ interface FigurinhaProps {
     jogador: {
       id: string;
       nome: string;
+      time: string;
     };
   };
   onClick?: () => void;
@@ -39,7 +40,7 @@ export default function Figurinha({ figurinha, onClick, className = '' }: Figuri
       </div>
       <div className="mt-2 text-center">
         <p className="text-sm font-medium text-gray-900">{figurinha.jogador.nome}</p>
-        <p className="text-xs text-gray-500">{figurinha.time}</p>
+        <p className="text-xs text-gray-500">{figurinha.jogador.time}</p>
       </div>
     </div>
   );
