@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { signIn } from 'next-auth/react';
 
 interface LoginRequest {
   email: string;
@@ -25,15 +25,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { message: 'Formato inválido dos dados' },
         { status: 400 }
-      );
-    }
-
-    // Verificar se o JWT_SECRET está configurado
-    if (!process.env.JWT_SECRET) {
-      console.error('JWT_SECRET não está configurado');
-      return NextResponse.json(
-        { message: 'Erro de configuração do servidor' },
-        { status: 500 }
       );
     }
 
@@ -63,17 +54,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        email: user.email,
-        name: user.name
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Usar o NextAuth para autenticação
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
 
-    const response = NextResponse.json(
+    if (result?.error) {
+      return NextResponse.json(
+        { message: result.error },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json(
       { 
         message: 'Login realizado com sucesso',
         user: {
@@ -84,16 +79,6 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-
-    response.cookies.set('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60, // 7 dias
-      path: '/',
-    });
-
-    return response;
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     return NextResponse.json(
