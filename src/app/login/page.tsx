@@ -28,22 +28,6 @@ export default function LoginPage() {
     const password = formData.get('password') as string;
 
     try {
-      // Primeiro, verifica as credenciais
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Erro ao fazer login');
-      }
-
-      // Se as credenciais são válidas, usa o NextAuth para fazer o login
       const result = await signIn('credentials', {
         email,
         password,
@@ -54,7 +38,7 @@ export default function LoginPage() {
         throw new Error(result.error);
       }
 
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao fazer login');
     } finally {

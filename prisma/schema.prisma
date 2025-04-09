@@ -12,9 +12,69 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
   name      String
+  email     String   @unique
   password  String
+  pacotes   Pacote[]
+  trocas    Troca[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Pacote {
+  id          String      @id @default(cuid())
+  userId      String
+  tipo        String
+  figurinhas  Figurinha[]
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Figurinha {
+  id        String   @id @default(cuid())
+  pacoteId  String
+  jogadorId String
+  pacote    Pacote   @relation(fields: [pacoteId], references: [id])
+  jogador   Jogador  @relation(fields: [jogadorId], references: [id])
+  trocas    Troca[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Troca {
+  id           String     @id @default(cuid())
+  figurinhaId  String
+  figurinha    Figurinha  @relation(fields: [figurinhaId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  status       String     // 'PENDENTE', 'ACEITA', 'RECUSADA'
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Time {
+  id        String    @id @default(cuid())
+  nome      String
+  escudo    String?
+  apiId     Int       @unique
+  jogadores Jogador[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Jogador {
+  id           String      @id @default(cuid())
+  nome         String
+  numero       Int?
+  posicao      String?
+  idade        Int?
+  nacionalidade String?
+  foto         String?
+  apiId        Int        @unique
+  timeId       String
+  time         Time       @relation(fields: [timeId], references: [id])
+  figurinhas   Figurinha[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 } 

@@ -7,9 +7,17 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || 
                     request.nextUrl.pathname.startsWith('/register')
   const isApiRoute = request.nextUrl.pathname.startsWith('/api')
-  const isPublicRoute = request.nextUrl.pathname === '/' || 
-                       request.nextUrl.pathname.startsWith('/_next') ||
-                       request.nextUrl.pathname.startsWith('/static')
+  const isPublicRoute = request.nextUrl.pathname === '/'
+
+  // Redireciona usuários autenticados para fora das páginas de autenticação
+  if (isAuthPage && token) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // Redireciona usuários não autenticados para a página de login
+  if (!isAuthPage && !isApiRoute && !isPublicRoute && !token) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
   // Adiciona headers de segurança
   const response = NextResponse.next()
@@ -27,22 +35,12 @@ export async function middleware(request: NextRequest) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; " +
     "img-src 'self' data: https:; " +
-    "connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;"
+    "connect-src 'self'"
   )
   // Força HTTPS
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
   // Referrer Policy
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-  // Se for uma rota protegida (não pública e não API) e não estiver autenticado, redireciona para login
-  if (!isPublicRoute && !isApiRoute && !isAuthPage && !token) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  // Se estiver autenticado e tentar acessar páginas de auth, redireciona para dashboard
-  if (isAuthPage && token) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
 
   return response
 }
@@ -54,7 +52,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
 } 
