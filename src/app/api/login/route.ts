@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const body = await request.json() as LoginRequest;
+    const { email, password } = body;
 
+    // Validação dos campos
     if (!email || !password) {
       return NextResponse.json(
         { message: 'Email e senha são obrigatórios' },
@@ -13,39 +21,83 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar usuário pelo email
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { message: 'Formato inválido dos dados' },
+        { status: 400 }
+      );
+    }
+
+    // Verificar se o JWT_SECRET está configurado
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET não está configurado');
+      return NextResponse.json(
+        { message: 'Erro de configuração do servidor' },
+        { status: 500 }
+      );
+    }
+
     const user = await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        name: true,
+      },
     });
 
     if (!user) {
       return NextResponse.json(
-        { message: 'Email ou senha incorretos' },
-        { status: 401 }
+        { message: 'Usuário não encontrado' },
+        { status: 404 }
       );
     }
 
-    // Verificar senha
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!passwordMatch) {
+    if (!isPasswordValid) {
       return NextResponse.json(
-        { message: 'Email ou senha incorretos' },
+        { message: 'Senha incorreta' },
         { status: 401 }
       );
     }
 
-    // Remover a senha do objeto retornado
-    const { password: _, ...userWithoutPassword } = user;
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        email: user.email,
+        name: user.name
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
-    return NextResponse.json(
-      { message: 'Login realizado com sucesso', user: userWithoutPassword },
+    const response = NextResponse.json(
+      { 
+        message: 'Login realizado com sucesso',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name
+        }
+      },
       { status: 200 }
     );
+
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60, // 7 dias
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     return NextResponse.json(
-      { message: 'Erro ao fazer login' },
+      { message: 'Erro interno do servidor' },
       { status: 500 }
     );
   }

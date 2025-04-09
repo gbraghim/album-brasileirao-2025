@@ -1,23 +1,33 @@
-import React from 'react';
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { getServerSession } from 'next-auth';
+import { SessionProvider } from 'next-auth/react';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Álbum Brasileirão 2025",
   description: "Monte seu álbum digital do Brasileirão! Colecione, troque figurinhas e complete seu álbum.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
+
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SessionProvider session={session}>
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-grow container mx-auto px-4 py-8">
+              {children}
+            </main>
+          </div>
+        </SessionProvider>
+      </body>
     </html>
   );
 } 
