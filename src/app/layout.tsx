@@ -1,7 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { getServerSession } from 'next-auth';
-import { SessionProvider } from 'next-auth/react';
+import Providers from '@/components/Providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,13 +20,13 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
-        <SessionProvider session={session}>
+        <Providers session={session}>
           <div className="min-h-screen flex flex-col">
             <main className="flex-grow container mx-auto px-4 py-8">
               {children}
             </main>
           </div>
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );
