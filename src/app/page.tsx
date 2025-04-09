@@ -93,7 +93,7 @@ export default function Home() {
           </form>
           <p className="text-center text-white mt-4">
             Não tem uma conta?{' '}
-            <Link href="/register" className="text-purple-300 hover:text-purple-200">
+            <Link href="/register" className="text-purple-300 hover:text-purple-200 underline">
               Cadastre-se
             </Link>
           </p>

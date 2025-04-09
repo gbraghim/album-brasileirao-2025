@@ -11,10 +11,11 @@ export async function middleware(request: NextRequest) {
 
   // Redireciona usuários autenticados para fora das páginas de autenticação
   if (isAuthPage && token) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redireciona usuários não autenticados para a página de login
+  // Exceto para páginas públicas e de autenticação
   if (!isAuthPage && !isApiRoute && !isPublicRoute && !token) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
@@ -33,9 +34,12 @@ export async function middleware(request: NextRequest) {
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self'"
+    "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data: blob:; " +
+    "img-src 'self' data: https: blob:; " +
+    "connect-src 'self' http://localhost:* https://*.vercel.app; " +
+    "frame-src 'self'; " +
+    "worker-src 'self' blob:; " +
+    "child-src 'self' blob:"
   )
   // Força HTTPS
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')

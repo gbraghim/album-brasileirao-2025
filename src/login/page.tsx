@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    if (searchParams?.get('registered') === 'true') {
+    if (searchParams.get('registered') === 'true') {
       setSuccess('Conta criada com sucesso! Faça login para continuar.');
     }
   }, [searchParams]);
@@ -38,7 +38,7 @@ export default function LoginPage() {
         throw new Error(result.error);
       }
 
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao fazer login');
     } finally {
@@ -47,15 +47,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Entre na sua conta
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-300">
+          <p className="mt-2 text-center text-sm text-gray-600">
             Ou{' '}
-            <Link href="/register" className="font-medium text-purple-300 hover:text-purple-200">
+            <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
               crie uma conta se ainda não tiver
             </Link>
           </p>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email"
               />
             </div>
@@ -86,25 +86,39 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Senha"
               />
             </div>
           </div>
 
           {error && (
-            <div className="text-red-400 text-sm text-center">{error}</div>
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                </div>
+              </div>
+            </div>
           )}
 
           {success && (
-            <div className="text-green-400 text-sm text-center">{success}</div>
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">{success}</h3>
+                </div>
+              </div>
+            </div>
           )}
 
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
