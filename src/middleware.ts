@@ -34,9 +34,9 @@ export async function middleware(request: NextRequest) {
   // Referrer Policy
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
-  // Se for uma rota protegida e não estiver autenticado, redireciona para login
-  if (!isPublicRoute && !isApiRoute && !token) {
-    return NextResponse.redirect(new URL('/', request.url))
+  // Se for uma rota protegida (não pública e não API) e não estiver autenticado, redireciona para login
+  if (!isPublicRoute && !isApiRoute && !isAuthPage && !token) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // Se estiver autenticado e tentar acessar páginas de auth, redireciona para dashboard
