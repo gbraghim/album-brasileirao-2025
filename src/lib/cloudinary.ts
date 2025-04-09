@@ -7,28 +7,13 @@ export const cloudinaryConfig = {
   apiSecret: process.env.CLOUDINARY_API_SECRET,
 };
 
-interface CloudinaryImageProps extends ComponentProps<typeof CldImage> {
+type CloudinaryImageProps = {
   src: string;
   alt: string;
   width: number;
   height: number;
-}
+} & Omit<ComponentProps<typeof CldImage>, 'src' | 'alt' | 'width' | 'height'>;
 
-export function CloudinaryImage({ 
-  src, 
-  alt, 
-  width, 
-  height,
-  ...props 
-}: CloudinaryImageProps) {
-  return (
-    <CldImage
-      width={width}
-      height={height}
-      src={src}
-      alt={alt}
-      loading="lazy"
-      {...props}
-    />
-  );
+export function CloudinaryImage(props: CloudinaryImageProps) {
+  return <CldImage {...props} />;
 } 

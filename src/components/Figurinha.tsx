@@ -34,6 +34,7 @@ export default function Figurinha({ figurinha, onClick, className = '' }: Figuri
           alt={figurinha.jogador.nome}
           width={128}
           height={192}
+          onLoad={() => setIsLoading(false)}
         />
       </div>
       <div className="mt-2 text-center">
