@@ -3,10 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET não está configurado');
-}
-
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error('NEXTAUTH_SECRET não está configurado');
 }
@@ -50,10 +46,6 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 horas
   },
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    maxAge: 24 * 60 * 60, // 24 horas
-  },
   pages: {
     signIn: '/login',
     error: '/login',
@@ -70,6 +62,10 @@ export const authOptions: AuthOptions = {
         session.user.id = token.id as string;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      return baseUrl + '/dashboard';
     }
   },
   secret: process.env.NEXTAUTH_SECRET,

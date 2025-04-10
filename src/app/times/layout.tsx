@@ -1,15 +1,15 @@
-import Header from '@/components/Header';
+import ProtectedNav from '@/components/ProtectedNav';
 import Footer from '@/components/Footer';
 
-export default function ProtectedLayout({
+export default function TimesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <ProtectedNav />
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />

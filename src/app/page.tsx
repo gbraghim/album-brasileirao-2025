@@ -26,14 +26,13 @@ export default function Home() {
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/dashboard',
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
-
-      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {

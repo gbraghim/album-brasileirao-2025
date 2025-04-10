@@ -11,46 +11,67 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  pacotes   Pacote[]
-  trocas    Troca[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  password     String
+  pacotes      Pacote[]
+  figurinhas   UserFigurinha[] // Relação com as figurinhas do usuário
+  trocasEnviadas     Troca[]       @relation("TrocasEnviadas")
+  trocasRecebidas    Troca[]       @relation("TrocasRecebidas")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Pacote {
   id          String      @id @default(cuid())
   userId      String
-  tipo        String
-  figurinhas  Figurinha[]
-  user        User        @relation(fields: [userId], references: [id])
+  tipo        String      @default("DIARIO")
+  aberto      Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+  figurinhas  Figurinha[]
 }
 
 model Figurinha {
-  id        String   @id @default(cuid())
-  pacoteId  String
-  jogadorId String
-  pacote    Pacote   @relation(fields: [pacoteId], references: [id])
-  jogador   Jogador  @relation(fields: [jogadorId], references: [id])
-  trocas    Troca[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String         @id @default(cuid())
+  pacoteId   String
+  jogadorId  String
+  pacote     Pacote         @relation(fields: [pacoteId], references: [id])
+  jogador    Jogador        @relation(fields: [jogadorId], references: [id])
+  usuarios   UserFigurinha[] // Relação com os usuários que possuem esta figurinha
+  trocas     Troca[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+// Tabela de junção para representar a quantidade de cada figurinha que um usuário possui
+model UserFigurinha {
+  id          String    @id @default(cuid())
+  userId      String
+  figurinhaId String
+  quantidade  Int       @default(1) // A quantidade da figurinha que o usuário possui
+  user        User      @relation(fields: [userId], references: [id])
+  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, figurinhaId]) // Um usuário só pode ter uma entrada para cada figurinha
 }
 
 model Troca {
-  id           String     @id @default(cuid())
-  figurinhaId  String
-  figurinha    Figurinha  @relation(fields: [figurinhaId], references: [id])
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  status       String     // 'PENDENTE', 'ACEITA', 'RECUSADA'
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id                String    @id @default(cuid())
+  figurinhaOfertaId String
+  figurinhaDesejadaId String?
+  figurinhaOferta    Figurinha @relation(fields: [figurinhaOfertaId], references: [id])
+  usuarioEnviaId    String
+  usuarioRecebeId   String?
+  usuarioEnvia      User      @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
+  usuarioRecebe     User?     @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
+  status            String    // 'PENDENTE', 'ACEITA', 'RECUSADA'
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model Time {

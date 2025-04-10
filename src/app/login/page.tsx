@@ -32,13 +32,19 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
+        callbackUrl: '/dashboard'
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      router.push('/dashboard');
+      if (result?.url) {
+        router.push(result.url);
+      } else {
+        router.push('/dashboard');
+      }
+      router.refresh();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao fazer login');
     } finally {
