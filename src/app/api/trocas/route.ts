@@ -17,9 +17,14 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: {
-        trocas: {
+        trocasEnviadas: {
           include: {
-            figurinha: true
+            figurinhaOferta: true
+          }
+        },
+        trocasRecebidas: {
+          include: {
+            figurinhaOferta: true
           }
         }
       }
@@ -32,7 +37,13 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(user.trocas);
+    // Combinar trocas enviadas e recebidas
+    const todasTrocas = [
+      ...user.trocasEnviadas.map(t => ({ ...t, tipo: 'enviada' })),
+      ...user.trocasRecebidas.map(t => ({ ...t, tipo: 'recebida' }))
+    ];
+
+    return NextResponse.json(todasTrocas);
   } catch (error) {
     console.error('Erro ao buscar trocas:', error);
     return NextResponse.json(
