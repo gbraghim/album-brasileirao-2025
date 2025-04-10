@@ -3,21 +3,15 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: [
-      'api-football.com',
-      'media.api-sports.io',
-      'localhost',
-      'res.cloudinary.com'
-    ],
+    domains: ['s.glbimg.com', 'res.cloudinary.com', 'localhost', 'logodetimes.com'],
   },
   env: {
     JWT_SECRET: process.env.JWT_SECRET,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
   experimental: {
-    serverComponentsExternalPackages: ['bcryptjs']
-  }
-}
+    serverComponents: true,
+  },
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig; 

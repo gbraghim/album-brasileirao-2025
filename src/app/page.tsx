@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { CloudinaryImage } from '@/lib/cloudinary';
+import EscudosCarousel from '@/components/EscudosCarousel';
 
 export default function Home() {
   const router = useRouter();
@@ -53,51 +53,13 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Featured Players */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-          <div className="flex flex-col items-center">
-            <div className="w-32 h-48 relative mb-4">
-              <CloudinaryImage
-                src="album-brasileirao-players/arrascaeta_cveoqs"
-                alt="Arrascaeta"
-                width={128}
-                height={192}
-              />
-            </div>
-            <p className="text-white font-medium">Arrascaeta</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-32 h-48 relative mb-4">
-              <CloudinaryImage
-                src="album-brasileirao-players/veiga_pnl0nc"
-                alt="Veiga"
-                width={128}
-                height={192}
-              />
-            </div>
-            <p className="text-white font-medium">Veiga</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-32 h-48 relative mb-4">
-              <CloudinaryImage
-                src="album-brasileirao-players/gabigol_crcdci"
-                alt="Gabigol"
-                width={128}
-                height={192}
-              />
-            </div>
-            <p className="text-white font-medium">Gabigol</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-32 h-48 relative mb-4">
-              <CloudinaryImage
-                src="album-brasileirao-players/endrick_s2p8ws"
-                alt="Endrick"
-                width={128}
-                height={192}
-              />
-            </div>
-            <p className="text-white font-medium">Endrick</p>
+        {/* Times Carousel */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-white text-center mb-8">
+            Times da Série A 2025
+          </h2>
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8">
+            <EscudosCarousel />
           </div>
         </div>
 

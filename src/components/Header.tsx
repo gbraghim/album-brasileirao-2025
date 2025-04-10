@@ -54,6 +54,14 @@ export default function Header() {
               Trocas
             </Link>
             <Link 
+              href="/meu-album" 
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                pathname === '/meu-album' ? 'bg-blue-700' : ''
+              }`}
+            >
+              Meu Álbum
+            </Link>
+            <Link 
               href="/perfil" 
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 pathname === '/perfil' ? 'bg-blue-700' : ''
