@@ -31,7 +31,11 @@ export async function POST(
       include: {
         figurinhas: {
           include: {
-            jogador: true
+            jogador: {
+              include: {
+                time: true
+              }
+            }
           }
         }
       }
