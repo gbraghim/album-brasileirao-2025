@@ -23,16 +23,24 @@ const TIMES_SERIE_A = {
   'vasco': { nome: 'Vasco', estado: 'Rio de Janeiro', fundacao: '1898' },
   'vitoria': { nome: 'Vitória', estado: 'Bahia', fundacao: '1899' },
   'juventude': { nome: 'Juventude', estado: 'Rio Grande do Sul', fundacao: '1913' }
-};
+} as const;
 
-export default async function TimePage({ params }: { params: { timeId: string } }) {
+type TimeId = keyof typeof TIMES_SERIE_A;
+
+interface PageProps {
+  params: {
+    timeId: TimeId;
+  };
+}
+
+export default async function TimePage({ params }: PageProps) {
   const session = await getServerSession();
   
   if (!session) {
     redirect('/login');
   }
 
-  const time = TIMES_SERIE_A[params.timeId as keyof typeof TIMES_SERIE_A];
+  const time = TIMES_SERIE_A[params.timeId];
 
   if (!time) {
     return (
