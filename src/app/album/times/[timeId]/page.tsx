@@ -1,8 +1,5 @@
-'use client';
-
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 const TIMES_SERIE_A = {
@@ -28,24 +25,14 @@ const TIMES_SERIE_A = {
   'juventude': { nome: 'Juventude', estado: 'Rio Grande do Sul', fundacao: '1913' }
 };
 
-export default function TimePage({ params }: { params: { timeId: string } }) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const time = TIMES_SERIE_A[params.timeId as keyof typeof TIMES_SERIE_A];
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
-  }, [status, router]);
-
-  if (status === 'loading') {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+export default async function TimePage({ params }: { params: { timeId: string } }) {
+  const session = await getServerSession();
+  
+  if (!session) {
+    redirect('/login');
   }
+
+  const time = TIMES_SERIE_A[params.timeId as keyof typeof TIMES_SERIE_A];
 
   if (!time) {
     return (
