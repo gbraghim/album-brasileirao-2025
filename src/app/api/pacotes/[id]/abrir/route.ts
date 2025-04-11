@@ -4,11 +4,11 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Pacote, UserFigurinha } from '@prisma/client';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
+    const pathname = request.nextUrl.pathname;
+    const id = pathname.split('/').pop() || '';
+    
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
@@ -25,7 +25,7 @@ export async function POST(
 
     const pacote = await prisma.pacote.findUnique({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id
       },
       include: {
