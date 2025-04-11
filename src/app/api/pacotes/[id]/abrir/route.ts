@@ -5,9 +5,15 @@ import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+type Props = {
+  params: {
+    id: string
+  }
+}
+
 export async function POST(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: Props
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +22,7 @@ export async function POST(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const pacoteId = context.params.id;
+    const pacoteId = params.id;
     
     // Buscar o usuário pelo email
     const user = await prisma.user.findUnique({
