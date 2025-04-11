@@ -4,13 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Pacote, UserFigurinha } from '@prisma/client';
 
-interface RouteSegment {
-  id: string;
-}
-
 export async function POST(
   request: NextRequest,
-  { params }: { params: RouteSegment }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
