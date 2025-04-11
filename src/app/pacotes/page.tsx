@@ -89,11 +89,13 @@ export default function Pacotes() {
 
   const handleAbrirPacote = async (pacoteId: string) => {
     try {
-      const response = await fetch(`/api/pacotes/${pacoteId}/abrir`, {
+      const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session?.user?.email}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ pacoteId }),
       });
 
       if (!response.ok) {
