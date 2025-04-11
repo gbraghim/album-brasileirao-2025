@@ -1,122 +1,66 @@
-'use client';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import Image from 'next/image';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { CloudinaryImage } from '@/lib/cloudinary';
-
-interface Jogador {
-  id: string;
+interface PageParams {
   nome: string;
-  numero: number;
-  posicao: string;
-  idade: number;
-  nacionalidade: string;
-  foto: string;
 }
 
-interface Time {
-  id: string;
-  nome: string;
-  escudo: string;
-  jogadores: Jogador[];
-}
+export default async function TimePage({ params }: { params: PageParams }) {
+  const session = await getServerSession();
 
-export default function TimePage({ params }: { params: { nome: string } }) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [time, setTime] = useState<Time | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/');
-      return;
-    }
-
-    const fetchTime = async () => {
-      try {
-        // Converter o nome da URL para um formato que possa ser comparado com o banco de dados
-        const nomeFormatado = params.nome
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-          
-        const response = await fetch(`/api/times/nome/${nomeFormatado}`);
-        const data = await response.json();
-        setTime(data);
-      } catch (error) {
-        console.error('Erro ao carregar time:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTime();
-  }, [status, router, params.nome]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Carregando jogadores...</h1>
-        </div>
-      </div>
-    );
+  if (!session) {
+    redirect('/login');
   }
 
+  const time = await prisma.time.findFirst({
+    where: {
+      nome: {
+        contains: params.nome.replace(/-/g, ' '),
+        mode: 'insensitive'
+      }
+    },
+    include: {
+      jogadores: true
+    }
+  });
+
   if (!time) {
-    return (
-      <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Time não encontrado</h1>
-        </div>
-      </div>
-    );
+    redirect('/times');
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center mb-8">
-          <div className="w-16 h-16 relative mr-4">
-            <CloudinaryImage
-              src={time.escudo}
-              alt={time.nome}
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          </div>
-          <h1 className="text-3xl font-bold text-brasil-blue">{time.nome}</h1>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {time.jogadores.map((jogador) => (
-            <div
-              key={jogador.id}
-              className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20 transform transition-all duration-300 hover:scale-[1.02]"
-            >
-              <div className="flex flex-col items-center">
-                <div className="w-32 h-48 relative mb-4">
-                  <CloudinaryImage
-                    src={jogador.foto}
-                    alt={jogador.nome}
-                    width={128}
-                    height={192}
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <h2 className="text-xl font-bold text-center mb-2 text-brasil-blue">{jogador.nome}</h2>
-                <div className="text-center space-y-1">
-                  <p className="text-brasil-blue/80">Número: {jogador.numero}</p>
-                  <p className="text-brasil-blue/80">Posição: {jogador.posicao}</p>
-                  <p className="text-brasil-blue/80">Idade: {jogador.idade} anos</p>
-                  <p className="text-brasil-blue/80">Nacionalidade: {jogador.nacionalidade}</p>
-                </div>
-              </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">{time.nome}</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Informações do Time</h2>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <Image
+                src={time.escudo || '/placeholder-escudo.png'}
+                alt={`Escudo do ${time.nome}`}
+                fill
+                className="object-contain"
+              />
             </div>
-          ))}
+            <p className="text-gray-600">
+              Total de jogadores: {time.jogadores.length}
+            </p>
+          </div>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Jogadores</h2>
+          <div className="bg-white rounded-lg shadow p-6">
+            <ul className="space-y-2">
+              {time.jogadores.map((jogador) => (
+                <li key={jogador.id} className="flex items-center">
+                  <span className="text-gray-800">{jogador.nome}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
