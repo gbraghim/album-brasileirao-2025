@@ -77,8 +77,13 @@ export async function POST(req: Request) {
       },
     });
 
-    // Cria os pacotes iniciais para o novo usuário
-    await verificarPacotesIniciais(user.id);
+    // Tenta criar os pacotes iniciais, mas não falha se der erro
+    try {
+      await verificarPacotesIniciais(user.id);
+    } catch (error) {
+      console.error('Erro ao criar pacotes iniciais:', error);
+      // Não lança o erro, apenas loga
+    }
 
     return NextResponse.json(
       { 
