@@ -1,5 +1,10 @@
-import ProtectedNav from '@/components/ProtectedNav';
-import Footer from '@/components/Footer';
+import { Metadata } from 'next';
+import Header from '@/components/Header';
+
+export const metadata: Metadata = {
+  title: 'Times - Álbum Brasileirão 2025',
+  description: 'Visualize todos os times do Brasileirão 2025',
+};
 
 export default function TimesLayout({
   children,
@@ -7,12 +12,11 @@ export default function TimesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <ProtectedNav />
-      <main className="flex-grow">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
         {children}
       </main>
-      <Footer />
     </div>
   );
 } 
