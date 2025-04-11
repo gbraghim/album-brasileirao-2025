@@ -147,7 +147,7 @@ export default function Pacotes() {
         
         {pacotes.length === 0 ? (
           <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg">
-            <p className="text-brasil-blue">Você não tem pacotes disponíveis</p>
+            <p className="text-brasil-blue">Adquira mais pacotes e complete seu álbum!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

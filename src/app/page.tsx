@@ -56,7 +56,7 @@ export default function Home() {
             />
           </div>
           <h1 className="text-6xl font-bold text-brasil-blue mb-6">
-            eBrasileirão 2025
+            Colecione os craques!!
           </h1>
           <p className="text-2xl text-brasil-blue/80 max-w-3xl mx-auto">
             Complete seu álbum com as estrelas do futebol brasileiro. Colecione, troque e compartilhe figurinhas dos seus jogadores favoritos!

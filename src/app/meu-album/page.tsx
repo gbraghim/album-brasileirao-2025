@@ -198,7 +198,7 @@ export default function MeuAlbum() {
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-gray-500 text-xs">Sem escudo</span>
+                            <span className="text-gray-400">{jogador.time.nome[0]}</span>
                           </div>
                         )}
                       </div>
@@ -208,23 +208,11 @@ export default function MeuAlbum() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-2xl font-bold text-gray-700">#{jogador.numero}</span>
                       <span className="text-sm text-gray-500">x{jogador.quantidade}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="text-gray-500">Posição:</span>
-                      <span className="ml-1 font-medium">{jogador.posicao}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Idade:</span>
-                      <span className="ml-1 font-medium">{jogador.idade}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Nacionalidade:</span>
-                      <span className="ml-1 font-medium">{jogador.nacionalidade}</span>
-                    </div>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <p>Posição: {jogador.posicao}</p>
                   </div>
                 </div>
               </div>
