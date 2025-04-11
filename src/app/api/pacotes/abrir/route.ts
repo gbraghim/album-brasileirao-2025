@@ -1,20 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
-type Props = {
-  params: {
-    id: string
-  }
-}
-
-export async function POST(
-  request: Request,
-  { params }: Props
-) {
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -22,8 +13,12 @@ export async function POST(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const pacoteId = params.id;
+    const { pacoteId } = await request.json();
     
+    if (!pacoteId) {
+      return NextResponse.json({ error: 'ID do pacote não fornecido' }, { status: 400 });
+    }
+
     // Buscar o usuário pelo email
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
