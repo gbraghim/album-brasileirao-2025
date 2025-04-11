@@ -56,6 +56,7 @@ export default function AlbumPage() {
           {TIMES_SERIE_A.map((time) => (
             <Link
               key={time.id}
+              href={`/album/time/${time.id}`}
               className="block p-4 border rounded-lg hover:bg-blue-50 transition-colors"
             >
               <div className="flex items-center justify-between">
