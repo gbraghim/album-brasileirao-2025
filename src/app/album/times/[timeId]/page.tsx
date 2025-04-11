@@ -27,21 +27,20 @@ const TIMES_SERIE_A = {
 
 type TimeId = keyof typeof TIMES_SERIE_A;
 
-type Props = {
+interface PageProps {
   params: {
     timeId: string;
   };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+}
 
-export default async function TimePage(props: Props) {
+export default async function TimePage({ params }: PageProps) {
   const session = await getServerSession();
   
   if (!session) {
     redirect('/login');
   }
 
-  const timeId = props.params.timeId as TimeId;
+  const timeId = params.timeId as TimeId;
   const time = TIMES_SERIE_A[timeId];
 
   if (!time) {
