@@ -1,96 +1,67 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-
-interface Jogador {
-  id: string;
-  nome: string;
-  numero: number;
-  posicao: string;
-  idade: number;
-  nacionalidade: string;
-  foto: string;
-  quantidade: number;
-  time: {
-    nome: string;
-    escudo: string;
-  };
-}
-
-interface Filtros {
-  time: string;
-  nacionalidade: string;
-  posicao: string;
-}
+import { Jogador } from '@/types/jogador';
+import { Filtros } from '@/types/filtros';
+import { CardJogador } from '@/components/card-jogador';
+import { FiltrosAlbum } from '@/components/filtros-album';
+import { Loading } from '@/components/loading';
 
 export default function MeuAlbum() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState<Filtros>({
     time: '',
     nacionalidade: '',
     posicao: ''
   });
-  const [times, setTimes] = useState<string[]>([]);
-  const [nacionalidades, setNacionalidades] = useState<string[]>([]);
-  const [posicoes, setPosicoes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
-    } else if (status === 'authenticated') {
-      carregarJogadores();
     }
   }, [status, router]);
 
-  const carregarJogadores = async () => {
-    try {
-      const response = await fetch('/api/meu-album', {
-        headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
+  useEffect(() => {
+    const carregarJogadores = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        if (!session?.user?.email) {
+          throw new Error('Usuário não autenticado');
         }
-        throw new Error('Erro ao carregar álbum');
+
+        const response = await fetch('/api/meu-album', {
+          headers: {
+            'Authorization': `Bearer ${session.user.email}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro ao carregar álbum');
+        }
+
+        const data = await response.json();
+        setJogadores(data.jogadores);
+      } catch (err) {
+        console.error('Erro ao carregar jogadores:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao carregar álbum');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data = await response.json();
-      setJogadores(data.jogadores);
-
-      // Extrair valores únicos para os filtros
-      const timesUnicos = Array.from(new Set(data.jogadores.map((j: Jogador) => j.time.nome))) as string[];
-      const nacionalidadesUnicas = Array.from(new Set(data.jogadores.map((j: Jogador) => j.nacionalidade))) as string[];
-      const posicoesUnicas = Array.from(new Set(data.jogadores.map((j: Jogador) => j.posicao))) as string[];
-
-      setTimes(timesUnicos);
-      setNacionalidades(nacionalidadesUnicas);
-      setPosicoes(posicoesUnicas);
-    } catch (error) {
-      console.error('Erro ao carregar álbum:', error);
-    } finally {
-      setLoading(false);
+    if (session?.user?.email) {
+      carregarJogadores();
     }
-  };
-
-  const handleFiltroChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFiltros(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  }, [session]);
 
   const jogadoresFiltrados = jogadores.filter(jogador => {
     if (filtros.time && jogador.time.nome !== filtros.time) return false;
@@ -100,133 +71,51 @@ export default function MeuAlbum() {
   });
 
   if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </main>
-        <Footer />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Erro!</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow bg-gray-100 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Meu Álbum</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
+      
+      <FiltrosAlbum
+        jogadores={jogadores}
+        filtros={filtros}
+        setFiltros={setFiltros}
+      />
 
-          {/* Filtros */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                  Time
-                </label>
-                <select
-                  id="time"
-                  name="time"
-                  value={filtros.time}
-                  onChange={handleFiltroChange}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="">Todos os times</option>
-                  {times.map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </select>
-              </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {jogadoresFiltrados.map((jogador) => (
+          <CardJogador
+            key={jogador.id}
+            jogador={jogador}
+            quantidade={jogador.quantidade}
+          />
+        ))}
+      </div>
 
-              <div>
-                <label htmlFor="nacionalidade" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nacionalidade
-                </label>
-                <select
-                  id="nacionalidade"
-                  name="nacionalidade"
-                  value={filtros.nacionalidade}
-                  onChange={handleFiltroChange}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="">Todas as nacionalidades</option>
-                  {nacionalidades.map(nacionalidade => (
-                    <option key={nacionalidade} value={nacionalidade}>{nacionalidade}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="posicao" className="block text-sm font-medium text-gray-700 mb-1">
-                  Posição
-                </label>
-                <select
-                  id="posicao"
-                  name="posicao"
-                  value={filtros.posicao}
-                  onChange={handleFiltroChange}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="">Todas as posições</option>
-                  {posicoes.map(posicao => (
-                    <option key={posicao} value={posicao}>{posicao}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Lista de jogadores */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {jogadoresFiltrados.map((jogador) => (
-              <div
-                key={jogador.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-              >
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className="relative w-12 h-12 mr-3">
-                        {jogador.time.escudo ? (
-                          <Image
-                            src={jogador.time.escudo}
-                            alt={jogador.time.nome}
-                            fill
-                            className="object-contain"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-gray-400">{jogador.time.nome[0]}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold">{jogador.nome}</h3>
-                        <p className="text-sm text-gray-500">{jogador.time.nome}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-sm text-gray-500">x{jogador.quantidade}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <p>Posição: {jogador.posicao}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {jogadoresFiltrados.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados</p>
-            </div>
-          )}
+      {jogadoresFiltrados.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados.</p>
         </div>
-      </main>
-      <Footer />
+      )}
     </div>
   );
 } 

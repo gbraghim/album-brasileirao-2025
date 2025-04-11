@@ -10,11 +10,12 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (searchParams?.get('registered') === 'true') {
-      setSuccess('Conta criada com sucesso! Faça login para continuar.');
+    const registered = searchParams.get('registered');
+    if (registered === 'true') {
+      setSuccess(true);
     }
   }, [searchParams]);
 
@@ -22,30 +23,40 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setSuccess(false);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const email = formData.get('email')?.toString() || '';
+    const password = formData.get('password')?.toString() || '';
 
     try {
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
-        callbackUrl: '/dashboard'
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      if (result?.url) {
-        router.push(result.url);
-      } else {
-        router.push('/dashboard');
+      // Se o login foi bem sucedido, tenta criar os pacotes iniciais
+      try {
+        const response = await fetch('/api/pacotes-iniciais', {
+          method: 'POST',
+        });
+
+        if (!response.ok) {
+          console.error('Erro ao criar pacotes iniciais:', await response.text());
+        }
+      } catch (error) {
+        console.error('Erro ao criar pacotes iniciais:', error);
       }
-      router.refresh();
+
+      // Redireciona para o dashboard
+      router.push('/dashboard');
     } catch (error) {
+      console.error('Erro no login:', error);
       setError(error instanceof Error ? error.message : 'Erro ao fazer login');
     } finally {
       setLoading(false);
@@ -57,16 +68,29 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Entre na sua conta
+            Entrar na sua conta
           </h2>
           <p className="mt-2 text-center text-sm text-gray-300">
             Ou{' '}
             <Link href="/register" className="font-medium text-purple-300 hover:text-purple-200">
-              crie uma conta se ainda não tiver
+              crie uma conta se ainda não tiver uma
             </Link>
           </p>
         </div>
+
+        {success && (
+          <div className="bg-green-500/10 border border-green-500 text-green-500 px-4 py-3 rounded">
+            <p className="font-medium">Conta criada com sucesso!</p>
+            <p className="text-sm mt-1">Faça login para começar a colecionar.</p>
+          </div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">
@@ -98,19 +122,11 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-400 text-sm text-center">{error}</div>
-          )}
-
-          {success && (
-            <div className="text-green-400 text-sm text-center">{success}</div>
-          )}
-
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>

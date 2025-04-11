@@ -63,9 +63,15 @@ export default function Pacotes() {
 
   const carregarPacotes = async () => {
     try {
+      if (!session?.user?.email) {
+        setError('Usuário não autenticado');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/pacotes', {
         headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
+          'Authorization': `Bearer ${session.user.email}`,
         },
       });
 
@@ -74,14 +80,18 @@ export default function Pacotes() {
           router.push('/login');
           return;
         }
-        throw new Error('Erro ao carregar pacotes');
+        
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || 'Erro ao carregar pacotes';
+        setError(errorMessage);
+        return;
       }
 
       const data = await response.json();
       setPacotes(data.filter((pacote: any) => !pacote.aberto));
     } catch (err) {
-      setError('Erro ao carregar pacotes');
-      console.error(err);
+      console.error('Erro ao carregar pacotes:', err);
+      setError('Ocorreu um erro ao carregar os pacotes. Tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -99,29 +109,31 @@ export default function Pacotes() {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao abrir pacote');
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
+        
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || 'Erro ao abrir pacote';
+        setError(errorMessage);
+        return;
       }
 
       const data = await response.json();
-      // Marca as figurinhas como novas ou repetidas
-      const figurinhasProcessadas = data.figurinhas.map((fig: any) => ({
-        ...fig,
-        nova: !userFigurinhas.has(fig.jogador.id)
-      }));
-      console.log('Figurinhas processadas:', figurinhasProcessadas);
-      setFigurinhasAbertas(figurinhasProcessadas);
+      setFigurinhasAbertas(data.figurinhas);
       setModalAberto(true);
-      carregarPacotes(); // Recarrega os pacotes após abrir
-      carregarFigurinhasUsuario(); // Atualiza a lista de figurinhas do usuário
+      carregarPacotes();
+      carregarFigurinhasUsuario();
     } catch (err) {
-      setError('Erro ao abrir pacote');
-      console.error(err);
+      console.error('Erro ao abrir pacote:', err);
+      setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -129,57 +141,59 @@ export default function Pacotes() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">{error}</div>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button
+          onClick={() => {
+            setError(null);
+            carregarPacotes();
+          }}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-brasil-blue">Meus Pacotes</h1>
-          <span className="text-lg text-brasil-blue bg-brasil-yellow/20 px-4 py-2 rounded-lg">
-            {pacotes.length} {pacotes.length === 1 ? 'pacote disponível' : 'pacotes disponíveis'}
-          </span>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Meus Pacotes</h1>
+      
+      {pacotes.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">Você não tem pacotes disponíveis.</p>
         </div>
-        
-        {pacotes.length === 0 ? (
-          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg">
-            <p className="text-brasil-blue">Adquira mais pacotes e complete seu álbum!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pacotes.map((pacote) => (
-              <div
-                key={pacote.id}
-                className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                onClick={() => handleAbrirPacote(pacote.id)}
-              >
-                <div className="relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                  <Image
-                    src="/pacote-figurinhas.png"
-                    alt="Pacote de Figurinhas"
-                    fill
-                    className="object-contain p-4"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brasil-blue/80 backdrop-blur-sm">
-                    <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
-                      Abrir Pacote
-                    </button>
-                  </div>
-                </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pacotes.map((pacote) => (
+            <div
+              key={pacote.id}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Pacote {pacote.tipo}</h2>
+                <span className="text-sm text-gray-500">
+                  {new Date(pacote.dataCriacao).toLocaleDateString()}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              
+              <button
+                onClick={() => handleAbrirPacote(pacote.id)}
+                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                Abrir Pacote
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <ModalFigurinhas
         isOpen={modalAberto}
         onClose={() => setModalAberto(false)}
         figurinhas={figurinhasAbertas}
+        userFigurinhas={userFigurinhas}
       />
     </div>
   );

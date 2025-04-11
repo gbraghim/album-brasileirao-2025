@@ -14,7 +14,7 @@ export async function GET() {
       );
     }
 
-    // Busca todas as figurinhas do usuário
+    // Busca todas as figurinhas do usuário com os detalhes dos jogadores
     const figurinhas = await prisma.figurinha.findMany({
       where: {
         pacote: {
@@ -22,34 +22,31 @@ export async function GET() {
             email: session.user.email
           }
         }
+      },
+      include: {
+        jogador: true
       }
     });
 
-    // Conta quantas vezes cada jogador aparece
-    const contagemJogadores = figurinhas.reduce((acc, figurinha) => {
+    // Agrupa as figurinhas por jogador e conta as repetições
+    const figurinhasAgrupadas = figurinhas.reduce((acc, figurinha) => {
       const jogadorId = figurinha.jogadorId;
-      acc[jogadorId] = (acc[jogadorId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Filtra apenas os jogadores que aparecem mais de uma vez
-    const jogadoresRepetidos = Object.entries(contagemJogadores)
-      .filter(([_, count]) => count > 1)
-      .map(([jogadorId]) => jogadorId);
-
-    // Busca as figurinhas dos jogadores repetidos
-    const figurinhasRepetidas = await prisma.figurinha.findMany({
-      where: {
-        jogadorId: {
-          in: jogadoresRepetidos
-        },
-        pacote: {
-          user: {
-            email: session.user.email
-          }
-        }
+      if (!acc[jogadorId]) {
+        acc[jogadorId] = {
+          jogadorId,
+          nome: figurinha.jogador.nome,
+          posicao: figurinha.jogador.posicao,
+          quantidade: 0
+        };
       }
-    });
+      acc[jogadorId].quantidade++;
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Filtra apenas as figurinhas que aparecem mais de uma vez
+    const figurinhasRepetidas = Object.values(figurinhasAgrupadas)
+      .filter(fig => fig.quantidade > 1)
+      .sort((a, b) => b.quantidade - a.quantidade);
 
     return NextResponse.json(figurinhasRepetidas);
   } catch (error) {

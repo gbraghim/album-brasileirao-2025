@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface Jogador {
+  id: string;
   nome: string;
   time: {
     nome: string;
@@ -21,9 +22,10 @@ interface ModalFigurinhasProps {
   isOpen: boolean;
   onClose: () => void;
   figurinhas: Figurinha[];
+  userFigurinhas: Set<string>;
 }
 
-export default function ModalFigurinhas({ isOpen, onClose, figurinhas }: ModalFigurinhasProps) {
+export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigurinhas }: ModalFigurinhasProps) {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -72,13 +74,13 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas }: ModalFi
                           key={figurinha.id}
                           className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-brasil-yellow/20 relative transform transition-all duration-300 hover:scale-[1.02]"
                         >
-                          {figurinha.nova ? (
-                            <span className="absolute top-2 right-2 bg-brasil-green text-white px-3 py-1 rounded-full text-sm font-medium">
-                              Nova
-                            </span>
-                          ) : (
+                          {userFigurinhas.has(figurinha.jogador.id) ? (
                             <span className="absolute top-2 right-2 bg-brasil-yellow text-brasil-blue px-3 py-1 rounded-full text-sm font-medium">
                               Repetida
+                            </span>
+                          ) : (
+                            <span className="absolute top-2 right-2 bg-brasil-green text-white px-3 py-1 rounded-full text-sm font-medium">
+                              Nova
                             </span>
                           )}
                           <div className="flex flex-col">

@@ -12,7 +12,13 @@
     "populate:times": "node scripts/populate-times.js",
     "populate:flamengo": "node scripts/populate-flamengo.js",
     "populate:sao-paulo": "node scripts/populate-sao-paulo.js",
-    "populate:gremio": "node scripts/populate-gremio.js"
+    "populate:gremio": "node scripts/populate-gremio.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.1",

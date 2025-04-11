@@ -4,126 +4,195 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Modal from '@/components/Modal';
 
 interface Figurinha {
   id: string;
   numero: number;
   repetida: boolean;
   pacoteId: string;
+  nome: string;
+  posicao: string;
 }
 
 interface Troca {
   id: string;
-  figurinhaId: string;
-  status: 'PENDENTE' | 'ACEITA' | 'RECUSADA';
-  createdAt: string;
   figurinha: Figurinha;
+  status: 'disponivel' | 'pendente' | 'concluida';
+  usuarioId: string;
 }
 
 export default function Trocas() {
   const { data: session } = useSession();
-  const [trocas, setTrocas] = useState<Troca[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [minhasTrocas, setMinhasTrocas] = useState<Troca[]>([]);
+  const [trocasDisponiveis, setTrocasDisponiveis] = useState<Troca[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [figurinhasRepetidas, setFigurinhasRepetidas] = useState<Figurinha[]>([]);
 
   useEffect(() => {
-    const fetchTrocas = async () => {
-      try {
-        const response = await fetch('/api/trocas');
-        if (!response.ok) {
-          throw new Error('Erro ao buscar trocas');
-        }
-        const data = await response.json();
-        setTrocas(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro ao buscar trocas');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (session) {
-      fetchTrocas();
+      carregarTrocas();
     }
   }, [session]);
 
+  const carregarTrocas = async () => {
+    try {
+      // Simulação de dados - substituir por chamadas à API
+      const minhasTrocasMock: Troca[] = [
+        {
+          id: '1',
+          figurinha: {
+            id: '1',
+            numero: 10,
+            repetida: true,
+            pacoteId: '123',
+            nome: 'Neymar',
+            posicao: 'Atacante'
+          },
+          status: 'disponivel',
+          usuarioId: session?.user?.id || ''
+        }
+      ];
+
+      const trocasDisponiveisMock: Troca[] = [
+        {
+          id: '2',
+          figurinha: {
+            id: '2',
+            numero: 9,
+            repetida: true,
+            pacoteId: '456',
+            nome: 'Gabigol',
+            posicao: 'Atacante'
+          },
+          status: 'disponivel',
+          usuarioId: 'outro-usuario'
+        }
+      ];
+
+      setMinhasTrocas(minhasTrocasMock);
+      setTrocasDisponiveis(trocasDisponiveisMock);
+    } catch (error) {
+      console.error('Erro ao carregar trocas:', error);
+    }
+  };
+
+  const adicionarTroca = async (figurinha: Figurinha) => {
+    try {
+      // Simulação de adição de troca - substituir por chamada à API
+      const novaTroca: Troca = {
+        id: Date.now().toString(),
+        figurinha,
+        status: 'disponivel',
+        usuarioId: session?.user?.id || ''
+      };
+
+      setMinhasTrocas([...minhasTrocas, novaTroca]);
+      setShowModal(false);
+    } catch (error) {
+      console.error('Erro ao adicionar troca:', error);
+    }
+  };
+
+  const selecionarFigurinha = (figurinha: Figurinha) => {
+    adicionarTroca(figurinha);
+  };
+
   if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-4xl font-bold mb-4">Área Restrita</h1>
-          <p className="text-xl mb-6">Faça login para ver suas trocas</p>
-          <Link
-            href="/login"
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
-          >
-            Fazer Login
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800 flex items-center justify-center">
-        <div className="text-white text-xl">Carregando...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800 flex items-center justify-center">
-        <div className="text-white text-xl">{error}</div>
+      <div className="min-h-screen bg-purple-900 text-white p-8">
+        <h1 className="text-3xl font-bold mb-8">Área de Trocas</h1>
+        <p>Por favor, faça login para acessar a área de trocas.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800 p-8">
-      <div className="container mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-8">Minhas Trocas</h1>
-        
-        {trocas.length === 0 ? (
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center text-white">
-            <p className="text-xl">Você ainda não tem trocas.</p>
-            <Link
-              href="/repetidas"
-              className="inline-block mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
-            >
-              Ver Minhas Repetidas
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trocas.map((troca) => (
+    <div className="min-h-screen bg-purple-900 text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Área de Trocas</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Seção "Quero trocar" */}
+        <div className="bg-purple-800 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold mb-4">Quero trocar</h2>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mb-4"
+          >
+            Adicionar figurinha para troca
+          </button>
+          <div className="grid grid-cols-2 gap-4">
+            {minhasTrocas.map((troca) => (
               <div
                 key={troca.id}
-                className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-white"
+                className="bg-purple-700 p-4 rounded-lg"
               >
-                <div className="relative h-48 mb-4">
-                  <Image
-                    src={`/players/${troca.figurinha.numero}.jpg`}
-                    alt={`Figurinha ${troca.figurinha.numero}`}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-center font-bold">#{troca.figurinha.numero}</p>
-                  <p className="text-center">
-                    Status: {troca.status}
-                  </p>
-                  <p className="text-center text-sm text-gray-300">
-                    {new Date(troca.createdAt).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
+                <img
+                  src={`/players/${troca.figurinha.numero}.jpg`}
+                  alt={troca.figurinha.nome}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                />
+                <h3 className="font-bold">{troca.figurinha.nome}</h3>
+                <p className="text-sm">{troca.figurinha.posicao}</p>
               </div>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Seção "Disponível para obter" */}
+        <div className="bg-purple-800 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold mb-4">Disponível para obter</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {trocasDisponiveis.map((troca) => (
+              <div
+                key={troca.id}
+                className="bg-purple-700 p-4 rounded-lg"
+              >
+                <img
+                  src={`/players/${troca.figurinha.numero}.jpg`}
+                  alt={troca.figurinha.nome}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                />
+                <h3 className="font-bold">{troca.figurinha.nome}</h3>
+                <p className="text-sm">{troca.figurinha.posicao}</p>
+                <button className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">
+                  Propor troca
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* Modal para selecionar figurinha */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Selecione uma figurinha para troca</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {figurinhasRepetidas.map((figurinha) => (
+              <div
+                key={figurinha.id}
+                className="bg-purple-700 p-4 rounded-lg cursor-pointer hover:bg-purple-600"
+                onClick={() => selecionarFigurinha(figurinha)}
+              >
+                <img
+                  src={`/players/${figurinha.numero}.jpg`}
+                  alt={figurinha.nome}
+                  className="w-full h-24 object-cover rounded-lg mb-2"
+                />
+                <h3 className="font-bold text-sm">{figurinha.nome}</h3>
+                <p className="text-xs">{figurinha.posicao}</p>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => setShowModal(false)}
+            className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+          >
+            Cancelar
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 } 

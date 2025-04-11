@@ -1,7 +1,24 @@
 import { prisma } from './prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './auth';
-import { Jogador } from '@prisma/client';
+import { Jogador, Prisma } from '@prisma/client';
+
+interface PacoteRaw {
+  id: string;
+  userId: string;
+  tipo: string;
+  aberto: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface FigurinhaRaw {
+  id: string;
+  pacoteId: string;
+  jogadorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const TIMES_SERIE_A = [
   'america-mg', 'athletico-pr', 'atletico-mg', 'bahia', 'botafogo',
@@ -17,26 +34,84 @@ const FIGURINHAS_POR_PACOTE = 4; // Cada pacote contém exatamente 4 figurinhas
 export async function verificarPacotesIniciais(userId: string) {
   try {
     // Verifica se o usuário já recebeu os pacotes iniciais
-    const pacotesIniciais = await prisma.pacote.findMany({
-      where: {
-        userId,
-        tipo: 'CADASTRO'
-      }
-    });
+    const pacotesIniciais = await prisma.$queryRaw<PacoteRaw[]>`
+      SELECT * FROM "Pacote"
+      WHERE "userId" = ${userId}
+      AND "tipo" = 'CADASTRO'
+    `;
 
     // Se não houver pacotes iniciais, cria 10 pacotes
     if (pacotesIniciais.length === 0) {
-      for (let i = 0; i < 10; i++) {
-        const pacote = await prisma.pacote.create({
-          data: {
-            userId,
-            tipo: 'CADASTRO',
-            aberto: false
-          }
-        });
-        
-        await gerarFigurinhasParaPacote(pacote.id, userId);
+      console.log(`Criando 10 pacotes iniciais para o usuário ${userId}`);
+      
+      // Buscar todos os IDs dos jogadores
+      const jogadoresIds = await prisma.jogador.findMany({
+        select: { id: true }
+      });
+
+      if (jogadoresIds.length === 0) {
+        throw new Error('Nenhum jogador encontrado no banco de dados');
       }
+
+      // Criar 10 pacotes
+      for (let i = 0; i < 10; i++) {
+        // Criar o pacote
+        const [pacote] = await prisma.$queryRaw<PacoteRaw[]>`
+          INSERT INTO "Pacote" ("id", "userId", "tipo", "aberto", "createdAt", "updatedAt")
+          VALUES (
+            ${Prisma.sql`gen_random_uuid()`},
+            ${userId},
+            'CADASTRO',
+            false,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+          RETURNING *
+        `;
+
+        // Selecionar 4 jogadores aleatórios para o pacote
+        const jogadoresSelecionados = [];
+        for (let j = 0; j < FIGURINHAS_POR_PACOTE; j++) {
+          const randomIndex = Math.floor(Math.random() * jogadoresIds.length);
+          const jogadorId = jogadoresIds[randomIndex].id;
+          jogadoresSelecionados.push(jogadorId);
+        }
+
+        // Criar as figurinhas no pacote e a relação com o usuário
+        for (const jogadorId of jogadoresSelecionados) {
+          // Criar a figurinha
+          const [figurinha] = await prisma.$queryRaw<FigurinhaRaw[]>`
+            INSERT INTO "Figurinha" ("id", "pacoteId", "jogadorId", "createdAt", "updatedAt")
+            VALUES (
+              ${Prisma.sql`gen_random_uuid()`},
+              ${pacote.id},
+              ${jogadorId},
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            RETURNING *
+          `;
+
+          // Criar ou atualizar a relação com o usuário
+          await prisma.$executeRaw`
+            INSERT INTO "UserFigurinha" ("id", "userId", "figurinhaId", "quantidade", "createdAt", "updatedAt")
+            VALUES (
+              ${Prisma.sql`gen_random_uuid()`},
+              ${userId},
+              ${figurinha.id},
+              1,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            ON CONFLICT ("userId", "figurinhaId")
+            DO UPDATE SET
+              "quantidade" = "UserFigurinha"."quantidade" + 1,
+              "updatedAt" = CURRENT_TIMESTAMP
+          `;
+        }
+      }
+
+      console.log(`Pacotes iniciais criados com sucesso para o usuário ${userId}`);
     }
   } catch (error) {
     console.error('Erro ao verificar pacotes iniciais:', error);
@@ -51,26 +126,28 @@ export async function verificarPacotesDiarios(userId: string) {
     hoje.setHours(0, 0, 0, 0);
 
     // Verifica se o usuário já recebeu os pacotes diários hoje
-    const pacotesDiarios = await prisma.pacote.findMany({
-      where: {
-        userId,
-        tipo: 'DIARIO',
-        createdAt: {
-          gte: hoje
-        }
-      }
-    });
+    const pacotesDiarios = await prisma.$queryRaw<PacoteRaw[]>`
+      SELECT * FROM "Pacote"
+      WHERE "userId" = ${userId}
+      AND "tipo" = 'DIARIO'
+      AND "createdAt" >= ${hoje}
+    `;
 
     // Se não houver pacotes diários hoje, cria 3 pacotes
     if (pacotesDiarios.length === 0) {
       for (let i = 0; i < 3; i++) {
-        const pacote = await prisma.pacote.create({
-          data: {
-            userId,
-            tipo: 'DIARIO',
-            aberto: false
-          }
-        });
+        const [pacote] = await prisma.$queryRaw<PacoteRaw[]>`
+          INSERT INTO "Pacote" ("id", "userId", "tipo", "aberto", "createdAt", "updatedAt")
+          VALUES (
+            ${Prisma.sql`gen_random_uuid()`},
+            ${userId},
+            'DIARIO',
+            false,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+          RETURNING *
+        `;
         
         await gerarFigurinhasParaPacote(pacote.id, userId);
       }
@@ -82,67 +159,59 @@ export async function verificarPacotesDiarios(userId: string) {
 }
 
 async function gerarFigurinhasParaPacote(pacoteId: string, userId: string) {
-  const jogadores: Jogador[] = [];
-  
-  // Selecionar 4 jogadores aleatórios (podendo repetir)
-  for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
-    // Pegar um offset aleatório
-    const offset = Math.floor(Math.random() * (await prisma.jogador.count()));
-    
-    // Buscar um jogador aleatório
-    const jogador = await prisma.jogador.findFirst({
-      skip: offset,
-      take: 1
+  try {
+    // Buscar todos os IDs dos jogadores
+    const jogadoresIds = await prisma.jogador.findMany({
+      select: { id: true }
     });
-    
-    if (jogador) {
-      jogadores.push(jogador);
-    }
-  }
-  
-  // Criar as figurinhas no pacote
-  for (const jogador of jogadores) {
-    try {
-      // Primeiro criar a figurinha no pacote
-      const figurinha = await prisma.figurinha.create({
-        data: {
-          pacoteId,
-          jogadorId: jogador.id
-        }
-      });
 
-      // Verificar se o usuário já tem a figurinha
-      const existingUserFigurinha = await prisma.userFigurinha.findFirst({
-        where: {
-          userId,
-          figurinhaId: figurinha.id
-        }
-      });
-
-      if (existingUserFigurinha) {
-        // Se já tem, incrementa a quantidade
-        await prisma.userFigurinha.update({
-          where: {
-            id: existingUserFigurinha.id
-          },
-          data: {
-            quantidade: existingUserFigurinha.quantidade + 1
-          }
-        });
-      } else {
-        // Se não tem, cria uma nova
-        await prisma.userFigurinha.create({
-          data: {
-            userId,
-            figurinhaId: figurinha.id,
-            quantidade: 1
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Erro ao processar figurinha para usuário:', error);
-      throw error;
+    if (jogadoresIds.length === 0) {
+      throw new Error('Nenhum jogador encontrado no banco de dados');
     }
+
+    // Selecionar 4 jogadores aleatórios
+    const jogadoresSelecionados = [];
+    for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
+      const randomIndex = Math.floor(Math.random() * jogadoresIds.length);
+      const jogadorId = jogadoresIds[randomIndex].id;
+      jogadoresSelecionados.push(jogadorId);
+    }
+
+    // Criar as figurinhas no pacote e a relação com o usuário
+    for (const jogadorId of jogadoresSelecionados) {
+      // Criar a figurinha
+      const [figurinha] = await prisma.$queryRaw<FigurinhaRaw[]>`
+        INSERT INTO "Figurinha" ("id", "pacoteId", "jogadorId", "createdAt", "updatedAt")
+        VALUES (
+          ${Prisma.sql`gen_random_uuid()`},
+          ${pacoteId},
+          ${jogadorId},
+          CURRENT_TIMESTAMP,
+          CURRENT_TIMESTAMP
+        )
+        RETURNING *
+      `;
+
+      // Criar ou atualizar a relação com o usuário
+      await prisma.$executeRaw`
+        INSERT INTO "UserFigurinha" ("id", "userId", "figurinhaId", "quantidade", "createdAt", "updatedAt")
+        VALUES (
+          ${Prisma.sql`gen_random_uuid()`},
+          ${userId},
+          ${figurinha.id},
+          1,
+          CURRENT_TIMESTAMP,
+          CURRENT_TIMESTAMP
+        )
+        ON CONFLICT ("userId", "figurinhaId")
+        DO UPDATE SET
+          "quantidade" = "UserFigurinha"."quantidade" + 1,
+          "updatedAt" = CURRENT_TIMESTAMP
+      `;
+    }
+  } catch (error) {
+    console.error('Erro ao gerar figurinhas para pacote:', error);
+    throw error;
   }
 }
 
@@ -232,16 +301,22 @@ export async function criarPacotesParaUsuario(email: string, quantidade: number)
   if (!user) return null;
 
   // Criar os pacotes
-  const pacotes = await Promise.all(
-    Array(quantidade).fill(null).map(() => 
-      prisma.pacote.create({
-        data: {
-          userId: user.id,
-          tipo: 'INICIAL'
-        }
-      })
-    )
-  );
+  const pacotes: PacoteRaw[] = [];
+  for (let i = 0; i < quantidade; i++) {
+    const [pacote] = await prisma.$queryRaw<PacoteRaw[]>`
+      INSERT INTO "Pacote" ("id", "userId", "tipo", "aberto", "createdAt", "updatedAt")
+      VALUES (
+        ${Prisma.sql`gen_random_uuid()`},
+        ${user.id},
+        'CADASTRO',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+      )
+      RETURNING *
+    `;
+    pacotes.push(pacote);
+  }
 
   // Gera as figurinhas para cada pacote
   for (const pacote of pacotes) {
