@@ -10,7 +10,6 @@ export default function Header() {
   
   return (
     <div className="bg-brasil-green text-white shadow-lg relative z-10">
-      <div className="absolute inset-0 bg-[url('/ball.svg')] bg-repeat-x opacity-10" />
       <div className="container mx-auto px-4 relative">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-6">
@@ -21,14 +20,6 @@ export default function Header() {
               }`}
             >
               Home
-            </Link>
-            <Link 
-              href="/times" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname.startsWith('/times') ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Times
             </Link>
             <Link 
               href="/pacotes" 

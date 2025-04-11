@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import EscudosCarousel from '@/components/EscudosCarousel';
+import Image from 'next/image';
 
 export default function Home() {
   const router = useRouter();
@@ -45,22 +45,22 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-16">
+          <div className="mb-8 flex justify-center">
+            <Image
+              src="/logo.png"
+              alt="eBrasileirão Logo"
+              width={300}
+              height={300}
+              priority
+              className="w-auto h-auto"
+            />
+          </div>
           <h1 className="text-6xl font-bold text-brasil-blue mb-6">
-            Álbum Digital Brasileirão 2025
+            eBrasileirão 2025
           </h1>
           <p className="text-2xl text-brasil-blue/80 max-w-3xl mx-auto">
             Complete seu álbum com as estrelas do futebol brasileiro. Colecione, troque e compartilhe figurinhas dos seus jogadores favoritos!
           </p>
-        </div>
-
-        {/* Times Carousel */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-brasil-blue text-center mb-8">
-            Times da Série A 2025
-          </h2>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-8 shadow-lg border border-brasil-yellow/20">
-            <EscudosCarousel />
-          </div>
         </div>
 
         {/* Login Form */}
@@ -110,18 +110,18 @@ export default function Home() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20">
-            <div className="text-4xl mb-4">⚽</div>
+          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
+            <div className="text-4xl mb-4 flex justify-center">⚽</div>
             <h3 className="text-xl font-bold mb-2">20 Times da Série A</h3>
             <p>Todos os clubes do Brasileirão 2025 com seus elencos completos e atualizados.</p>
           </div>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20">
-            <div className="text-4xl mb-4">🌟</div>
+          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
+            <div className="text-4xl mb-4 flex justify-center">🌟</div>
             <h3 className="text-xl font-bold mb-2">Figurinhas Especiais</h3>
             <p>Encontre figurinhas raras dos craques e momentos históricos do campeonato.</p>
           </div>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20">
-            <div className="text-4xl mb-4">🔄</div>
+          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
+            <div className="text-4xl mb-4 flex justify-center">🔄</div>
             <h3 className="text-xl font-bold mb-2">Sistema de Trocas</h3>
             <p>Troque suas figurinhas repetidas com outros colecionadores de todo o Brasil.</p>
           </div>
@@ -129,41 +129,48 @@ export default function Home() {
 
         {/* Engagement Section */}
         <div className="bg-white/80 backdrop-blur-lg rounded-xl p-8 text-brasil-blue shadow-lg border border-brasil-yellow/20 mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-center">Junte-se à Comunidade</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">Ranking de Colecionadores</h3>
-              <p>Compita com outros colecionadores e suba no ranking semanal.</p>
-              <ul className="mt-4 space-y-2">
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">🏆</span>
-                  Prêmios semanais
+          <h2 className="text-3xl font-bold mb-8 text-center text-brasil-blue">Junte-se à Comunidade</h2>
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Coluna da Esquerda */}
+            <div className="flex flex-col items-start">
+              <h3 className="text-xl font-bold mb-3 text-brasil-blue">Ranking de Colecionadores</h3>
+              <p className="text-brasil-blue/80 mb-6">
+                Compita com outros colecionadores e suba no ranking semanal.
+              </p>
+              <ul className="space-y-4 w-full">
+                <li className="flex items-center gap-3 text-brasil-blue/90">
+                  <span className="text-2xl">🏆</span>
+                  <span>Prêmios semanais</span>
                 </li>
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">📊</span>
-                  Estatísticas detalhadas
+                <li className="flex items-center gap-3 text-brasil-blue/90">
+                  <span className="text-2xl">📊</span>
+                  <span>Estatísticas detalhadas</span>
                 </li>
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">👥</span>
-                  Comunidade ativa
+                <li className="flex items-center gap-3 text-brasil-blue/90">
+                  <span className="text-2xl">👥</span>
+                  <span>Comunidade ativa</span>
                 </li>
               </ul>
             </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4">Eventos Especiais</h3>
-              <p>Participe de eventos exclusivos e ganhe figurinhas raras.</p>
-              <ul className="mt-4 space-y-2">
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">🎮</span>
-                  Desafios diários
+
+            {/* Coluna da Direita */}
+            <div className="flex flex-col items-end">
+              <h3 className="text-xl font-bold mb-3 text-brasil-blue">Eventos Especiais</h3>
+              <p className="text-brasil-blue/80 mb-6 text-right">
+                Participe de eventos exclusivos e ganhe figurinhas raras.
+              </p>
+              <ul className="space-y-4 w-full">
+                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
+                  <span>Desafios diários</span>
+                  <span className="text-2xl">🎮</span>
                 </li>
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">🎁</span>
-                  Recompensas exclusivas
+                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
+                  <span>Recompensas exclusivas</span>
+                  <span className="text-2xl">🎁</span>
                 </li>
-                <li className="flex items-center">
-                  <span className="text-brasil-green mr-2">🏅</span>
-                  Conquistas especiais
+                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
+                  <span>Conquistas especiais</span>
+                  <span className="text-2xl">🏅</span>
                 </li>
               </ul>
             </div>

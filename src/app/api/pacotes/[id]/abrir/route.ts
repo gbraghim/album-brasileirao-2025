@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { Pacote, UserFigurinha } from '@prisma/client';
 
-export async function POST(request: NextRequest) {
+const prisma = new PrismaClient();
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const pathname = request.nextUrl.pathname;
-    const id = pathname.split('/').pop() || '';
-    
     const session = await getServerSession(authOptions);
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    const pacoteId = params.id;
+    
     // Buscar o usuário pelo email
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
@@ -23,9 +27,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
+    // Busca o pacote e suas figurinhas
     const pacote = await prisma.pacote.findUnique({
-      where: {
-        id: id,
+      where: { 
+        id: pacoteId,
         userId: user.id
       },
       include: {
@@ -45,7 +50,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Pacote não encontrado' }, { status: 404 });
     }
 
-    // Atualizar quantidades das figurinhas do usuário
+    if (pacote.aberto) {
+      return NextResponse.json({ error: 'Pacote já foi aberto' }, { status: 400 });
+    }
+
+    // Marca o pacote como aberto
+    await prisma.pacote.update({
+      where: { id: pacoteId },
+      data: { aberto: true }
+    });
+
+    // Adiciona as figurinhas ao álbum do usuário
     for (const figurinha of pacote.figurinhas) {
       await prisma.userFigurinha.upsert({
         where: {
@@ -67,21 +82,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Marcar o pacote como aberto em vez de deletá-lo
-    await prisma.pacote.update({
-      where: {
-        id: pacote.id
-      },
-      data: {
-        aberto: true
-      }
-    });
-
     return NextResponse.json({ figurinhas: pacote.figurinhas });
   } catch (error) {
     console.error('Erro ao abrir pacote:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro ao processar a requisição' },
       { status: 500 }
     );
   }

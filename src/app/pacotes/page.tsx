@@ -168,11 +168,6 @@ export default function Pacotes() {
                     </button>
                   </div>
                 </div>
-                <div className="text-center mt-4">
-                  <p className="text-sm text-brasil-blue bg-brasil-yellow/20 px-3 py-1 rounded-full inline-block">
-                    {new Date(pacote.dataCriacao).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
               </div>
             ))}
           </div>
