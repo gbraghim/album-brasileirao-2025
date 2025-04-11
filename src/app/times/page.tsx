@@ -50,19 +50,19 @@ export default function TimesPage() {
   };
 
   return (
-    <main className="bg-gray-100 p-8 min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {loading ? (
-          <h1 className="text-3xl font-bold mb-8">Carregando times...</h1>
+          <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Carregando times...</h1>
         ) : (
           <>
-            <h1 className="text-3xl font-bold mb-8">Times do Brasileirão 2025</h1>
+            <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Times do Brasileirão 2025</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {times.map((time) => (
                 <div
                   key={time.id}
                   onClick={() => router.push(`/times/${formatarNomeParaUrl(time.nome)}`)}
-                  className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                  className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-brasil-yellow/20"
                 >
                   <div className="flex flex-col items-center">
                     <div className="w-24 h-24 relative mb-4">
@@ -74,8 +74,8 @@ export default function TimesPage() {
                         className="object-contain"
                       />
                     </div>
-                    <h2 className="text-xl font-bold text-center mb-2">{time.nome}</h2>
-                    <p className="text-gray-600">{time._count.jogadores} jogadores</p>
+                    <h2 className="text-xl font-bold text-center mb-2 text-brasil-blue">{time.nome}</h2>
+                    <p className="text-brasil-blue/80">{time._count.jogadores} jogadores</p>
                   </div>
                 </div>
               ))}
@@ -83,6 +83,6 @@ export default function TimesPage() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 } 

@@ -57,9 +57,9 @@ export default function TimePage({ params }: { params: { nome: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 p-8">
+      <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Carregando jogadores...</h1>
+          <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Carregando jogadores...</h1>
         </div>
       </div>
     );
@@ -67,16 +67,16 @@ export default function TimePage({ params }: { params: { nome: string } }) {
 
   if (!time) {
     return (
-      <div className="min-h-screen bg-gray-100 p-8">
+      <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Time não encontrado</h1>
+          <h1 className="text-3xl font-bold mb-8 text-brasil-blue">Time não encontrado</h1>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center mb-8">
           <div className="w-16 h-16 relative mr-4">
@@ -88,14 +88,14 @@ export default function TimePage({ params }: { params: { nome: string } }) {
               className="object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold">{time.nome}</h1>
+          <h1 className="text-3xl font-bold text-brasil-blue">{time.nome}</h1>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {time.jogadores.map((jogador) => (
             <div
               key={jogador.id}
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20 transform transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex flex-col items-center">
                 <div className="w-32 h-48 relative mb-4">
@@ -107,12 +107,12 @@ export default function TimePage({ params }: { params: { nome: string } }) {
                     className="object-cover rounded-lg"
                   />
                 </div>
-                <h2 className="text-xl font-bold text-center mb-2">{jogador.nome}</h2>
+                <h2 className="text-xl font-bold text-center mb-2 text-brasil-blue">{jogador.nome}</h2>
                 <div className="text-center space-y-1">
-                  <p className="text-gray-600">Número: {jogador.numero}</p>
-                  <p className="text-gray-600">Posição: {jogador.posicao}</p>
-                  <p className="text-gray-600">Idade: {jogador.idade} anos</p>
-                  <p className="text-gray-600">Nacionalidade: {jogador.nacionalidade}</p>
+                  <p className="text-brasil-blue/80">Número: {jogador.numero}</p>
+                  <p className="text-brasil-blue/80">Posição: {jogador.posicao}</p>
+                  <p className="text-brasil-blue/80">Idade: {jogador.idade} anos</p>
+                  <p className="text-brasil-blue/80">Nacionalidade: {jogador.nacionalidade}</p>
                 </div>
               </div>
             </div>
