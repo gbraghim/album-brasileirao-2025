@@ -4,9 +4,15 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Pacote, UserFigurinha } from '@prisma/client';
 
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -25,7 +31,7 @@ export async function POST(
 
     const pacote = await prisma.pacote.findUnique({
       where: {
-        id: context.params.id,
+        id: params.id,
         userId: user.id
       },
       include: {
