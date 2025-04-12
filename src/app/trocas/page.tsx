@@ -1,198 +1,126 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
-import Link from 'next/link';
-import Modal from '@/components/Modal';
+import { useRouter } from 'next/navigation';
+import { Jogador } from '@/types/jogador';
+import { CardJogador } from '@/components/card-jogador';
 
 interface Figurinha {
   id: string;
   numero: number;
-  repetida: boolean;
-  pacoteId: string;
-  nome: string;
-  posicao: string;
+  raridade: string;
+  jogador: Jogador;
+  quantidade: number;
 }
 
-interface Troca {
+interface TrocaFigurinha {
   id: string;
   figurinha: Figurinha;
-  status: 'disponivel' | 'pendente' | 'concluida';
-  usuarioId: string;
+  usuario: {
+    name: string;
+    email: string;
+  };
 }
 
 export default function Trocas() {
   const { data: session } = useSession();
-  const [minhasTrocas, setMinhasTrocas] = useState<Troca[]>([]);
-  const [trocasDisponiveis, setTrocasDisponiveis] = useState<Troca[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [figurinhasRepetidas, setFigurinhasRepetidas] = useState<Figurinha[]>([]);
+  const router = useRouter();
+  const [minhasTrocas, setMinhasTrocas] = useState<TrocaFigurinha[]>([]);
+  const [outrasTrocas, setOutrasTrocas] = useState<TrocaFigurinha[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (session) {
-      carregarTrocas();
+    if (!session) {
+      router.push('/login');
+      return;
     }
-  }, [session]);
 
-  const carregarTrocas = async () => {
+    fetchTrocas();
+  }, [session, router]);
+
+  const fetchTrocas = async () => {
     try {
-      // Simulação de dados - substituir por chamadas à API
-      const minhasTrocasMock: Troca[] = [
-        {
-          id: '1',
-          figurinha: {
-            id: '1',
-            numero: 10,
-            repetida: true,
-            pacoteId: '123',
-            nome: 'Neymar',
-            posicao: 'Atacante'
-          },
-          status: 'disponivel',
-          usuarioId: session?.user?.id || ''
-        }
-      ];
-
-      const trocasDisponiveisMock: Troca[] = [
-        {
-          id: '2',
-          figurinha: {
-            id: '2',
-            numero: 9,
-            repetida: true,
-            pacoteId: '456',
-            nome: 'Gabigol',
-            posicao: 'Atacante'
-          },
-          status: 'disponivel',
-          usuarioId: 'outro-usuario'
-        }
-      ];
-
-      setMinhasTrocas(minhasTrocasMock);
-      setTrocasDisponiveis(trocasDisponiveisMock);
+      const response = await fetch('/api/trocas');
+      if (!response.ok) {
+        throw new Error('Erro ao buscar trocas');
+      }
+      const data = await response.json();
+      setMinhasTrocas(data.minhasTrocas);
+      setOutrasTrocas(data.outrasTrocas);
+      setLoading(false);
     } catch (error) {
-      console.error('Erro ao carregar trocas:', error);
+      console.error('Erro:', error);
+      setError('Erro ao carregar trocas');
+      setLoading(false);
     }
   };
 
-  const adicionarTroca = async (figurinha: Figurinha) => {
-    try {
-      // Simulação de adição de troca - substituir por chamada à API
-      const novaTroca: Troca = {
-        id: Date.now().toString(),
-        figurinha,
-        status: 'disponivel',
-        usuarioId: session?.user?.id || ''
-      };
-
-      setMinhasTrocas([...minhasTrocas, novaTroca]);
-      setShowModal(false);
-    } catch (error) {
-      console.error('Erro ao adicionar troca:', error);
-    }
-  };
-
-  const selecionarFigurinha = (figurinha: Figurinha) => {
-    adicionarTroca(figurinha);
-  };
-
-  if (!session) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white p-8">
-        <h1 className="text-3xl font-bold mb-8">Área de Trocas</h1>
-        <p>Por favor, faça login para acessar a área de trocas.</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-red-600 text-xl">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white p-8">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Área de Trocas</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Seção "Quero trocar" */}
-        <div className="bg-purple-800 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold mb-4">Quero trocar</h2>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mb-4"
-          >
-            Adicionar figurinha para troca
-          </button>
-          <div className="grid grid-cols-2 gap-4">
-            {minhasTrocas.map((troca) => (
-              <div
-                key={troca.id}
-                className="bg-purple-700 p-4 rounded-lg"
-              >
-                <img
-                  src={`/players/${troca.figurinha.numero}.jpg`}
-                  alt={troca.figurinha.nome}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
-                />
-                <h3 className="font-bold">{troca.figurinha.nome}</h3>
-                <p className="text-sm">{troca.figurinha.posicao}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Minhas figurinhas para troca */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Minhas Figurinhas para Troca</h2>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            {minhasTrocas.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {minhasTrocas.map((troca) => (
+                  <div key={troca.id} className="relative">
+                    <CardJogador jogador={troca.figurinha.jogador} quantidade={1} />
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-gray-600 text-center">
+                Você ainda não tem figurinhas disponíveis para troca.
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Seção "Disponível para obter" */}
-        <div className="bg-purple-800 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold mb-4">Disponível para obter</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {trocasDisponiveis.map((troca) => (
-              <div
-                key={troca.id}
-                className="bg-purple-700 p-4 rounded-lg"
-              >
-                <img
-                  src={`/players/${troca.figurinha.numero}.jpg`}
-                  alt={troca.figurinha.nome}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
-                />
-                <h3 className="font-bold">{troca.figurinha.nome}</h3>
-                <p className="text-sm">{troca.figurinha.posicao}</p>
-                <button className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">
-                  Propor troca
-                </button>
+        {/* Figurinhas disponíveis para troca */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Figurinhas Disponíveis para Troca</h2>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            {outrasTrocas.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {outrasTrocas.map((troca) => (
+                  <div key={troca.id} className="relative">
+                    <CardJogador jogador={troca.figurinha.jogador} quantidade={1} />
+                    <div className="absolute bottom-2 right-2 bg-gray-100 px-3 py-1 rounded-md text-sm">
+                      Oferecido por: {troca.usuario.name}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-gray-600 text-center">
+                Não há figurinhas disponíveis para troca no momento.
+              </p>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Modal para selecionar figurinha */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Selecione uma figurinha para troca</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {figurinhasRepetidas.map((figurinha) => (
-              <div
-                key={figurinha.id}
-                className="bg-purple-700 p-4 rounded-lg cursor-pointer hover:bg-purple-600"
-                onClick={() => selecionarFigurinha(figurinha)}
-              >
-                <img
-                  src={`/players/${figurinha.numero}.jpg`}
-                  alt={figurinha.nome}
-                  className="w-full h-24 object-cover rounded-lg mb-2"
-                />
-                <h3 className="font-bold text-sm">{figurinha.nome}</h3>
-                <p className="text-xs">{figurinha.posicao}</p>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={() => setShowModal(false)}
-            className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-          >
-            Cancelar
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 } 

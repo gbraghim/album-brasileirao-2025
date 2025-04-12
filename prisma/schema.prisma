@@ -19,10 +19,11 @@ model User {
   figurinhas   UserFigurinha[] // Relação com as figurinhas do usuário
   trocasEnviadas     Troca[]       @relation("TrocasEnviadas")
   trocasRecebidas    Troca[]       @relation("TrocasRecebidas")
+  trocas        TrocaFigurinha[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  numeroDeLogins Int         @default(0)
-  primeiroAcesso Boolean    @default(true)
+  numeroDeLogins Int      @default(0)
+  primeiroAcesso Boolean  @default(true)
 }
 
 model Pacote {
@@ -44,8 +45,11 @@ model Figurinha {
   jogador    Jogador        @relation(fields: [jogadorId], references: [id])
   usuarios   UserFigurinha[] // Relação com os usuários que possuem esta figurinha
   trocas     Troca[]
+  trocasFigurinha TrocaFigurinha[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+
+  @@index([jogadorId])
 }
 
 // Tabela de junção para representar a quantidade de cada figurinha que um usuário possui
@@ -60,6 +64,8 @@ model UserFigurinha {
   updatedAt   DateTime  @updatedAt
 
   @@unique([userId, figurinhaId]) // Um usuário só pode ter uma entrada para cada figurinha
+  @@index([userId])
+  @@index([figurinhaId])
 }
 
 model Troca {
@@ -100,4 +106,19 @@ model Jogador {
   figurinhas   Figurinha[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+}
+
+model TrocaFigurinha {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  figurinhaId String
+  status      String   @default("DISPONIVEL") // DISPONIVEL, TROCADA
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuario     User     @relation(fields: [usuarioId], references: [id])
+  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
+
+  @@index([usuarioId])
+  @@index([figurinhaId])
 } 

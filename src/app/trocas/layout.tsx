@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Header from '@/components/Header';
+import { Header } from '@/components/header';
 
 export const metadata: Metadata = {
   title: 'Trocas - Álbum Brasileirão 2025',
@@ -12,11 +12,9 @@ export default function TrocasLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Header />
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
+      <main>{children}</main>
     </div>
   );
 } 
