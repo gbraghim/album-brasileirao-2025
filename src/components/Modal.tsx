@@ -4,9 +4,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  title?: string;
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -34,6 +35,11 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         onClick={onClose}
       />
       <div className="relative bg-purple-900 rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+        {title && (
+          <div className="p-4 border-b border-purple-800">
+            <h2 className="text-xl font-bold text-white">{title}</h2>
+          </div>
+        )}
         {children}
       </div>
     </div>

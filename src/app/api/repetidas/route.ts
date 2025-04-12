@@ -2,27 +2,29 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Jogador } from '@/types/jogador';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Buscar as figurinhas do usuário
-    const userFigurinhas = await prisma.userFigurinha.findMany({
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    // Buscar todas as figurinhas do usuário que estão repetidas
+    const figurinhasRepetidas = await prisma.userFigurinha.findMany({
       where: {
-        user: {
-          email: session.user.email
-        },
+        userId: user.id,
         quantidade: {
-          gt: 1 // Apenas figurinhas com quantidade maior que 1 (repetidas)
+          gt: 1
         }
       },
       include: {
@@ -35,25 +37,35 @@ export async function GET(request: Request) {
             }
           }
         }
-      },
-      distinct: ['figurinhaId'] // Garante que cada figurinha apareça apenas uma vez
+      }
     });
 
-    // Transformar os dados para o formato esperado
-    const jogadoresRepetidos = userFigurinhas.map(uf => ({
-      id: uf.figurinhaId,
-      nome: uf.figurinha.jogador.nome,
+    console.log('Figurinhas repetidas encontradas:', figurinhasRepetidas.length);
+
+    // Formatar as figurinhas repetidas com todas as informações necessárias
+    const figurinhasFormatadas = figurinhasRepetidas.map(uf => ({
+      id: uf.figurinha.id,
       numero: uf.figurinha.jogador.numero,
+      nome: uf.figurinha.jogador.nome,
       posicao: uf.figurinha.jogador.posicao,
-      time: uf.figurinha.jogador.time.nome,
-      quantidade: uf.quantidade - 1 // Quantidade de repetidas (total - 1)
+      idade: uf.figurinha.jogador.idade,
+      nacionalidade: uf.figurinha.jogador.nacionalidade,
+      foto: uf.figurinha.jogador.foto,
+      quantidade: uf.quantidade,
+      time: {
+        id: uf.figurinha.jogador.time.id,
+        nome: uf.figurinha.jogador.time.nome,
+        escudo: uf.figurinha.jogador.time.escudo
+      }
     }));
 
-    return NextResponse.json({ jogadores: jogadoresRepetidos });
+    console.log('Figurinhas formatadas:', figurinhasFormatadas);
+
+    return NextResponse.json(figurinhasFormatadas);
   } catch (error) {
-    console.error('Erro ao buscar repetidas:', error);
+    console.error('Erro ao buscar figurinhas repetidas:', error);
     return NextResponse.json(
-      { message: 'Erro ao buscar repetidas' },
+      { error: 'Erro ao buscar figurinhas repetidas' },
       { status: 500 }
     );
   }

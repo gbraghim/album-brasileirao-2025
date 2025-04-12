@@ -61,40 +61,14 @@ export async function GET() {
           },
           figurinhas: [{
             id: uf.figurinha.id,
-            quantidade: uf.quantidade,
-            jogador: {
-              id: jogador.id,
-              nome: jogador.nome,
-              numero: jogador.numero,
-              posicao: jogador.posicao,
-              idade: jogador.idade,
-              nacionalidade: jogador.nacionalidade,
-              foto: jogador.foto,
-              time: {
-                nome: jogador.time.nome,
-                escudo: jogador.time.escudo || ''
-              }
-            }
+            quantidade: uf.quantidade
           }]
         });
       } else {
         const jogadorExistente = jogadoresMap.get(jogadorId);
         jogadorExistente.figurinhas.push({
           id: uf.figurinha.id,
-          quantidade: uf.quantidade,
-          jogador: {
-            id: jogador.id,
-            nome: jogador.nome,
-            numero: jogador.numero,
-            posicao: jogador.posicao,
-            idade: jogador.idade,
-            nacionalidade: jogador.nacionalidade,
-            foto: jogador.foto,
-            time: {
-              nome: jogador.time.nome,
-              escudo: jogador.time.escudo || ''
-            }
-          }
+          quantidade: uf.quantidade
         });
       }
     });

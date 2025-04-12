@@ -9,8 +9,15 @@ interface Figurinha {
   numero: number;
   nome: string;
   posicao: string;
+  idade: number;
+  nacionalidade: string;
+  foto: string;
   quantidade: number;
-  time: string;
+  time: {
+    id: string;
+    nome: string;
+    escudo: string;
+  };
 }
 
 export default function Repetidas() {
@@ -34,13 +41,20 @@ export default function Repetidas() {
         throw new Error('Erro ao buscar figurinhas repetidas');
       }
       const data = await response.json();
-      setFigurinhas(data.jogadores.map((jogador: any) => ({
-        id: jogador.id,
-        numero: jogador.numero || 0,
-        nome: jogador.nome,
-        posicao: jogador.posicao,
-        quantidade: jogador.quantidade,
-        time: jogador.time
+      setFigurinhas(data.map((figurinha: any) => ({
+        id: figurinha.id,
+        numero: figurinha.numero || 0,
+        nome: figurinha.nome,
+        posicao: figurinha.posicao,
+        idade: figurinha.idade,
+        nacionalidade: figurinha.nacionalidade,
+        foto: figurinha.foto,
+        quantidade: figurinha.quantidade - 1, // Quantidade de repetidas (total - 1)
+        time: {
+          id: figurinha.time.id,
+          nome: figurinha.time.nome,
+          escudo: figurinha.time.escudo
+        }
       })));
       setLoading(false);
     } catch (error) {
@@ -113,21 +127,42 @@ export default function Repetidas() {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Figurinhas Repetidas</h1>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
           {figurinhas.map((figurinha) => (
-            <div
-              key={figurinha.id}
-              className="bg-purple-800 p-4 rounded-lg"
-            >
-              <h3 className="font-bold">#{figurinha.numero} - {figurinha.nome}</h3>
-              <p className="text-sm">{figurinha.posicao}</p>
-              <p className="text-sm">{figurinha.time}</p>
-              <p className="text-sm mt-2">Repetidas: {figurinha.quantidade}</p>
+            <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+              <div className="flex items-center mb-4">
+                <img
+                  src={figurinha.time.escudo}
+                  alt={figurinha.time.nome}
+                  className="w-12 h-12 object-contain mr-4"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold">{figurinha.nome}</h3>
+                  <p className="text-gray-600">{figurinha.time.nome}</p>
+                </div>
+              </div>
+              <div className="flex-grow">
+                <img
+                  src={figurinha.foto}
+                  alt={figurinha.nome}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <p><span className="font-semibold">Número:</span> {figurinha.numero}</p>
+                  <p><span className="font-semibold">Posição:</span> {figurinha.posicao}</p>
+                  <p><span className="font-semibold">Idade:</span> {figurinha.idade}</p>
+                  <p><span className="font-semibold">Nacionalidade:</span> {figurinha.nacionalidade}</p>
+                  <p className="col-span-2">
+                    <span className="font-semibold">Repetidas:</span> {figurinha.quantidade - 1}
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => enviarParaTroca(figurinha)}
-                className="mt-2 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm w-full"
+                className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={loading}
               >
-                Disponibilizar para Troca
+                {loading ? 'Processando...' : 'Disponibilizar para Troca'}
               </button>
             </div>
           ))}
@@ -135,22 +170,27 @@ export default function Repetidas() {
       </div>
 
       {/* Modal de sucesso */}
-      <Modal isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)}>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
-          <p className="mb-4">
-            A figurinha #{selectedFigurinha?.numero} - {selectedFigurinha?.nome} foi disponibilizada para troca com sucesso!
-          </p>
-          <div className="flex justify-end">
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg"
-            >
-              Fechar
-            </button>
+      {showSuccessModal && selectedFigurinha && (
+        <Modal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+        >
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
+            <p className="mb-4">
+              A figurinha {selectedFigurinha.nome} foi disponibilizada para troca com sucesso!
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg"
+              >
+                Fechar
+              </button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 } 

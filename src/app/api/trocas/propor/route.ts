@@ -36,6 +36,13 @@ export async function POST(request: Request) {
         quantidade: {
           gt: 1 // Apenas figurinhas repetidas podem ser trocadas
         }
+      },
+      include: {
+        figurinha: {
+          include: {
+            jogador: true
+          }
+        }
       }
     });
     console.log('Usuário figurinha encontrada:', usuarioFigurinha);
@@ -55,7 +62,11 @@ export async function POST(request: Request) {
         status: 'PENDENTE' // Garante que a troca ainda está disponível
       },
       include: {
-        figurinhaOferta: true,
+        figurinhaOferta: {
+          include: {
+            jogador: true
+          }
+        },
         usuarioEnvia: true
       }
     });
@@ -95,6 +106,17 @@ export async function POST(request: Request) {
       }
     });
     console.log('Nova troca criada:', novaTroca);
+
+    // Criar notificação para o usuário que recebeu a proposta
+    await prisma.notificacao.create({
+      data: {
+        usuarioId: trocaOriginal.usuarioEnviaId,
+        tipo: 'PROPOSTA_RECEBIDA',
+        mensagem: `${usuario.name} propôs uma troca: ${usuarioFigurinha.figurinha.jogador.nome} pelo seu ${trocaOriginal.figurinhaOferta.jogador.nome}`,
+        lida: false,
+        trocaId: novaTroca.id
+      }
+    });
 
     return NextResponse.json(novaTroca);
   } catch (error) {
