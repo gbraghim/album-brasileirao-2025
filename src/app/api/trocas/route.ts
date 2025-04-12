@@ -10,16 +10,23 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    // Buscar o usuário pelo email
+    const usuario = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
+
+    if (!usuario) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
     // Buscar figurinhas do usuário disponíveis para troca
-    const minhasTrocas = await prisma.trocaFigurinha.findMany({
+    const minhasTrocas = await prisma.troca.findMany({
       where: {
-        usuario: {
-          email: session.user.email
-        },
-        status: 'DISPONIVEL'
+        usuarioEnviaId: usuario.id,
+        status: 'PENDENTE'
       },
       include: {
-        figurinha: {
+        figurinhaOferta: {
           include: {
             jogador: true
           }
@@ -28,22 +35,20 @@ export async function GET() {
     });
 
     // Buscar figurinhas de outros usuários disponíveis para troca
-    const outrasTrocas = await prisma.trocaFigurinha.findMany({
+    const outrasTrocas = await prisma.troca.findMany({
       where: {
-        usuario: {
-          email: {
-            not: session.user.email
-          }
+        usuarioEnviaId: {
+          not: usuario.id
         },
-        status: 'DISPONIVEL'
+        status: 'PENDENTE'
       },
       include: {
-        figurinha: {
+        figurinhaOferta: {
           include: {
             jogador: true
           }
         },
-        usuario: {
+        usuarioEnvia: {
           select: {
             name: true,
             email: true
@@ -74,31 +79,39 @@ export async function POST(request: Request) {
 
     const { figurinhaId } = await request.json();
 
-    // Verificar se a figurinha pertence ao usuário
-    const usuarioFigurinha = await prisma.usuarioFigurinha.findFirst({
+    // Buscar o usuário pelo email
+    const usuario = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
+
+    if (!usuario) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    // Verificar se a figurinha pertence ao usuário e está repetida
+    const usuarioFigurinha = await prisma.userFigurinha.findFirst({
       where: {
-        usuario: {
-          email: session.user.email
-        },
-        figurinhaId
+        userId: usuario.id,
+        figurinhaId,
+        quantidade: {
+          gt: 1 // Apenas figurinhas repetidas podem ser trocadas
+        }
       }
     });
 
     if (!usuarioFigurinha) {
       return NextResponse.json(
-        { error: 'Figurinha não encontrada' },
+        { error: 'Figurinha não encontrada ou não está disponível para troca' },
         { status: 404 }
       );
     }
 
     // Verificar se a figurinha já está disponível para troca
-    const trocaExistente = await prisma.trocaFigurinha.findFirst({
+    const trocaExistente = await prisma.troca.findFirst({
       where: {
-        usuario: {
-          email: session.user.email
-        },
-        figurinhaId,
-        status: 'DISPONIVEL'
+        usuarioEnviaId: usuario.id,
+        figurinhaOfertaId: figurinhaId,
+        status: 'PENDENTE'
       }
     });
 
@@ -109,22 +122,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Adicionar figurinha à área de trocas
-    const troca = await prisma.trocaFigurinha.create({
+    // Criar nova troca
+    const novaTroca = await prisma.troca.create({
       data: {
-        usuario: {
-          connect: {
-            email: session.user.email
-          }
-        },
-        figurinha: {
-          connect: {
-            id: figurinhaId
-          }
-        }
+        usuarioEnviaId: usuario.id,
+        figurinhaOfertaId: figurinhaId,
+        status: 'PENDENTE'
       },
       include: {
-        figurinha: {
+        figurinhaOferta: {
           include: {
             jogador: true
           }
@@ -132,11 +138,11 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json(troca);
+    return NextResponse.json(novaTroca);
   } catch (error) {
-    console.error('Erro ao adicionar figurinha para troca:', error);
+    console.error('Erro ao criar troca:', error);
     return NextResponse.json(
-      { error: 'Erro ao adicionar figurinha para troca' },
+      { error: 'Erro ao criar troca' },
       { status: 500 }
     );
   }

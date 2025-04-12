@@ -28,21 +28,22 @@ export async function GET(request: Request) {
       include: {
         figurinha: {
           include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
+            jogador: true
           }
         }
-      }
+      },
+      distinct: ['figurinhaId'] // Garante que cada figurinha apareça apenas uma vez
     });
 
     // Transformar os dados para o formato esperado
-    const jogadoresRepetidos = userFigurinhas.map(uf => ({
-      ...uf.figurinha.jogador,
-      quantidade: uf.quantidade
-    }));
+    const jogadoresRepetidos = userFigurinhas.map(uf => {
+      const { id, ...jogador } = uf.figurinha.jogador;
+      return {
+        id: uf.figurinhaId, // Usar o ID da figurinha ao invés do jogador
+        ...jogador,
+        quantidade: uf.quantidade - 1 // Quantidade de repetidas (total - 1)
+      };
+    });
 
     return NextResponse.json({ jogadores: jogadoresRepetidos });
   } catch (error) {
