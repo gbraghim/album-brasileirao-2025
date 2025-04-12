@@ -4,53 +4,27 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { verificarPacotesDiarios } from '@/lib/pacotes';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+
+    if (!session?.user?.id) {
+      return new NextResponse('Não autorizado', { status: 401 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
-    }
-
-    // Verifica e cria pacotes diários
-    await verificarPacotesDiarios(user.id);
 
     const pacotes = await prisma.pacote.findMany({
       where: {
-        userId: user.id,
-        aberto: false as const
+        userId: session.user.id,
       },
-      include: {
-        figurinhas: {
-          include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
-          }
-        }
+      select: {
+        id: true,
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
     });
 
     return NextResponse.json(pacotes);
   } catch (error) {
     console.error('Erro ao buscar pacotes:', error);
-    return NextResponse.json(
-      { error: 'Erro ao buscar pacotes' },
-      { status: 500 }
-    );
+    return new NextResponse('Erro interno do servidor', { status: 500 });
   }
 }
 

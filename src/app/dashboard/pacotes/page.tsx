@@ -169,22 +169,29 @@ export default function Pacotes() {
           {pacotes.map((pacote) => (
             <div
               key={pacote.id}
-              className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
-              onClick={() => handleAbrirPacote(pacote.id)}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
             >
-              <div className="relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Pacote {pacote.tipo}</h2>
+                <span className="text-sm text-gray-500">
+                  {new Date(pacote.dataCriacao).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="relative w-full h-[300px]">
                 <Image
                   src="/pacote-figurinhas.png"
                   alt="Pacote de Figurinhas"
-                  fill
-                  className="object-contain p-4"
+                  layout="fill"
+                  objectFit="contain"
+                  sizes="100vw"
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brasil-blue/80 backdrop-blur-sm">
-                  <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
-                    Abrir Pacote
-                  </button>
-                </div>
               </div>
+              <button
+                onClick={() => handleAbrirPacote(pacote.id)}
+                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors mt-4"
+              >
+                Abrir Pacote
+              </button>
             </div>
           ))}
         </div>
