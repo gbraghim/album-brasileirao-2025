@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { verificarPacotesIniciais } from '@/lib/pacotes';
 
 interface RegisterRequest {
   name: string;
@@ -68,6 +67,8 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
+        numeroDeLogins: 0,
+        primeiroAcesso: true
       },
       select: {
         id: true,
@@ -76,9 +77,6 @@ export async function POST(req: Request) {
         createdAt: true,
       },
     });
-
-    // Cria os pacotes iniciais para o novo usuário
-    await verificarPacotesIniciais(user.id);
 
     return NextResponse.json(
       { 

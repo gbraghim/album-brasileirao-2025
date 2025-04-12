@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession, signIn } from 'next-auth/react';
 import { Notificacoes } from './Notificacoes';
 
 export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname() || '';
+  const router = useRouter();
   
   return (
     <header className="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
@@ -89,8 +90,10 @@ export default function Header() {
               <>
                 <Notificacoes />
                 <button
-                  onClick={() => signOut()}
-                  className="text-white/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  onClick={() => {
+                    signOut({ callbackUrl: '/' });
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
                 >
                   Sair
                 </button>

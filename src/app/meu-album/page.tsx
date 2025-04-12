@@ -9,6 +9,7 @@ import { CardJogador } from '@/components/card-jogador';
 import FiltrosAlbum from '@/components/FiltrosAlbum';
 import { Loading } from '@/components/loading';
 import Header from '@/components/Header';
+import Link from 'next/link';
 
 export default function MeuAlbum() {
   const { data: session, status } = useSession();
@@ -93,19 +94,23 @@ export default function MeuAlbum() {
   }
 
   return (
-    <>
-      <Header />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
-        
-        <FiltrosAlbum
-          jogadores={jogadores}
-          filtros={filtros}
-          setFiltros={setFiltros}
-        />
+    <div className="min-h-screen bg-purple-900 text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {jogadoresFiltrados.map((jogador) => (
+      {jogadores.length === 0 ? (
+        <div className="text-center py-12 bg-purple-800 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Seu álbum está vazio!</h2>
+          <p className="text-lg mb-6">Comece sua coleção abrindo pacotes de figurinhas.</p>
+          <Link 
+            href="/pacotes" 
+            className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+          >
+            Abrir Pacotes
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {jogadores.map((jogador) => (
             <CardJogador
               key={jogador.id}
               jogador={jogador}
@@ -113,13 +118,7 @@ export default function MeuAlbum() {
             />
           ))}
         </div>
-
-        {jogadoresFiltrados.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados.</p>
-          </div>
-        )}
-      </div>
-    </>
+      )}
+    </div>
   );
 } 

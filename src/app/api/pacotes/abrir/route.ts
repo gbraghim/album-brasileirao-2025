@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const FIGURINHAS_POR_PACOTE = 4;
 
 export async function POST(request: Request) {
   try {
@@ -13,98 +14,105 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { pacoteId } = await request.json();
-    
-    if (!pacoteId) {
-      return NextResponse.json({ error: 'ID do pacote não fornecido' }, { status: 400 });
-    }
-
     // Buscar o usuário pelo email
-    const user = await prisma.user.findUnique({
+    const usuario = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
 
-    if (!user) {
+    if (!usuario) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
-    // Busca o pacote e suas figurinhas
+    // Buscar o pacote mais antigo não aberto
     const pacote = await prisma.pacote.findFirst({
-      where: { 
-        id: pacoteId,
-        userId: user.id,
+      where: {
+        userId: usuario.id,
         aberto: false
       },
-      include: {
-        figurinhas: {
-          include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
-          }
-        }
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 
     if (!pacote) {
-      return NextResponse.json({ error: 'Pacote não encontrado ou já foi aberto' }, { status: 404 });
+      return NextResponse.json({ error: 'Nenhum pacote disponível' }, { status: 404 });
     }
 
-    // Marca o pacote como aberto
-    await prisma.pacote.update({
-      where: { id: pacoteId },
-      data: { aberto: true }
+    // Buscar todos os IDs dos jogadores
+    const jogadoresIds = await prisma.jogador.findMany({
+      select: { id: true }
     });
 
-    // Adiciona as figurinhas ao álbum do usuário
-    for (const figurinha of pacote.figurinhas) {
-      const userFigurinha = await prisma.userFigurinha.findUnique({
-        where: {
-          userId_figurinhaId: {
-            userId: user.id,
-            figurinhaId: figurinha.id
+    if (jogadoresIds.length === 0) {
+      return NextResponse.json({ error: 'Nenhum jogador encontrado' }, { status: 404 });
+    }
+
+    // Selecionar 4 jogadores aleatórios
+    const jogadoresSelecionados = [];
+    for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
+      const randomIndex = Math.floor(Math.random() * jogadoresIds.length);
+      const jogadorId = jogadoresIds[randomIndex].id;
+      jogadoresSelecionados.push(jogadorId);
+    }
+
+    // Criar as figurinhas no pacote e a relação com o usuário
+    const figurinhasCriadas = [];
+    for (const jogadorId of jogadoresSelecionados) {
+      // Criar a figurinha
+      const figurinha = await prisma.figurinha.create({
+        data: {
+          pacoteId: pacote.id,
+          jogadorId: jogadorId
+        },
+        include: {
+          jogador: {
+            include: {
+              time: true
+            }
           }
         }
       });
 
-      if (userFigurinha) {
-        await prisma.userFigurinha.update({
-          where: {
-            userId_figurinhaId: {
-              userId: user.id,
-              figurinhaId: figurinha.id
-            }
-          },
-          data: {
-            quantidade: userFigurinha.quantidade + 1
+      // Criar ou atualizar a relação com o usuário
+      await prisma.userFigurinha.upsert({
+        where: {
+          userId_figurinhaId: {
+            userId: usuario.id,
+            figurinhaId: figurinha.id
           }
-        });
-      } else {
-        await prisma.userFigurinha.create({
-          data: {
-            userId: user.id,
-            figurinhaId: figurinha.id,
-            quantidade: 1
+        },
+        update: {
+          quantidade: {
+            increment: 1
           }
-        });
-      }
+        },
+        create: {
+          userId: usuario.id,
+          figurinhaId: figurinha.id,
+          quantidade: 1
+        }
+      });
+
+      figurinhasCriadas.push(figurinha);
     }
 
-    return NextResponse.json({ 
-      figurinhas: pacote.figurinhas.map(f => ({
-        ...f,
-        jogador: {
-          ...f.jogador,
-          time: f.jogador.time
-        }
-      }))
+    // Marcar o pacote como aberto
+    await prisma.pacote.update({
+      where: { id: pacote.id },
+      data: { aberto: true }
+    });
+
+    return NextResponse.json({
+      pacote: {
+        ...pacote,
+        aberto: true
+      },
+      figurinhas: figurinhasCriadas
     });
   } catch (error) {
     console.error('Erro ao abrir pacote:', error);
     return NextResponse.json(
-      { error: 'Erro ao processar a requisição' },
+      { error: 'Erro ao abrir pacote' },
       { status: 500 }
     );
   }

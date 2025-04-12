@@ -84,6 +84,23 @@ export function Notificacoes() {
     }
   };
 
+  const marcarTodasComoLidas = async () => {
+    try {
+      const response = await fetch('/api/notificacoes/ler-todas', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao marcar notificações como lidas');
+      }
+
+      // Atualizar o estado local
+      setNotificacoes(notificacoes.map(n => ({ ...n, lida: true })));
+    } catch (error) {
+      console.error('Erro ao marcar notificações como lidas:', error);
+    }
+  };
+
   const notificacoesNaoLidas = notificacoes.filter(n => !n.lida).length;
 
   return (

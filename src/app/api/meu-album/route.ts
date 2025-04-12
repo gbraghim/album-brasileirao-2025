@@ -39,32 +39,63 @@ export async function GET() {
 
     console.log('Figurinhas encontradas:', userFigurinhas);
 
-    // Criar um Map para armazenar jogadores únicos com suas quantidades
-    const jogadoresMap = new Map<string, any>();
+    // Agrupar figurinhas por jogador
+    const jogadoresMap = new Map();
 
-    // Processar as figurinhas e agrupar por jogador
     userFigurinhas.forEach((uf) => {
-      const jogadorId = uf.figurinha.jogador.id;
+      const jogador = uf.figurinha.jogador;
+      const jogadorId = jogador.id;
+
       if (!jogadoresMap.has(jogadorId)) {
         jogadoresMap.set(jogadorId, {
           id: jogadorId,
-          nome: uf.figurinha.jogador.nome,
-          numero: uf.figurinha.jogador.numero,
-          posicao: uf.figurinha.jogador.posicao,
-          idade: uf.figurinha.jogador.idade,
-          nacionalidade: uf.figurinha.jogador.nacionalidade,
-          foto: uf.figurinha.jogador.foto,
-          quantidade: uf.quantidade,
+          nome: jogador.nome,
+          numero: jogador.numero,
+          posicao: jogador.posicao,
+          idade: jogador.idade,
+          nacionalidade: jogador.nacionalidade,
+          foto: jogador.foto,
           time: {
-            nome: uf.figurinha.jogador.time.nome,
-            escudo: uf.figurinha.jogador.time.escudo || ''
-          }
+            nome: jogador.time.nome,
+            escudo: jogador.time.escudo || ''
+          },
+          figurinhas: [{
+            id: uf.figurinha.id,
+            quantidade: uf.quantidade,
+            jogador: {
+              id: jogador.id,
+              nome: jogador.nome,
+              numero: jogador.numero,
+              posicao: jogador.posicao,
+              idade: jogador.idade,
+              nacionalidade: jogador.nacionalidade,
+              foto: jogador.foto,
+              time: {
+                nome: jogador.time.nome,
+                escudo: jogador.time.escudo || ''
+              }
+            }
+          }]
         });
       } else {
-        // Se o jogador já existe, somar a quantidade
-        const jogador = jogadoresMap.get(jogadorId);
-        jogador.quantidade += uf.quantidade;
-        jogadoresMap.set(jogadorId, jogador);
+        const jogadorExistente = jogadoresMap.get(jogadorId);
+        jogadorExistente.figurinhas.push({
+          id: uf.figurinha.id,
+          quantidade: uf.quantidade,
+          jogador: {
+            id: jogador.id,
+            nome: jogador.nome,
+            numero: jogador.numero,
+            posicao: jogador.posicao,
+            idade: jogador.idade,
+            nacionalidade: jogador.nacionalidade,
+            foto: jogador.foto,
+            time: {
+              nome: jogador.time.nome,
+              escudo: jogador.time.escudo || ''
+            }
+          }
+        });
       }
     });
 

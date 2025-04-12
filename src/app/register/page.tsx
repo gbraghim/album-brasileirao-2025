@@ -6,30 +6,20 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [error, setError] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
     setLoading(true);
-    setSuccess(false);
-
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get('name')?.toString() || '';
-    const email = formData.get('email')?.toString() || '';
-    const password = formData.get('password')?.toString() || '';
-
-    // Validação básica no cliente
-    if (!name || !email || !password) {
-      setError('Todos os campos são obrigatórios');
-      setLoading(false);
-      return;
-    }
 
     try {
-      const res = await fetch('/api/register', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,27 +27,16 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const json = await res.json();
+      const data = await response.json();
 
-
-      // Se chegou aqui, o usuário foi criado com sucesso
-      setSuccess(true);
-      
-      // Redireciona para o login após 3 segundos
-      setTimeout(() => {
-        router.push('/login?registered=true');
-      }, 3000);
-    } catch (error) {
-      console.error('Erro no registro:', error);
-      // Se o erro for relacionado aos pacotes iniciais, ainda mostramos sucesso
-      if (error instanceof Error && error.message.includes('pacotes iniciais')) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push('/login?registered=true');
-        }, 3000);
-      } else {
-        setError(error instanceof Error ? error.message : 'Erro ao registrar usuário');
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao criar conta');
       }
+
+      // Redirecionar para a página inicial
+      router.push('/');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Erro ao criar conta');
     } finally {
       setLoading(false);
     }
@@ -110,6 +89,8 @@ export default function RegisterPage() {
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
                   placeholder="Nome completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div>
@@ -124,6 +105,8 @@ export default function RegisterPage() {
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
                   placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -138,6 +121,8 @@ export default function RegisterPage() {
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
                   placeholder="Senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>

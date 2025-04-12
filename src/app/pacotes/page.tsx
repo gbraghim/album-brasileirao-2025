@@ -5,12 +5,19 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ModalFigurinhas from '@/components/ModalFigurinhas';
 import Image from 'next/image';
-import { Filtros } from '@/types/filtros';
-import FiltrosPacotes from '@/components/FiltrosPacotes';
 import { Pacote as PacoteType } from '@/types/pacote';
 
 interface Pacote extends PacoteType {
   // Adicione propriedades adicionais específicas desta página, se necessário
+}
+
+interface Jogador {
+  id: string;
+  figurinhas?: Array<{ id: string }>;
+}
+
+interface AlbumResponse {
+  jogadores: Jogador[];
 }
 
 export default function Pacotes() {
@@ -22,12 +29,6 @@ export default function Pacotes() {
   const [modalAberto, setModalAberto] = useState(false);
   const [figurinhasAbertas, setFigurinhasAbertas] = useState<any[]>([]);
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
-  const [filtros, setFiltros] = useState<Filtros>({
-    time: '',
-    posicao: '',
-    raridade: '',
-    search: ''
-  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -47,9 +48,15 @@ export default function Pacotes() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        const jogadores = data.jogadores as Array<{ id: string }>;
-        const figurinhasIds = new Set(jogadores.map(j => j.id));
+        const data = await response.json() as AlbumResponse;
+        const figurinhasIds = new Set<string>();
+        
+        data.jogadores.forEach(jogador => {
+          jogador.figurinhas?.forEach(figurinha => {
+            figurinhasIds.add(figurinha.id);
+          });
+        });
+        
         setUserFigurinhas(figurinhasIds);
       }
     } catch (err) {
@@ -120,11 +127,15 @@ export default function Pacotes() {
       setFigurinhasAbertas(data.figurinhas);
       setModalAberto(true);
       carregarPacotes();
-      carregarFigurinhasUsuario();
     } catch (err) {
       console.error('Erro ao abrir pacote:', err);
       setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
     }
+  };
+
+  const handleFecharModal = () => {
+    setModalAberto(false);
+    carregarFigurinhasUsuario();
   };
 
   if (loading) {
@@ -153,50 +164,51 @@ export default function Pacotes() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Meus Pacotes</h1>
-      
-      {pacotes.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">Você não tem pacotes disponíveis.</p>
+    <div className="min-h-screen bg-purple-900 text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Pacotes de Figurinhas</h1>
+
+      {pacotes.length > 0 ? (
+        <div className="mb-4 p-4 bg-purple-800 rounded-lg">
+          <p className="text-lg">
+            Você tem <span className="font-bold">{pacotes.length}</span> pacote{pacotes.length !== 1 ? 's' : ''} disponível{pacotes.length !== 1 ? 's' : ''}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pacotes.map((pacote) => (
-            <div
-              key={pacote.id}
-              className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
-              onClick={() => handleAbrirPacote(pacote.id)}
-            >
-              <div className="relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                <Image
-                  src="/pacote-figurinhas.png"
-                  alt="Pacote de Figurinhas"
-                  fill
-                  className="object-contain p-4"
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brasil-blue/80 backdrop-blur-sm">
-                  <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
-                    Abrir Pacote
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="mb-4 p-4 bg-purple-800 rounded-lg">
+          <p className="text-lg">Você não tem pacotes disponíveis no momento.</p>
+          <p className="text-sm mt-2">Volte amanhã para receber seu pacote diário!</p>
         </div>
       )}
 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {pacotes.map((pacote) => (
+          <div
+            key={pacote.id}
+            className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
+            onClick={() => handleAbrirPacote(pacote.id)}
+          >
+            <div className="relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+              <Image
+                src="/pacote-figurinhas.png"
+                alt="Pacote de Figurinhas"
+                fill
+                className="object-contain p-4"
+              />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brasil-blue/80 backdrop-blur-sm">
+                <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
+                  Abrir Pacote
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <ModalFigurinhas
         isOpen={modalAberto}
-        onClose={() => setModalAberto(false)}
+        onClose={handleFecharModal}
         figurinhas={figurinhasAbertas}
         userFigurinhas={userFigurinhas}
-      />
-
-      <FiltrosPacotes
-        pacotes={pacotes}
-        filtros={filtros}
-        setFiltros={setFiltros}
       />
     </div>
   );
