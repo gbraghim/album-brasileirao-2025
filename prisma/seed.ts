@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -51,7 +51,7 @@ async function main() {
     },
     {
       nome: 'Flamengo',
-      escudo: 'C:\Users\Braghinho\album-brasileirao-2025\scripts',
+      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/flamengo',
       apiId: 10
     },
     {
@@ -106,26 +106,17 @@ async function main() {
     }
   ];
 
-  for (const time of times) {
-    try {
-      const timeExistente = await prisma.time.findUnique({
-        where: { apiId: time.apiId }
-      });
+  // Limpar a tabela de times antes de inserir novos dados
+  await prisma.time.deleteMany();
 
-      if (!timeExistente) {
-        await prisma.time.create({
-          data: time
-        });
-        console.log(`Time ${time.nome} criado com sucesso!`);
-      } else {
-        console.log(`Time ${time.nome} já existe no banco de dados.`);
-      }
-    } catch (error) {
-      console.error(`Erro ao criar time ${time.nome}:`, error);
-    }
+  // Inserir os novos times
+  for (const time of times) {
+    await prisma.time.create({
+      data: time
+    });
   }
 
-  console.log('Processo de população dos times concluído!');
+  console.log('Seed concluído com sucesso!');
 }
 
 main()

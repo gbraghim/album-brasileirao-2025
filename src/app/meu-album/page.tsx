@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Jogador } from '@/types/jogador';
 import { Filtros } from '@/types/filtros';
 import { CardJogador } from '@/components/card-jogador';
-import { FiltrosAlbum } from '@/components/filtros-album';
+import FiltrosAlbum from '@/components/FiltrosAlbum';
 import { Loading } from '@/components/loading';
+import Header from '@/components/Header';
 
 export default function MeuAlbum() {
   const { data: session, status } = useSession();
@@ -15,8 +16,9 @@ export default function MeuAlbum() {
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [filtros, setFiltros] = useState<Filtros>({
     time: '',
-    nacionalidade: '',
-    posicao: ''
+    posicao: '',
+    raridade: '',
+    search: ''
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,6 @@ export default function MeuAlbum() {
 
   const jogadoresFiltrados = jogadores.filter(jogador => {
     if (filtros.time && jogador.time.nome !== filtros.time) return false;
-    if (filtros.nacionalidade && jogador.nacionalidade !== filtros.nacionalidade) return false;
     if (filtros.posicao && jogador.posicao !== filtros.posicao) return false;
     return true;
   });
@@ -92,30 +93,33 @@ export default function MeuAlbum() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
-      
-      <FiltrosAlbum
-        jogadores={jogadores}
-        filtros={filtros}
-        setFiltros={setFiltros}
-      />
+    <>
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
+        
+        <FiltrosAlbum
+          jogadores={jogadores}
+          filtros={filtros}
+          setFiltros={setFiltros}
+        />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {jogadoresFiltrados.map((jogador) => (
-          <CardJogador
-            key={jogador.id}
-            jogador={jogador}
-            quantidade={jogador.quantidade}
-          />
-        ))}
-      </div>
-
-      {jogadoresFiltrados.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {jogadoresFiltrados.map((jogador) => (
+            <CardJogador
+              key={jogador.id}
+              jogador={jogador}
+              quantidade={jogador.quantidade}
+            />
+          ))}
         </div>
-      )}
-    </div>
+
+        {jogadoresFiltrados.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados.</p>
+          </div>
+        )}
+      </div>
+    </>
   );
 } 

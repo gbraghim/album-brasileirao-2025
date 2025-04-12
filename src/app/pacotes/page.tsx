@@ -5,22 +5,12 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ModalFigurinhas from '@/components/ModalFigurinhas';
 import Image from 'next/image';
+import { Filtros } from '@/types/filtros';
+import FiltrosPacotes from '@/components/FiltrosPacotes';
+import { Pacote as PacoteType } from '@/types/pacote';
 
-interface Pacote {
-  id: string;
-  tipo: string;
-  dataCriacao: string;
-  figurinhas: {
-    id: string;
-    jogador: {
-      nome: string;
-      time: {
-        nome: string;
-      };
-      posicao: string;
-      idade: number;
-    };
-  }[];
+interface Pacote extends PacoteType {
+  // Adicione propriedades adicionais específicas desta página, se necessário
 }
 
 export default function Pacotes() {
@@ -32,6 +22,12 @@ export default function Pacotes() {
   const [modalAberto, setModalAberto] = useState(false);
   const [figurinhasAbertas, setFigurinhasAbertas] = useState<any[]>([]);
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
+  const [filtros, setFiltros] = useState<Filtros>({
+    time: '',
+    posicao: '',
+    raridade: '',
+    search: ''
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -195,6 +191,12 @@ export default function Pacotes() {
         onClose={() => setModalAberto(false)}
         figurinhas={figurinhasAbertas}
         userFigurinhas={userFigurinhas}
+      />
+
+      <FiltrosPacotes
+        pacotes={pacotes}
+        filtros={filtros}
+        setFiltros={setFiltros}
       />
     </div>
   );

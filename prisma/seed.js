@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const TIMES = [
   {
     nome: 'Flamengo',
-    escudo: 'https://logodetimes.com/times/flamengo/flamengo-256.png',
+    escudo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/819.png',
     apiId: 1
   },
   {

@@ -1,5 +1,22 @@
+import { Dispatch, SetStateAction } from 'react';
+import { Jogador } from './jogador';
+import { Pacote } from './pacote';
+
 export interface Filtros {
-  posicao: string;
   time: string;
-  nacionalidade: string;
+  posicao: string;
+  raridade: string;
+  search: string;
+}
+
+export interface FiltrosAlbumProps {
+  jogadores: Jogador[];
+  filtros: Filtros;
+  setFiltros: Dispatch<SetStateAction<Filtros>>;
+}
+
+export interface FiltrosPacotesProps {
+  pacotes: Pacote[];
+  filtros: Filtros;
+  setFiltros: Dispatch<SetStateAction<Filtros>>;
 } 
