@@ -6,13 +6,9 @@ import { UserFigurinha } from '@prisma/client';
 
 export async function GET() {
   try {
-    console.log('Iniciando requisição GET para meu-album');
-    
     const session = await getServerSession(authOptions);
-    console.log('Sessão obtida:', session?.user?.email);
 
     if (!session?.user?.email) {
-      console.log('Usuário não autenticado');
       return new NextResponse('Não autorizado', { status: 401 });
     }
 
@@ -22,11 +18,8 @@ export async function GET() {
     });
 
     if (!user) {
-      console.log('Usuário não encontrado no banco');
       return new NextResponse('Usuário não encontrado', { status: 404 });
     }
-
-    console.log('Usuário encontrado:', user.id);
 
     // Buscar as figurinhas do usuário
     const userFigurinhas = await prisma.userFigurinha.findMany({
@@ -44,7 +37,7 @@ export async function GET() {
       }
     });
 
-    console.log('Quantidade de figurinhas encontradas:', userFigurinhas.length);
+    console.log('Figurinhas encontradas:', userFigurinhas);
 
     // Criar um Map para armazenar jogadores únicos com suas quantidades
     const jogadoresMap = new Map<string, any>();
@@ -80,11 +73,11 @@ export async function GET() {
       a.nome.localeCompare(b.nome)
     );
 
-    console.log('Quantidade de jogadores processados:', jogadores.length);
+    console.log('Jogadores processados:', jogadores);
 
     return NextResponse.json({ jogadores });
   } catch (error) {
-    console.error('Erro detalhado ao carregar álbum:', error);
+    console.error('Erro ao carregar álbum:', error);
     return new NextResponse('Erro interno do servidor', { status: 500 });
   }
 } 

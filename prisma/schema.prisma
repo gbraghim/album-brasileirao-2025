@@ -20,6 +20,7 @@ model User {
   trocasEnviadas     Troca[]       @relation("TrocasEnviadas")
   trocasRecebidas    Troca[]       @relation("TrocasRecebidas")
   trocas        TrocaFigurinha[]
+  notificacoes  Notificacao[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   numeroDeLogins Int      @default(0)
@@ -78,6 +79,7 @@ model Troca {
   usuarioEnvia      User      @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
   usuarioRecebe     User?     @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
   status            String    // 'PENDENTE', 'ACEITA', 'RECUSADA'
+  notificacoes      Notificacao[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 }
@@ -121,4 +123,21 @@ model TrocaFigurinha {
 
   @@index([usuarioId])
   @@index([figurinhaId])
+}
+
+model Notificacao {
+  id        String   @id @default(cuid())
+  tipo      String
+  mensagem  String
+  lida      Boolean  @default(false)
+  usuarioId String
+  trocaId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuario   User     @relation(fields: [usuarioId], references: [id])
+  troca     Troca?   @relation(fields: [trocaId], references: [id])
+
+  @@index([usuarioId])
+  @@index([trocaId])
 } 

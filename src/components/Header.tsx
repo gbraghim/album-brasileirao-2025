@@ -1,96 +1,111 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
+import { signOut, useSession, signIn } from 'next-auth/react';
+import { Notificacoes } from './Notificacoes';
 
 export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname() || '';
   
   return (
-    <div className="bg-brasil-green text-white shadow-lg relative z-10">
-      <div className="container mx-auto px-4 relative">
-        <div className="flex justify-between items-center py-4">
-          <div className="flex items-center space-x-6">
-            <Link 
-              href="/dashboard" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/dashboard' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/pacotes" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/pacotes' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Pacotes
-            </Link>
-            <Link 
-              href="/repetidas" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/repetidas' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Repetidas
-            </Link>
-            <Link 
-              href="/trocas" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/trocas' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Trocas
-            </Link>
-            <Link 
-              href="/meu-album" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/meu-album' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Meu Álbum
-            </Link>
-            <Link 
-              href="/perfil" 
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                pathname === '/perfil' ? 'bg-brasil-blue text-brasil-yellow' : 'hover:bg-brasil-blue/20'
-              }`}
-            >
-              Perfil
-            </Link>
-          </div>
-          
-          <div className="flex items-center relative">
-            {session && (
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
-                className="bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow px-4 py-2 rounded-md text-sm font-medium transition-colors relative"
+    <header className="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <div className="flex-shrink-0 flex items-center">
+              <Link href="/" className="flex items-center space-x-2">
+                <Image src="/logo.png" alt="Logo" width={32} height={32} className="w-8 h-8" />
+                <span className="text-xl font-bold text-white hover:text-green-200">eBrasileirão</span>
+              </Link>
+            </div>
+            <nav className="ml-6 flex space-x-8">
+              <Link 
+                href="/dashboard" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/dashboard' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
               >
-                Sair
+                Home
+              </Link>
+              <Link 
+                href="/meu-album" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/meu-album' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
+              >
+                Meu Álbum
+              </Link>
+              <Link 
+                href="/repetidas" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/repetidas' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
+              >
+                Repetidas
+              </Link>
+              <Link 
+                href="/trocas" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/trocas' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
+              >
+                Trocas
+              </Link>
+              <Link 
+                href="/pacotes" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/pacotes' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
+              >
+                Pacotes
+              </Link>
+              <Link 
+                href="/perfil" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/perfil' 
+                    ? 'border-white text-white' 
+                    : 'border-transparent text-white/80 hover:text-white hover:border-white/50'
+                }`}
+              >
+                Perfil
+              </Link>
+            </nav>
+          </div>
+          <div className="flex items-center space-x-4">
+            {session ? (
+              <>
+                <Notificacoes />
+                <button
+                  onClick={() => signOut()}
+                  className="text-white/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => signIn()}
+                className="text-white/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Entrar
               </button>
-            )}
-            {!session && (
-              <div className="flex items-center space-x-4">
-                <Link 
-                  href="/login" 
-                  className="text-white hover:text-brasil-yellow transition-colors relative"
-                >
-                  Entrar
-                </Link>
-                <Link 
-                  href="/register" 
-                  className="bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow px-4 py-2 rounded-md text-sm font-medium transition-colors relative"
-                >
-                  Cadastrar
-                </Link>
-              </div>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 } 
