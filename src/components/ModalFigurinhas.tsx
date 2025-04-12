@@ -10,6 +10,7 @@ interface Jogador {
   };
   posicao: string;
   idade: number;
+  numero: number;
 }
 
 interface Figurinha {
@@ -85,7 +86,7 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                           )}
                           <div className="flex flex-col">
                             <h4 className="text-lg font-semibold text-brasil-blue">
-                              {figurinha.jogador.nome}
+                              #{figurinha.jogador.numero} - {figurinha.jogador.nome}
                             </h4>
                             <div className="mt-2 space-y-1">
                               <p className="text-sm">

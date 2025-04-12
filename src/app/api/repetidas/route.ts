@@ -28,7 +28,11 @@ export async function GET(request: Request) {
       include: {
         figurinha: {
           include: {
-            jogador: true
+            jogador: {
+              include: {
+                time: true
+              }
+            }
           }
         }
       },
@@ -36,14 +40,14 @@ export async function GET(request: Request) {
     });
 
     // Transformar os dados para o formato esperado
-    const jogadoresRepetidos = userFigurinhas.map(uf => {
-      const { id, ...jogador } = uf.figurinha.jogador;
-      return {
-        id: uf.figurinhaId, // Usar o ID da figurinha ao invés do jogador
-        ...jogador,
-        quantidade: uf.quantidade - 1 // Quantidade de repetidas (total - 1)
-      };
-    });
+    const jogadoresRepetidos = userFigurinhas.map(uf => ({
+      id: uf.figurinhaId,
+      nome: uf.figurinha.jogador.nome,
+      numero: uf.figurinha.jogador.numero,
+      posicao: uf.figurinha.jogador.posicao,
+      time: uf.figurinha.jogador.time.nome,
+      quantidade: uf.quantidade - 1 // Quantidade de repetidas (total - 1)
+    }));
 
     return NextResponse.json({ jogadores: jogadoresRepetidos });
   } catch (error) {

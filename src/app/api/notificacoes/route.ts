@@ -69,38 +69,41 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const notificacoes = await prisma.notificacao.findMany({
       where: {
-        usuarioId: session.user.id,
+        usuarioId: session.user.id
+      },
+      orderBy: {
+        createdAt: 'desc'
       },
       include: {
         troca: {
           include: {
             figurinhaOferta: {
               include: {
-                jogador: true,
-              },
+                jogador: true
+              }
             },
-            usuarioEnvia: true,
-            usuarioRecebe: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+            usuarioEnvia: true
+          }
+        }
+      }
     });
 
     return NextResponse.json(notificacoes);
   } catch (error) {
     console.error('Erro ao buscar notificações:', error);
-    return NextResponse.json({ error: 'Erro ao buscar notificações' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao buscar notificações' },
+      { status: 500 }
+    );
   }
 } 

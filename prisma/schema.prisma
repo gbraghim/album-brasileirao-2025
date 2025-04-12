@@ -36,6 +36,8 @@ model Pacote {
   updatedAt   DateTime    @updatedAt
   user        User        @relation(fields: [userId], references: [id])
   figurinhas  Figurinha[]
+
+  @@index([userId])
 }
 
 model Figurinha {
@@ -51,6 +53,7 @@ model Figurinha {
   updatedAt  DateTime      @updatedAt
 
   @@index([jogadorId])
+  @@index([pacoteId])
 }
 
 // Tabela de junção para representar a quantidade de cada figurinha que um usuário possui
@@ -82,6 +85,10 @@ model Troca {
   notificacoes      Notificacao[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  @@index([usuarioEnviaId])
+  @@index([usuarioRecebeId])
+  @@index([figurinhaOfertaId])
 }
 
 model Time {
@@ -108,6 +115,8 @@ model Jogador {
   figurinhas   Figurinha[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+
+  @@index([timeId])
 }
 
 model TrocaFigurinha {
@@ -127,16 +136,15 @@ model TrocaFigurinha {
 
 model Notificacao {
   id        String   @id @default(cuid())
-  tipo      String
+  tipo      String   // PROPOSTA_TROCA, TROCA_ACEITA, TROCA_RECUSADA
   mensagem  String
   lida      Boolean  @default(false)
   usuarioId String
   trocaId   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   usuario   User     @relation(fields: [usuarioId], references: [id])
   troca     Troca?   @relation(fields: [trocaId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([usuarioId])
   @@index([trocaId])

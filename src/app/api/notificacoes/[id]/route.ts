@@ -1,29 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 
-export async function PATCH(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
+interface RouteParams {
+  params: {
+    id: string;
+  }
+}
+
+export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const notificacao = await prisma.notificacao.update({
-      where: {
-        id: context.params.id,
-        usuarioId: session.user.id,
-      },
-      data: {
-        lida: true,
-      },
+    const notificacao = await prisma.notificacao.findUnique({
+      where: { id: params.id }
     });
 
-    return NextResponse.json(notificacao);
+    if (!notificacao) {
+      return NextResponse.json({ error: 'Notificação não encontrada' }, { status: 404 });
+    }
+
+    if (notificacao.usuarioId !== session.user.id) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const notificacaoAtualizada = await prisma.notificacao.update({
+      where: { id: params.id },
+      data: { lida: true }
+    });
+
+    return NextResponse.json(notificacaoAtualizada);
   } catch (error) {
     console.error('Erro ao atualizar notificação:', error);
     return NextResponse.json(

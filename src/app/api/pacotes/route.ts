@@ -16,9 +16,17 @@ export async function GET() {
       where: {
         userId: session.user.id,
       },
-      select: {
-        id: true,
-      },
+      include: {
+        figurinhas: {
+          include: {
+            jogador: {
+              include: {
+                time: true
+              }
+            }
+          }
+        }
+      }
     });
 
     return NextResponse.json(pacotes);

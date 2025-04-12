@@ -14,7 +14,7 @@ export async function GET() {
       );
     }
 
-    // Busca todas as figurinhas do usuário com os detalhes dos jogadores
+    // Busca todas as figurinhas do usuário
     const figurinhas = await prisma.figurinha.findMany({
       where: {
         pacote: {
@@ -22,14 +22,11 @@ export async function GET() {
             email: session.user.email
           }
         }
-      },
-      include: {
-        jogador: true
       }
     });
 
-    // Agrupa as figurinhas por jogador e conta as repetições
-    const figurinhasAgrupadas = figurinhas.reduce((acc, figurinha) => {
+    // Conta quantas vezes cada jogador aparece
+    const contagemJogadores = figurinhas.reduce((acc, figurinha) => {
       const jogadorId = figurinha.jogadorId;
       if (!acc[jogadorId]) {
         acc[jogadorId] = {

@@ -10,6 +10,7 @@ interface Figurinha {
   nome: string;
   posicao: string;
   quantidade: number;
+  time: string;
 }
 
 export default function Repetidas() {
@@ -38,7 +39,8 @@ export default function Repetidas() {
         numero: jogador.numero || 0,
         nome: jogador.nome,
         posicao: jogador.posicao,
-        quantidade: jogador.quantidade
+        quantidade: jogador.quantidade,
+        time: jogador.time
       })));
       setLoading(false);
     } catch (error) {
@@ -50,7 +52,6 @@ export default function Repetidas() {
 
   const enviarParaTroca = async (figurinha: Figurinha) => {
     try {
-      setSelectedFigurinha(figurinha);
       const response = await fetch('/api/trocas', {
         method: 'POST',
         headers: {
@@ -60,12 +61,13 @@ export default function Repetidas() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao enviar figurinha para troca');
+        const data = await response.json();
+        throw new Error(data.error || 'Erro ao disponibilizar figurinha para troca');
       }
 
+      setSelectedFigurinha(figurinha);
       setShowSuccessModal(true);
-      await fetchFigurinhasRepetidas(); // Recarrega as figurinhas após enviar para troca
+      fetchFigurinhasRepetidas(); // Recarrega a lista de figurinhas
     } catch (error) {
       console.error('Erro ao enviar figurinha para troca:', error);
       setError(error instanceof Error ? error.message : 'Erro ao enviar figurinha para troca');
@@ -83,18 +85,25 @@ export default function Repetidas() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white p-8">
-        <h1 className="text-3xl font-bold mb-8">Figurinhas Repetidas</h1>
-        <p>Carregando...</p>
+      <div className="min-h-screen bg-purple-900 text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white p-8">
-        <h1 className="text-3xl font-bold mb-8">Figurinhas Repetidas</h1>
-        <p className="text-red-400">{error}</p>
+      <div className="min-h-screen bg-purple-900 text-white flex flex-col items-center justify-center">
+        <p className="text-red-400 mb-4">{error}</p>
+        <button
+          onClick={() => {
+            setError(null);
+            fetchFigurinhasRepetidas();
+          }}
+          className="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded-lg"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
@@ -110,9 +119,9 @@ export default function Repetidas() {
               key={figurinha.id}
               className="bg-purple-800 p-4 rounded-lg"
             >
-              <h3 className="font-bold">{figurinha.nome}</h3>
+              <h3 className="font-bold">#{figurinha.numero} - {figurinha.nome}</h3>
               <p className="text-sm">{figurinha.posicao}</p>
-              <p className="text-sm">#{figurinha.numero}</p>
+              <p className="text-sm">{figurinha.time}</p>
               <p className="text-sm mt-2">Repetidas: {figurinha.quantidade}</p>
               <button
                 onClick={() => enviarParaTroca(figurinha)}
@@ -130,7 +139,7 @@ export default function Repetidas() {
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
           <p className="mb-4">
-            A figurinha de {selectedFigurinha?.nome} foi disponibilizada para troca com sucesso!
+            A figurinha #{selectedFigurinha?.numero} - {selectedFigurinha?.nome} foi disponibilizada para troca com sucesso!
           </p>
           <div className="flex justify-end">
             <button
