@@ -1,79 +1,121 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Jogador } from '../../types/jogador';
-import { Filtros } from '../../types/filtros';
-import FiltrosRepetidas from '../../components/FiltrosRepetidas';
-import FigurinhaCard from '../../components/FigurinhaCard';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Jogador } from '@/types/jogador';
+import { Filtros } from '@/types/filtros';
+import { CardJogador } from '@/components/card-jogador';
+import FiltrosAlbum from '@/components/FiltrosAlbum';
+import { Loading } from '@/components/loading';
 
-export default function RepetidasPage() {
+export default function Repetidas() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [filtros, setFiltros] = useState<Filtros>({
-    posicao: '',
     time: '',
-    nacionalidade: ''
+    posicao: '',
+    raridade: '',
+    search: ''
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchJogadores = async () => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    const carregarJogadores = async () => {
       try {
-        const response = await fetch('/api/jogadores');
+        setLoading(true);
+        setError(null);
+        
+        if (!session?.user?.email) {
+          throw new Error('Usuário não autenticado');
+        }
+
+        const response = await fetch('/api/repetidas', {
+          headers: {
+            'Authorization': `Bearer ${session.user.email}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro ao carregar repetidas');
+        }
+
         const data = await response.json();
-        // Filtrar apenas jogadores com quantidade > 1
-        const jogadoresRepetidos = data.filter((j: Jogador) => j.quantidade > 1);
-        setJogadores(jogadoresRepetidos);
-      } catch (error) {
-        console.error('Erro ao buscar jogadores:', error);
+        setJogadores(data.jogadores);
+      } catch (err) {
+        console.error('Erro ao carregar jogadores:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao carregar repetidas');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchJogadores();
-  }, []);
-
-  const handleAdicionarRepetida = async (jogador: Jogador) => {
-    try {
-      const response = await fetch('/api/repetidas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ jogadorId: jogador.id }),
-      });
-
-      if (response.ok) {
-        // Atualizar a lista de jogadores
-        const updatedJogadores = jogadores.map(j => 
-          j.id === jogador.id ? { ...j, quantidade: j.quantidade - 1 } : j
-        ).filter(j => j.quantidade > 1);
-        setJogadores(updatedJogadores);
-      }
-    } catch (error) {
-      console.error('Erro ao adicionar figurinha repetida:', error);
+    if (session?.user?.email) {
+      carregarJogadores();
     }
-  };
+  }, [session]);
 
   const jogadoresFiltrados = jogadores.filter(jogador => {
+    if (filtros.time && jogador.time.nome !== filtros.time) return false;
     if (filtros.posicao && jogador.posicao !== filtros.posicao) return false;
-    if (filtros.time && jogador.time !== filtros.time) return false;
-    if (filtros.nacionalidade && jogador.nacionalidade !== filtros.nacionalidade) return false;
     return true;
   });
 
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Erro!</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Minhas Figurinhas Repetidas</h1>
+      <h1 className="text-3xl font-bold mb-8">Minhas Repetidas</h1>
       
-      <FiltrosRepetidas filtros={filtros} onFiltrosChange={setFiltros} />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {jogadoresFiltrados.map(jogador => (
-          <FigurinhaCard
+      <FiltrosAlbum
+        jogadores={jogadores}
+        filtros={filtros}
+        setFiltros={setFiltros}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {jogadoresFiltrados.map((jogador) => (
+          <CardJogador
             key={jogador.id}
             jogador={jogador}
-            onAdicionarRepetida={handleAdicionarRepetida}
+            quantidade={jogador.quantidade}
           />
         ))}
       </div>
+
+      {jogadoresFiltrados.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Nenhum jogador encontrado com os filtros selecionados.</p>
+        </div>
+      )}
     </div>
   );
 } 
