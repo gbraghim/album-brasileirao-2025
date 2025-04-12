@@ -3,15 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
 export async function PATCH(
   request: NextRequest,
-  { params }: Props
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -21,7 +15,7 @@ export async function PATCH(
 
     const notificacao = await prisma.notificacao.update({
       where: {
-        id: params.id,
+        id: context.params.id,
         usuarioId: session.user.id,
       },
       data: {
