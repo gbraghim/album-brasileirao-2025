@@ -22,6 +22,9 @@ export async function GET() {
             email: session.user.email
           }
         }
+      },
+      include: {
+        jogador: true
       }
     });
 
@@ -41,7 +44,7 @@ export async function GET() {
     }, {} as Record<string, any>);
 
     // Filtra apenas as figurinhas que aparecem mais de uma vez
-    const figurinhasRepetidas = Object.values(figurinhasAgrupadas)
+    const figurinhasRepetidas = Object.values(contagemJogadores)
       .filter(fig => fig.quantidade > 1)
       .sort((a, b) => b.quantidade - a.quantidade);
 
