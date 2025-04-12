@@ -5,9 +5,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
@@ -20,7 +21,7 @@ export async function PATCH(
     }
 
     const troca = await prisma.troca.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         figurinhaOferta: {
           include: {
@@ -36,7 +37,7 @@ export async function PATCH(
 
     // Atualiza o status da troca
     const trocaAtualizada = await prisma.troca.update({
-      where: { id: params.id },
+      where: { id },
       data: { 
         status,
         usuarioRecebeId: session.user.id
