@@ -12,7 +12,7 @@ export default function PacotesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
       <main className="container mx-auto px-4 py-8">
         {children}

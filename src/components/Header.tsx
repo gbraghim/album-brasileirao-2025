@@ -12,14 +12,20 @@ export default function Header() {
   const router = useRouter();
   
   return (
-    <header className="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+    <header className="bg-gradient-to-r  text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center space-x-2">
-                <Image src="/logo.png" alt="Logo" width={32} height={32} className="w-8 h-8" />
-                <span className="text-xl font-bold text-white hover:text-green-200">eBrasileirão</span>
+              <Link href={session ? '/dashboard' : '/'} className="flex items-center">
+                <Image
+                  src="/logo.png"
+                  alt="Álbum Brasileirão 2025"
+                  width={40}
+                  height={40}
+                  className="mr-2"
+                />
+                <span className="text-xl font-bold text-gray-800">Álbum Brasileirão 2025</span>
               </Link>
             </div>
             <nav className="ml-6 flex space-x-8">

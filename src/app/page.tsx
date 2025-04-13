@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
+import Header from '@/components/Header';
 
 export default function Home() {
   const router = useRouter();
@@ -41,25 +42,26 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="mb-8 flex justify-center">
             <Image
               src="/logo.png"
-              alt="eBrasileirão Logo"
-              width={300}
-              height={300}
-              priority
-              className="w-auto h-auto"
+              alt="Álbum Brasileirão 2025"
+              width={120}
+              height={120}
+              className="rounded-lg"
             />
           </div>
-          <h1 className="text-6xl font-bold text-brasil-blue mb-6">
-            Colecione os craques!!
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">
+            Álbum Digital do Brasileirão 2025
           </h1>
-          <p className="text-2xl text-brasil-blue/80 max-w-3xl mx-auto">
-            Complete seu álbum com as estrelas do futebol brasileiro. Colecione, troque e compartilhe figurinhas dos seus jogadores favoritos!
+          <p className="text-xl text-blue-800 mb-8 max-w-2xl mx-auto">
+            Colecione, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro.
+            Uma experiência única para os fãs de futebol!
           </p>
         </div>
 
@@ -108,89 +110,44 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
-            <div className="text-4xl mb-4 flex justify-center">⚽</div>
-            <h3 className="text-xl font-bold mb-2">20 Times da Série A</h3>
-            <p>Todos os clubes do Brasileirão 2025 com seus elencos completos e atualizados.</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
-            <div className="text-4xl mb-4 flex justify-center">🌟</div>
-            <h3 className="text-xl font-bold mb-2">Figurinhas Especiais</h3>
-            <p>Encontre figurinhas raras dos craques e momentos históricos do campeonato.</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 text-brasil-blue shadow-lg border border-brasil-yellow/20 text-center">
-            <div className="text-4xl mb-4 flex justify-center">🔄</div>
-            <h3 className="text-xl font-bold mb-2">Sistema de Trocas</h3>
-            <p>Troque suas figurinhas repetidas com outros colecionadores de todo o Brasil.</p>
-          </div>
-        </div>
-
-        {/* Engagement Section */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-xl p-8 text-brasil-blue shadow-lg border border-brasil-yellow/20 mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center text-brasil-blue">Junte-se à Comunidade</h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Coluna da Esquerda */}
-            <div className="flex flex-col items-start">
-              <h3 className="text-xl font-bold mb-3 text-brasil-blue">Ranking de Colecionadores</h3>
-              <p className="text-brasil-blue/80 mb-6">
-                Compita com outros colecionadores e suba no ranking semanal.
+        {/* Join Community Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900">Junte-se à Comunidade</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
+              <h3 className="text-xl font-bold mb-4 text-blue-900">Troca de Figurinhas</h3>
+              <p className="text-blue-800">
+                Conecte-se com outros colecionadores e troque suas figurinhas repetidas. 
+                Um sistema seguro e fácil de usar para garantir trocas justas e divertidas.
               </p>
-              <ul className="space-y-4 w-full">
-                <li className="flex items-center gap-3 text-brasil-blue/90">
-                  <span className="text-2xl">🏆</span>
-                  <span>Prêmios semanais</span>
-                </li>
-                <li className="flex items-center gap-3 text-brasil-blue/90">
-                  <span className="text-2xl">📊</span>
-                  <span>Estatísticas detalhadas</span>
-                </li>
-                <li className="flex items-center gap-3 text-brasil-blue/90">
-                  <span className="text-2xl">👥</span>
-                  <span>Comunidade ativa</span>
-                </li>
-              </ul>
             </div>
-
-            {/* Coluna da Direita */}
-            <div className="flex flex-col items-end">
-              <h3 className="text-xl font-bold mb-3 text-brasil-blue">Eventos Especiais</h3>
-              <p className="text-brasil-blue/80 mb-6 text-right">
-                Participe de eventos exclusivos e ganhe figurinhas raras.
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
+              <h3 className="text-xl font-bold mb-4 text-blue-900">Pacotes Diários</h3>
+              <p className="text-blue-800">
+                Todos os dias você recebe novos pacotes de figurinhas para completar seu álbum. 
+                Quanto mais você participa, mais chances de conseguir figurinhas raras!
               </p>
-              <ul className="space-y-4 w-full">
-                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
-                  <span>Desafios diários</span>
-                  <span className="text-2xl">🎮</span>
-                </li>
-                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
-                  <span>Recompensas exclusivas</span>
-                  <span className="text-2xl">🎁</span>
-                </li>
-                <li className="flex items-center justify-end gap-3 text-brasil-blue/90">
-                  <span>Conquistas especiais</span>
-                  <span className="text-2xl">🏅</span>
-                </li>
-              </ul>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
+              <h3 className="text-xl font-bold mb-4 text-blue-900">Ranking de Figurinhas</h3>
+              <p className="text-blue-800">
+                Compita com outros colecionadores e suba no ranking semanal. 
+                Mostre quem tem a melhor coleção do Brasileirão!
+              </p>
             </div>
           </div>
         </div>
 
         {/* CTA Section */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-brasil-blue mb-6">Comece sua Coleção Hoje!</h2>
-          <p className="text-xl text-brasil-blue/80 mb-8">
-            Junte-se a milhares de colecionadores e comece sua jornada no álbum digital do Brasileirão 2025.
-          </p>
           <Link
             href="/register"
-            className="inline-block bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow font-bold py-4 px-8 rounded-lg text-lg transition duration-200"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-200"
           >
-            Criar Conta Gratuita
+            Começar Agora
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 } 

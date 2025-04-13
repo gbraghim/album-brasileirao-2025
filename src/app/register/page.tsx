@@ -9,15 +9,10 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
     try {
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -27,118 +22,73 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || 'Erro ao criar conta');
       }
 
-      // Redirecionar para a página inicial
-      router.push('/');
+      router.push('/login?registered=true');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao criar conta');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="max-w-md mx-auto bg-white/80 backdrop-blur-lg rounded-xl p-8 shadow-lg border border-brasil-yellow/20">
+      <h2 className="text-2xl font-bold text-brasil-blue mb-6 text-center">Crie sua conta</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Criar uma conta
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-300">
-            Ou{' '}
-            <Link href="/login" className="font-medium text-purple-300 hover:text-purple-200">
-              faça login se já tiver uma conta
-            </Link>
-          </p>
+          <label htmlFor="name" className="block text-brasil-blue mb-2">Nome</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="Seu nome"
+          />
         </div>
-
-        {success ? (
-          <div className="text-center">
-            <div className="bg-green-500/10 border border-green-500 text-green-500 px-4 py-3 rounded mb-4">
-              <p className="font-medium">Conta criada com sucesso!</p>
-              <p className="text-sm mt-1">Você será redirecionado para a página de login em instantes...</p>
-            </div>
-            <Link 
-              href="/login" 
-              className="text-purple-300 hover:text-purple-200 font-medium"
-            >
-              Clique aqui para ir para o login
-            </Link>
-          </div>
-        ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded">
-                {error}
-              </div>
-            )}
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <label htmlFor="name" className="sr-only">
-                  Nome
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                  placeholder="Nome completo"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="sr-only">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">
-                  Senha
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                  placeholder="Senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Criando conta...' : 'Criar conta'}
-              </button>
-            </div>
-          </form>
+        <div>
+          <label htmlFor="email" className="block text-brasil-blue mb-2">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="seu@email.com"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-brasil-blue mb-2">Senha</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="••••••••"
+          />
+        </div>
+        {error && (
+          <div className="text-red-500 text-sm">{error}</div>
         )}
-      </div>
+        <button
+          type="submit"
+          className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow font-bold py-3 px-4 rounded-lg transition duration-200"
+        >
+          Criar Conta
+        </button>
+      </form>
+      <p className="text-center text-brasil-blue mt-4">
+        Já tem uma conta?{' '}
+        <Link href="/login" className="text-brasil-green hover:text-brasil-green/80 underline">
+          Faça login
+        </Link>
+      </p>
     </div>
   );
 } 

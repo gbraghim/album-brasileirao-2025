@@ -90,8 +90,8 @@ export default function Repetidas() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white p-8">
-        <h1 className="text-3xl font-bold mb-8">Figurinhas Repetidas</h1>
+      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
+        <h1 class="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
         <p>Por favor, faça login para acessar suas figurinhas repetidas.</p>
       </div>
     );
@@ -99,7 +99,7 @@ export default function Repetidas() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white flex items-center justify-center">
+      <div className="min-h-screen  text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
     );
@@ -107,7 +107,7 @@ export default function Repetidas() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-purple-900 text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen text-white flex flex-col items-center justify-center">
         <p className="text-red-400 mb-4">{error}</p>
         <button
           onClick={() => {
@@ -123,9 +123,9 @@ export default function Repetidas() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white p-8">
+    <div className="min-h-screen  text-white p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Figurinhas Repetidas</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
           {figurinhas.map((figurinha) => (

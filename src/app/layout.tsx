@@ -4,9 +4,7 @@ import { Inter } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Providers from '@/components/Providers';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import FootballBackground from '@/components/FootballBackground';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,10 +22,10 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} min-h-screen bg-gray-50`}>
+      <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
         <Providers session={session}>
-          <FootballBackground />
           <main className="relative">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

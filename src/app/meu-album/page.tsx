@@ -96,18 +96,18 @@ export default function MeuAlbum() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Meu Álbum</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Meu Álbum</h1>
 
         {jogadores.length === 0 ? (
-          <div className="text-center py-12 bg-purple-800 rounded-lg">
+          <div className="text-center py-12  rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Seu álbum está vazio!</h2>
             <p className="text-lg mb-6">Comece sua coleção abrindo pacotes de figurinhas.</p>
             <Link 
               href="/pacotes" 
-              className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              className="inline-block hover: text-white font-bold py-3 px-6 rounded-lg transition-colors"
             >
               Abrir Pacotes
             </Link>

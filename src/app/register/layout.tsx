@@ -4,7 +4,7 @@ export default function RegisterLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-800">
+    <div className="min-h-screen bg-gradient-to-b">
       {children}
     </div>
   );

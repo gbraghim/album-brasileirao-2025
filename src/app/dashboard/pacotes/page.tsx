@@ -158,11 +158,11 @@ export default function Pacotes() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Meus Pacotes</h1>
+      <h1 className="text-2xl font-bold mb-6 text-brasil-blue">Meus Pacotes</h1>
       
       {pacotes.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">Você não tem pacotes disponíveis.</p>
+          <p className="text-green-600">Você não tem pacotes disponíveis.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

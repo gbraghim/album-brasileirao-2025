@@ -164,19 +164,19 @@ export default function Pacotes() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-8">Pacotes de Figurinhas</h1>
+    <div className="min-h-screen  bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Meus Pacotes</h1>
 
       {pacotes.length > 0 ? (
-        <div className="mb-4 p-4 bg-purple-800 rounded-lg">
-          <p className="text-lg">
-            Você tem <span className="font-bold">{pacotes.length}</span> pacote{pacotes.length !== 1 ? 's' : ''} disponível{pacotes.length !== 1 ? 's' : ''}
+        <div className="mb-4 p-4 bg- rounded-lg">
+          <p className="text-lg text-brasil-blue">
+            Você tem <span className="font-bold text-brasil-blue">{pacotes.length}</span> pacote{pacotes.length !== 1 ? 's' : ''} disponível{pacotes.length !== 1 ? 's' : ''}
           </p>
         </div>
       ) : (
-        <div className="mb-4 p-4 bg-purple-800 rounded-lg">
-          <p className="text-lg">Você não tem pacotes disponíveis no momento.</p>
-          <p className="text-sm mt-2">Volte amanhã para receber seu pacote diário!</p>
+        <div className="mb-4 p-4 bg- rounded-lg">
+          <p className="text-lg text-brasil-blue">Você não tem pacotes disponíveis no momento.</p>
+          <p className="text-sm mt-2 text-brasil-blue">Volte amanhã para receber seu pacote diário!</p>
         </div>
       )}
 

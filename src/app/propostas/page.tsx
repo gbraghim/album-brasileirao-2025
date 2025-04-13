@@ -85,7 +85,7 @@ export default function Propostas() {
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-200 to-yellow-200 text-gray-800 p-8">
-        <h1 className="text-3xl font-bold mb-8">Propostas de Troca</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Propostas de Troca</h1>
         <p>Por favor, faça login para acessar suas propostas de troca.</p>
       </div>
     );
@@ -94,7 +94,7 @@ export default function Propostas() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-200 to-yellow-200 text-gray-800 p-8">
-        <h1 className="text-3xl font-bold mb-8">Propostas de Troca</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Propostas de Troca</h1>
         <p>Carregando...</p>
       </div>
     );
@@ -103,7 +103,7 @@ export default function Propostas() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-200 to-yellow-200 text-gray-800 p-8">
-        <h1 className="text-3xl font-bold mb-8">Propostas de Troca</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Propostas de Troca</h1>
         <p className="text-red-500">{error}</p>
       </div>
     );
@@ -112,7 +112,7 @@ export default function Propostas() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-200 to-yellow-200 text-gray-800 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Propostas de Troca</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Propostas de Troca</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {propostas.map((proposta) => (
@@ -147,7 +147,7 @@ export default function Propostas() {
                     setSelectedProposta(proposta);
                     setShowModal(true);
                   }}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                  className="flex-1  hover: text-white px-4 py-2 rounded-lg"
                 >
                   Aceitar
                 </button>

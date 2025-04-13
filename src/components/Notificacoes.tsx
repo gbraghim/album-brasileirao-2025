@@ -143,7 +143,7 @@ export function Notificacoes() {
                           e.stopPropagation();
                           responderTroca(notificacao.troca!.id, true);
                         }}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+                        className=" hover: text-white px-3 py-1 rounded text-sm"
                       >
                         Aceitar
                       </button>

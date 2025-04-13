@@ -34,7 +34,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-purple-900 rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+      <div className="relative  rounded-xl shadow-2xl max-w-2xl w-full mx-4">
         {title && (
           <div className="p-4 border-b border-purple-800">
             <h2 className="text-xl font-bold text-white">{title}</h2>

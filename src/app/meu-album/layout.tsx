@@ -1,5 +1,3 @@
-import Header from '@/components/Header';
-
 export default function MeuAlbumLayout({
   children,
 }: {
@@ -7,7 +5,6 @@ export default function MeuAlbumLayout({
 }) {
   return (
     <>
-      <Header />
       {children}
     </>
   );
