@@ -36,15 +36,24 @@ const authOptions: AuthOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
-          username: user.username
+          username: user.username,
+          image: null
         };
       }
     })
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub as string;
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
       }
       return session;
     }
