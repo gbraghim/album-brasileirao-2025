@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Álbum Brasileirão 2025',
+  title: 'eBrasileirão 2025',
   description: 'Colecione figurinhas do Campeonato Brasileiro',
 };
 

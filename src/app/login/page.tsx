@@ -71,7 +71,7 @@ export default function Login() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 required
               />
               <button
@@ -101,7 +101,7 @@ export default function Login() {
           </button>
         </form>
         <div className="mt-6 text-center">
-          <Link href="/cadastro" className="text-sm text-blue-600 hover:text-blue-500">
+          <Link href="/register" className="text-sm text-blue-600 hover:text-blue-500">
             Não tem uma conta? Cadastre-se
           </Link>
         </div>

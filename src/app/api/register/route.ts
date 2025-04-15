@@ -2,93 +2,75 @@ import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
-interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-}
-
 export async function POST(req: Request) {
   try {
-    const body = await req.json() as RegisterRequest;
-    const { name, email, password } = body;
+    const { name, email, username, password, confirmPassword } = await req.json();
 
-    // Validação dos campos
-    if (!name || !email || !password) {
+    // Validações
+    if (!name || !email || !username || !password || !confirmPassword) {
       return NextResponse.json(
-        { message: 'Todos os campos são obrigatórios' },
+        { error: 'Todos os campos são obrigatórios' },
         { status: 400 }
       );
     }
 
-    // Validação dos tipos
-    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+    if (password !== confirmPassword) {
       return NextResponse.json(
-        { message: 'Formato inválido dos dados' },
+        { error: 'As senhas não coincidem' },
         { status: 400 }
       );
     }
 
-    // Validação do email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { message: 'Email inválido' },
-        { status: 400 }
-      );
-    }
-
-    // Validação da senha
     if (password.length < 6) {
       return NextResponse.json(
-        { message: 'A senha deve ter pelo menos 6 caracteres' },
+        { error: 'A senha deve ter pelo menos 6 caracteres' },
         { status: 400 }
       );
     }
 
-    // Verifica se o email já está em uso
-    const existingUser = await prisma.user.findUnique({
+    // Verificar se o email já existe
+    const existingEmail = await prisma.user.findUnique({
       where: { email },
     });
 
-    if (existingUser) {
+    if (existingEmail) {
       return NextResponse.json(
-        { message: 'Este email já está em uso' },
+        { error: 'Este email já está em uso' },
         { status: 400 }
       );
     }
 
-    // Hash da senha
-    const hashedPassword = await hash(password, 12);
+    // Verificar se o username já existe
+    const existingUsername = await prisma.user.findUnique({
+      where: { username },
+    });
 
-    // Cria o usuário
+    if (existingUsername) {
+      return NextResponse.json(
+        { error: 'Este nome de usuário já está em uso' },
+        { status: 400 }
+      );
+    }
+
+    // Criar usuário
+    const hashedPassword = await hash(password, 10);
     const user = await prisma.user.create({
       data: {
         name,
         email,
+        username,
         password: hashedPassword,
-        numeroDeLogins: 0,
-        primeiroAcesso: true
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        createdAt: true,
       },
     });
 
     return NextResponse.json(
-      { 
-        message: 'Usuário criado com sucesso', 
-        user 
-      },
+      { message: 'Usuário criado com sucesso' },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Erro ao registrar usuário:', error);
+    console.error('Erro ao criar usuário:', error);
     return NextResponse.json(
-      { message: 'Erro ao criar usuário' },
+      { error: 'Erro ao criar usuário' },
       { status: 500 }
     );
   }

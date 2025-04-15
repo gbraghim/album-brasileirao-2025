@@ -11,6 +11,7 @@ export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,24 +19,24 @@ export default function Home() {
     setError('');
 
     const formData = new FormData(e.currentTarget);
-    const data = {
-      email: formData.get('email'),
-      password: formData.get('password'),
-    };
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
     try {
       const result = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: true,
-        callbackUrl: '/dashboard',
+        email,
+        password,
+        redirect: false,
       });
 
       if (result?.error) {
-        throw new Error(result.error);
+        setError('Email ou senha inválidos');
+        return;
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+
+      router.push('/dashboard');
+    } catch (error) {
+      setError('Ocorreu um erro ao fazer login');
     } finally {
       setLoading(false);
     }
@@ -50,7 +51,7 @@ export default function Home() {
           <div className="mb-8 flex justify-center">
             <Image
               src="/logo.png"
-              alt="Álbum Brasileirão 2025"
+              alt="eBrasileirão 2025"
               width={120}
               height={120}
               className="rounded-lg"
@@ -82,14 +83,32 @@ export default function Home() {
             </div>
             <div>
               <label htmlFor="password" className="block text-brasil-blue mb-2">Senha</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
-                placeholder="••••••••"
-              />
+              <div className="relative text-black">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green text-black"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
             {error && (
               <div className="text-red-500 text-sm">{error}</div>
@@ -102,12 +121,11 @@ export default function Home() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
-          <p className="text-center text-brasil-blue mt-4">
-            Não tem uma conta?{' '}
-            <Link href="/register" className="text-brasil-green hover:text-brasil-green/80 underline">
-              Cadastre-se
+          <div className="mt-4 text-center">
+            <Link href="/register" className="text-brasil-blue hover:text-brasil-blue/80">
+              Não tem uma conta? Cadastre-se
             </Link>
-          </p>
+          </div>
         </div>
 
         {/* Join Community Section */}

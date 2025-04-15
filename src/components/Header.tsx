@@ -20,12 +20,12 @@ export default function Header() {
               <Link href={session ? '/dashboard' : '/'} className="flex items-center">
                 <Image
                   src="/logo.png"
-                  alt="Álbum Brasileirão 2025"
+                  alt="eBrasileirão 2025"
                   width={40}
                   height={40}
                   className="mr-2"
                 />
-                <span className="text-xl font-bold text-gray-800">Álbum Brasileirão 2025</span>
+                <span className="text-xl font-bold text-gray-800">eBrasileirão 2025</span>
               </Link>
             </div>
             <nav className="ml-6 flex space-x-8">
