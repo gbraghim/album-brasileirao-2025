@@ -41,19 +41,23 @@ export default function Repetidas() {
         throw new Error('Erro ao buscar figurinhas repetidas');
       }
       const data = await response.json();
+      if (!data || !Array.isArray(data)) {
+        setFigurinhas([]);
+        return;
+      }
       setFigurinhas(data.map((figurinha: any) => ({
-        id: figurinha.id,
+        id: figurinha.id || '',
         numero: figurinha.numero || 0,
-        nome: figurinha.nome,
-        posicao: figurinha.posicao,
-        idade: figurinha.idade,
-        nacionalidade: figurinha.nacionalidade,
-        foto: figurinha.foto,
-        quantidade: figurinha.quantidade - 1, // Quantidade de repetidas (total - 1)
+        nome: figurinha.nome || '',
+        posicao: figurinha.posicao || '',
+        idade: figurinha.idade || 0,
+        nacionalidade: figurinha.nacionalidade || '',
+        foto: figurinha.foto || '',
+        quantidade: (figurinha.quantidade || 1) - 1, // Quantidade de repetidas (total - 1)
         time: {
-          id: figurinha.time.id,
-          nome: figurinha.time.nome,
-          escudo: figurinha.time.escudo
+          id: figurinha.time?.id || '',
+          nome: figurinha.time?.nome || '',
+          escudo: figurinha.time?.escudo || ''
         }
       })));
       setLoading(false);
@@ -142,11 +146,14 @@ export default function Repetidas() {
                 </div>
               </div>
               <div className="flex-grow">
-                <img
-                  src={figurinha.foto}
-                  alt={figurinha.nome}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
+                {figurinha.foto && (
+                  <img
+                    src={figurinha.foto}
+                    alt={figurinha.nome}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                )}
+                <h3 className="text-xl font-bold text-white mb-2">{figurinha.nome}</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <p><span className="font-semibold">Número:</span> {figurinha.numero}</p>
                   <p><span className="font-semibold">Posição:</span> {figurinha.posicao}</p>

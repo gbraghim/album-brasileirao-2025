@@ -45,17 +45,14 @@ export async function GET() {
     // Formatar as figurinhas repetidas com todas as informações necessárias
     const figurinhasFormatadas = figurinhasRepetidas.map(uf => ({
       id: uf.figurinha.id,
-      numero: uf.figurinha.jogador.numero,
-      nome: uf.figurinha.jogador.nome,
-      posicao: uf.figurinha.jogador.posicao,
-      idade: uf.figurinha.jogador.idade,
-      nacionalidade: uf.figurinha.jogador.nacionalidade,
-      foto: uf.figurinha.jogador.foto,
+      numero: uf.figurinha.jogador?.numero || 0,
+      nome: uf.figurinha.jogador?.nome || '',
+      posicao: uf.figurinha.jogador?.posicao || '',
       quantidade: uf.quantidade,
       time: {
-        id: uf.figurinha.jogador.time.id,
-        nome: uf.figurinha.jogador.time.nome,
-        escudo: uf.figurinha.jogador.time.escudo
+        id: uf.figurinha.jogador?.time?.id || '',
+        nome: uf.figurinha.jogador?.time?.nome || '',
+        escudo: uf.figurinha.jogador?.time?.escudo || ''
       }
     }));
 

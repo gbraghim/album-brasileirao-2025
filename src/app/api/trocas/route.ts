@@ -92,33 +92,9 @@ export async function GET() {
       }
     });
 
-    // Buscar propostas recebidas pelo usuário
-    const propostasRecebidas = await prisma.troca.findMany({
-      where: {
-        usuarioRecebeId: user.id,
-        status: 'PENDENTE'
-      },
-      include: {
-        usuarioEnvia: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        figurinhaOferta: {
-          include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
-          }
-        }
-      }
-    });
-
     const formatarTroca = (troca: any) => ({
       id: troca.id,
+      status: troca.status,
       figurinha: {
         id: troca.figurinhaOferta.id,
         jogador: {
@@ -126,7 +102,6 @@ export async function GET() {
           nome: troca.figurinhaOferta.jogador.nome,
           posicao: troca.figurinhaOferta.jogador.posicao,
           numero: troca.figurinhaOferta.jogador.numero,
-          foto: troca.figurinhaOferta.jogador.foto,
           time: {
             id: troca.figurinhaOferta.jogador.time.id,
             nome: troca.figurinhaOferta.jogador.time.nome,
@@ -134,14 +109,12 @@ export async function GET() {
           }
         }
       },
-      usuarioEnvia: troca.usuarioEnvia,
-      status: troca.status
+      usuarioEnvia: troca.usuarioEnvia
     });
 
     return NextResponse.json({
       trocasDisponiveis: trocasDisponiveis.map(formatarTroca),
-      minhasTrocas: minhasTrocas.map(formatarTroca),
-      propostasRecebidas: propostasRecebidas.map(formatarTroca)
+      minhasTrocas: minhasTrocas.map(formatarTroca)
     });
   } catch (error) {
     console.error('Erro ao buscar trocas:', error);

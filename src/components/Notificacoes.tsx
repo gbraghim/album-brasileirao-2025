@@ -42,10 +42,35 @@ export function Notificacoes() {
       const response = await fetch('/api/notificacoes');
       if (response.ok) {
         const data = await response.json();
-        setNotificacoes(data);
+        if (!data || !Array.isArray(data)) {
+          setNotificacoes([]);
+          return;
+        }
+        setNotificacoes(data.map(notificacao => ({
+          id: notificacao.id || '',
+          mensagem: notificacao.mensagem || '',
+          lida: notificacao.lida || false,
+          tipo: notificacao.tipo || '',
+          createdAt: notificacao.createdAt || '',
+          troca: notificacao.troca ? {
+            id: notificacao.troca.id || '',
+            status: notificacao.troca.status || '',
+            figurinhaOferta: {
+              jogador: {
+                nome: notificacao.troca.figurinhaOferta?.jogador?.nome || '',
+                posicao: notificacao.troca.figurinhaOferta?.jogador?.posicao || '',
+                numero: notificacao.troca.figurinhaOferta?.jogador?.numero || 0
+              }
+            },
+            usuarioEnvia: {
+              name: notificacao.troca.usuarioEnvia?.name || ''
+            }
+          } : undefined
+        })));
       }
     } catch (error) {
       console.error('Erro ao buscar notificações:', error);
+      setNotificacoes([]);
     } finally {
       setLoading(false);
     }

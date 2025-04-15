@@ -41,16 +41,38 @@ export default function Propostas() {
 
   const fetchPropostas = async () => {
     try {
-      const response = await fetch('/api/notificacoes');
+      const response = await fetch('/api/trocas/propostas');
       if (!response.ok) {
-        throw new Error('Erro ao buscar propostas');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao buscar propostas');
       }
       const data = await response.json();
-      setPropostas(data);
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Adicionar verificações e valores padrão
+      const propostasFormatadas = (data.propostas || []).map((proposta: any) => ({
+        id: proposta.id || '',
+        troca: {
+          id: proposta.troca?.id || '',
+          figurinhaOferta: {
+            id: proposta.troca?.figurinhaOferta?.id || '',
+            jogador: {
+              nome: proposta.troca?.figurinhaOferta?.jogador?.nome || '',
+              posicao: proposta.troca?.figurinhaOferta?.jogador?.posicao || '',
+              numero: proposta.troca?.figurinhaOferta?.jogador?.numero || 0
+            }
+          }
+        },
+        status: proposta.status || 'pendente'
+      }));
+
+      setPropostas(propostasFormatadas);
       setLoading(false);
     } catch (error) {
-      console.error('Erro ao carregar propostas:', error);
-      setError('Erro ao carregar propostas');
+      console.error('Erro:', error);
+      setError(error instanceof Error ? error.message : 'Erro ao carregar propostas');
       setLoading(false);
     }
   };

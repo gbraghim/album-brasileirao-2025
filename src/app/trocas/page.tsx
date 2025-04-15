@@ -12,6 +12,11 @@ interface Figurinha {
   nome: string;
   posicao: string;
   quantidade: number;
+  time: {
+    id: string;
+    nome: string;
+    escudo: string;
+  };
 }
 
 interface Troca {
@@ -61,8 +66,58 @@ export default function Trocas() {
       if (data.error) {
         throw new Error(data.error);
       }
-      setMinhasTrocas(data.minhasTrocas);
-      setTrocasDisponiveis(data.outrasTrocas);
+
+      // Adicionar verificações e valores padrão
+      const trocasFormatadas: Troca[] = (data.trocasDisponiveis || []).map((troca: any) => ({
+        id: troca.id || '',
+        status: troca.status || 'PENDENTE',
+        figurinhaOferta: {
+          id: troca.figurinha?.id || '',
+          jogador: {
+            id: troca.figurinha?.jogador?.id || '',
+            nome: troca.figurinha?.jogador?.nome || '',
+            posicao: troca.figurinha?.jogador?.posicao || '',
+            numero: troca.figurinha?.jogador?.numero || 0,
+            time: {
+              id: troca.figurinha?.jogador?.time?.id || '',
+              nome: troca.figurinha?.jogador?.time?.nome || '',
+              escudo: troca.figurinha?.jogador?.time?.escudo || ''
+            }
+          }
+        },
+        usuarioEnvia: {
+          id: troca.usuarioEnvia?.id || '',
+          name: troca.usuarioEnvia?.name || '',
+          email: troca.usuarioEnvia?.email || ''
+        }
+      }));
+
+      const minhasTrocas = (data.minhasTrocas || []).map((troca: any) => ({
+        id: troca.id || '',
+        status: troca.status || 'PENDENTE',
+        figurinhaOferta: {
+          id: troca.figurinha?.id || '',
+          jogador: {
+            id: troca.figurinha?.jogador?.id || '',
+            nome: troca.figurinha?.jogador?.nome || '',
+            posicao: troca.figurinha?.jogador?.posicao || '',
+            numero: troca.figurinha?.jogador?.numero || 0,
+            time: {
+              id: troca.figurinha?.jogador?.time?.id || '',
+              nome: troca.figurinha?.jogador?.time?.nome || '',
+              escudo: troca.figurinha?.jogador?.time?.escudo || ''
+            }
+          }
+        },
+        usuarioEnvia: {
+          id: troca.usuarioEnvia?.id || '',
+          name: troca.usuarioEnvia?.name || '',
+          email: troca.usuarioEnvia?.email || ''
+        }
+      }));
+
+      setMinhasTrocas(minhasTrocas);
+      setTrocasDisponiveis(trocasFormatadas);
       setLoading(false);
     } catch (error) {
       console.error('Erro:', error);
@@ -78,16 +133,20 @@ export default function Trocas() {
         throw new Error('Erro ao buscar figurinhas repetidas');
       }
       const data = await response.json();
-      setFigurinhasRepetidas(data.jogadores.map((jogador: any) => ({
-        id: jogador.id,
-        numero: jogador.numero || 0,
-        nome: jogador.nome,
-        posicao: jogador.posicao,
-        quantidade: jogador.quantidade
-      })));
+      
+      if (!Array.isArray(data)) {
+        console.error('Dados inválidos recebidos da API:', data);
+        setFigurinhasRepetidas([]);
+        return;
+      }
+
+      setFigurinhasRepetidas(data);
+      setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar figurinhas repetidas:', error);
       setError('Erro ao carregar figurinhas repetidas');
+      setFigurinhasRepetidas([]);
+      setLoading(false);
     }
   };
 
