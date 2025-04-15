@@ -11,6 +11,7 @@ export default function RegisterPage() {
     email: '',
     username: '',
     password: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,7 @@ export default function RegisterPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -65,17 +66,27 @@ export default function RegisterPage() {
             placeholder="seu@email.com"
           />
         </div>
+        <div>
+          <label htmlFor="username" className="block text-brasil-blue mb-2">Nome de usuário</label>
+          <input
+            type="text"
+            id="username"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="Seu nome de usuário"
+          />
+        </div>
         <div className="relative">
-          <label htmlFor="password" className="sr-only">
-            Senha
-          </label>
+          <label htmlFor="password" className="block text-brasil-blue mb-2">Senha</label>
           <input
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brasil-blue focus:border-brasil-blue focus:z-10 sm:text-sm"
-            placeholder="Senha"
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="Sua senha"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
@@ -84,7 +95,7 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center top-8"
           >
             {showPassword ? (
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,6 +108,21 @@ export default function RegisterPage() {
               </svg>
             )}
           </button>
+        </div>
+        <div className="relative">
+          <label htmlFor="confirmPassword" className="block text-brasil-blue mb-2">Confirmar Senha</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type={showPassword ? "text" : "password"}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+            placeholder="Confirme sua senha"
+            value={formData.confirmPassword}
+            onChange={(e) =>
+              setFormData({ ...formData, confirmPassword: e.target.value })
+            }
+          />
         </div>
         {error && (
           <div className="text-red-500 text-sm">{error}</div>
