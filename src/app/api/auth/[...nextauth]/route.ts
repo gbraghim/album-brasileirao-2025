@@ -1,4 +1,4 @@
-import NextAuth, { AuthOptions, User } from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -14,7 +14,7 @@ const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials: Record<"email" | "password", string> | undefined, req: Pick<RequestInternal, "query" | "body" | "headers" | "method">): Promise<User | null> {
+      async authorize(credentials: Record<"email" | "password", string> | undefined, req: Pick<RequestInternal, "query" | "body" | "headers" | "method">): Promise<{ id: string; email: string; name: string; } | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email e senha são obrigatórios');
         }
@@ -33,15 +33,11 @@ const authOptions: AuthOptions = {
           return null;
         }
 
-        const authUser: User = {
+        return {
           id: user.id,
           name: user.name,
-          email: user.email,
-          username: user.username,
-          image: null
+          email: user.email
         };
-
-        return authUser;
       }
     })
   ],
@@ -49,14 +45,12 @@ const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.username = token.username as string;
       }
       return session;
     }
