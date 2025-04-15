@@ -14,7 +14,7 @@ const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, req): Promise<User | null> {
+      async authorize(credentials, req): Promise<any> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email e senha são obrigatórios');
         }
@@ -39,7 +39,7 @@ const authOptions: AuthOptions = {
           email: user.email || null,
           username: user.username || '',
           image: null
-        };
+        } as any;
       }
     })
   ],
