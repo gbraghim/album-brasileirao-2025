@@ -91,7 +91,7 @@ export default function Repetidas() {
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-        <h1 class="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
         <p>Por favor, faça login para acessar suas figurinhas repetidas.</p>
       </div>
     );
