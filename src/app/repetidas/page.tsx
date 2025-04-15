@@ -70,7 +70,7 @@ export default function Repetidas() {
         idade: figurinha.idade,
         nacionalidade: figurinha.nacionalidade,
         foto: figurinha.foto,
-        quantidade: figurinha.quantidade - 1,
+        quantidade: figurinha.quantidade,
         time: {
           id: figurinha.time.id,
           nome: figurinha.time.nome,
@@ -177,7 +177,7 @@ export default function Repetidas() {
                   <p className="text-gray-800"><span className="font-semibold">Idade:</span> {figurinha.idade}</p>
                   <p className="text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.nacionalidade}</p>
                   <p className="col-span-2 text-gray-800">
-                    <span className="font-semibold">Repetidas:</span> {figurinha.quantidade - 1}
+                    <span className="font-semibold">Repetidas:</span> {figurinha.quantidade}
                   </p>
                 </div>
               </div>
