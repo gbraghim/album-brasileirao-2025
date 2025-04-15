@@ -33,15 +33,13 @@ const authOptions: AuthOptions = {
           return null;
         }
 
-        const authUser: User = {
+        return {
           id: user.id,
-          name: user.name,
-          email: user.email,
+          name: user.name || null,
+          email: user.email || null,
           username: user.username,
           image: null
         };
-
-        return authUser;
       }
     })
   ],
