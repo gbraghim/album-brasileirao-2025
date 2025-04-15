@@ -1,7 +1,8 @@
-import NextAuth, { AuthOptions } from 'next-auth';
+import NextAuth, { AuthOptions, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { RequestInternal } from 'next-auth';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req): Promise<User | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email e senha são obrigatórios');
         }
@@ -32,13 +33,15 @@ const authOptions: AuthOptions = {
           return null;
         }
 
-        return {
+        const authUser: User = {
           id: user.id,
           name: user.name,
           email: user.email,
           username: user.username,
           image: null
         };
+
+        return authUser;
       }
     })
   ],
