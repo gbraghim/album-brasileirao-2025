@@ -23,13 +23,13 @@ const authOptions: AuthOptions = {
         });
 
         if (!user) {
-          throw new Error('Usuário não encontrado');
+          return null;
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error('Senha incorreta');
+          return null;
         }
 
         return {
@@ -42,31 +42,21 @@ const authOptions: AuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.username = user.username;
-      }
-      return token;
-    },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.username = token.username;
+        session.user.id = token.sub as string;
       }
       return session;
     }
   },
   pages: {
     signIn: '/login',
+    error: '/login'
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt'
   },
+  secret: process.env.NEXTAUTH_SECRET
 };
 
 const handler = NextAuth(authOptions);
