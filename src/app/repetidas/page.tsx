@@ -27,37 +27,54 @@ export default function Repetidas() {
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [selectedFigurinha, setSelectedFigurinha] = useState<Figurinha | null>(null);
+  const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
-      fetchFigurinhasRepetidas();
+      fetchData();
     }
   }, [session]);
 
-  const fetchFigurinhasRepetidas = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch('/api/repetidas');
-      if (!response.ok) {
-        throw new Error('Erro ao buscar figurinhas repetidas');
+      const [repetidasResponse, trocasResponse] = await Promise.all([
+        fetch('/api/repetidas'),
+        fetch('/api/trocas')
+      ]);
+
+      if (!repetidasResponse.ok || !trocasResponse.ok) {
+        throw new Error('Erro ao buscar dados');
       }
-      const data = await response.json();
-      if (!data || !Array.isArray(data)) {
-        setFigurinhas([]);
-        return;
-      }
-      setFigurinhas(data.map((figurinha: any) => ({
-        id: figurinha.id || '',
+
+      const [repetidasData, trocasData] = await Promise.all([
+        repetidasResponse.json(),
+        trocasResponse.json()
+      ]);
+
+      // Extrair IDs das figurinhas em troca do usuário atual
+      const figurinhasEmTrocaIds = Array.isArray(trocasData.minhasTrocas) 
+        ? trocasData.minhasTrocas
+            .map((t: any) => t.figurinha?.id)
+            .filter(Boolean)
+        : [];
+      setFigurinhasEmTroca(figurinhasEmTrocaIds);
+
+      // Mapear figurinhas repetidas
+      setFigurinhas(repetidasData.map((figurinha: any) => ({
+        id: figurinha.id,
         numero: figurinha.numero || 0,
-        nome: figurinha.nome || '',
-        posicao: figurinha.posicao || '',
-        idade: figurinha.idade || 0,
-        nacionalidade: figurinha.nacionalidade || '',
-        foto: figurinha.foto || '',
-        quantidade: (figurinha.quantidade || 1) - 1, // Quantidade de repetidas (total - 1)
+        nome: figurinha.nome,
+        posicao: figurinha.posicao,
+        idade: figurinha.idade,
+        nacionalidade: figurinha.nacionalidade,
+        foto: figurinha.foto,
+        quantidade: figurinha.quantidade - 1,
         time: {
-          id: figurinha.time?.id || '',
-          nome: figurinha.time?.nome || '',
-          escudo: figurinha.time?.escudo || ''
+          id: figurinha.time.id,
+          nome: figurinha.time.nome,
+          escudo: figurinha.time.escudo
         }
       })));
       setLoading(false);
@@ -80,15 +97,18 @@ export default function Repetidas() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Erro ao disponibilizar figurinha para troca');
+        setErrorMessage(data.error || 'Erro ao disponibilizar figurinha para troca');
+        setShowErrorModal(true);
+        return;
       }
 
       setSelectedFigurinha(figurinha);
       setShowSuccessModal(true);
-      fetchFigurinhasRepetidas(); // Recarrega a lista de figurinhas
+      fetchData(); // Recarrega a lista de figurinhas
     } catch (error) {
       console.error('Erro ao enviar figurinha para troca:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao enviar figurinha para troca');
+      setErrorMessage('Erro ao enviar figurinha para troca');
+      setShowErrorModal(true);
     }
   };
 
@@ -116,7 +136,7 @@ export default function Repetidas() {
         <button
           onClick={() => {
             setError(null);
-            fetchFigurinhasRepetidas();
+            fetchData();
           }}
           className="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded-lg"
         >
@@ -127,13 +147,13 @@ export default function Repetidas() {
   }
 
   return (
-    <div className="min-h-screen  text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
           {figurinhas.map((figurinha) => (
-            <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+            <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-4 flex flex-col">
               <div className="flex items-center mb-4">
                 <img
                   src={figurinha.time.escudo}
@@ -141,40 +161,67 @@ export default function Repetidas() {
                   className="w-12 h-12 object-contain mr-4"
                 />
                 <div>
-                  <h3 className="text-lg font-semibold">{figurinha.nome}</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{figurinha.nome}</h3>
                   <p className="text-gray-600">{figurinha.time.nome}</p>
                 </div>
               </div>
               <div className="flex-grow">
-                {figurinha.foto && (
-                  <img
-                    src={figurinha.foto}
-                    alt={figurinha.nome}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                )}
-                <h3 className="text-xl font-bold text-white mb-2">{figurinha.nome}</h3>
+                <img
+                  src={figurinha.foto}
+                  alt={figurinha.nome}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <p><span className="font-semibold">Número:</span> {figurinha.numero}</p>
-                  <p><span className="font-semibold">Posição:</span> {figurinha.posicao}</p>
-                  <p><span className="font-semibold">Idade:</span> {figurinha.idade}</p>
-                  <p><span className="font-semibold">Nacionalidade:</span> {figurinha.nacionalidade}</p>
-                  <p className="col-span-2">
+                  <p className="text-gray-800"><span className="font-semibold">Número:</span> {figurinha.numero}</p>
+                  <p className="text-gray-800"><span className="font-semibold">Posição:</span> {figurinha.posicao}</p>
+                  <p className="text-gray-800"><span className="font-semibold">Idade:</span> {figurinha.idade}</p>
+                  <p className="text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.nacionalidade}</p>
+                  <p className="col-span-2 text-gray-800">
                     <span className="font-semibold">Repetidas:</span> {figurinha.quantidade - 1}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => enviarParaTroca(figurinha)}
-                className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                disabled={loading}
-              >
-                {loading ? 'Processando...' : 'Disponibilizar para Troca'}
-              </button>
+              {figurinhasEmTroca.includes(figurinha.id) ? (
+                <button
+                  className="mt-4 bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed"
+                  disabled
+                >
+                  Figurinha já disponibilizada para troca
+                </button>
+              ) : (
+                <button
+                  onClick={() => enviarParaTroca(figurinha)}
+                  className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={loading}
+                >
+                  {loading ? 'Processando...' : 'Disponibilizar para Troca'}
+                </button>
+              )}
             </div>
           ))}
         </div>
       </div>
+
+      {/* Modal de erro */}
+      {showErrorModal && (
+        <Modal
+          isOpen={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+        >
+          <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
+            <h2 className="text-2xl font-bold mb-4 text-red-500">Atenção!</h2>
+            <p className="mb-4 text-gray-800">{errorMessage}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Modal de sucesso */}
       {showSuccessModal && selectedFigurinha && (
@@ -182,17 +229,17 @@ export default function Repetidas() {
           isOpen={showSuccessModal}
           onClose={() => setShowSuccessModal(false)}
         >
-          <div className="p-6">
+          <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
-            <p className="mb-4">
+            <p className="mb-4 text-gray-800">
               A figurinha {selectedFigurinha.nome} foi disponibilizada para troca com sucesso!
             </p>
             <div className="flex justify-end">
               <button
                 onClick={() => setShowSuccessModal(false)}
-                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
-                Fechar
+                OK
               </button>
             </div>
           </div>
