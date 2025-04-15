@@ -9,16 +9,15 @@ declare module 'next-auth' {
       name: string | null;
       email: string | null;
       username: string;
-      image?: string | null;
-    } & DefaultSession['user']
+      image?: string;
+    } & DefaultSession['user'];
   }
 
   interface User {
     id: string;
-    name: string | null;
-    email: string | null;
-    username: string;
-    image?: string | null;
+    name: string;
+    email: string;
+    image?: string;
   }
 }
 
