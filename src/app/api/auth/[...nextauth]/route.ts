@@ -1,22 +1,22 @@
-import NextAuth, { AuthOptions } from 'next-auth';
+import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { RequestInternal } from 'next-auth';
+import NextAuth from 'next-auth';
 
 const prisma = new PrismaClient();
 
-const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials: Record<"email" | "password", string> | undefined, req: Pick<RequestInternal, "query" | "body" | "headers" | "method">): Promise<{ id: string; email: string; name: string; } | null> {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios');
+          return null;
         }
 
         const user = await prisma.user.findUnique({
@@ -27,16 +27,16 @@ const authOptions: AuthOptions = {
           return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+        const isValid = await bcrypt.compare(credentials.password, user.password);
 
-        if (!isPasswordValid) {
+        if (!isValid) {
           return null;
         }
 
         return {
           id: user.id,
-          name: user.name,
-          email: user.email
+          email: user.email,
+          name: user.name
         };
       }
     })
@@ -45,12 +45,16 @@ const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (token) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
     }
@@ -61,8 +65,7 @@ const authOptions: AuthOptions = {
   },
   session: {
     strategy: 'jwt'
-  },
-  secret: process.env.NEXTAUTH_SECRET
+  }
 };
 
 const handler = NextAuth(authOptions);

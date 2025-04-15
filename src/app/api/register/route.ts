@@ -1,64 +1,37 @@
 import { NextResponse } from 'next/server';
-import { hash } from 'bcryptjs';
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-export async function POST(req: Request) {
+const prisma = new PrismaClient();
+
+export async function POST(request: Request) {
   try {
-    const { name, email, username, password, confirmPassword } = await req.json();
+    const { name, email, password } = await request.json();
 
-    // Validações
-    if (!name || !email || !username || !password || !confirmPassword) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Todos os campos são obrigatórios' },
+        { message: 'Todos os campos são obrigatórios' },
         { status: 400 }
       );
     }
 
-    if (password !== confirmPassword) {
-      return NextResponse.json(
-        { error: 'As senhas não coincidem' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'A senha deve ter pelo menos 6 caracteres' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar se o email já existe
-    const existingEmail = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
-    if (existingEmail) {
+    if (existingUser) {
       return NextResponse.json(
-        { error: 'Este email já está em uso' },
+        { message: 'Email já cadastrado' },
         { status: 400 }
       );
     }
 
-    // Verificar se o username já existe
-    const existingUsername = await prisma.user.findUnique({
-      where: { username },
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (existingUsername) {
-      return NextResponse.json(
-        { error: 'Este nome de usuário já está em uso' },
-        { status: 400 }
-      );
-    }
-
-    // Criar usuário
-    const hashedPassword = await hash(password, 10);
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        username,
         password: hashedPassword,
       },
     });
@@ -68,9 +41,9 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Erro ao criar usuário:', error);
+    console.error('Erro ao registrar usuário:', error);
     return NextResponse.json(
-      { error: 'Erro ao criar usuário' },
+      { message: 'Erro ao registrar usuário' },
       { status: 500 }
     );
   }
