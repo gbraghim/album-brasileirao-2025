@@ -52,13 +52,15 @@ export async function GET() {
       });
     });
 
-    // Calcula total de figurinhas (incluindo repetidas)
-    const totalFigurinhas = Array.from(jogadoresMap.values())
-      .reduce((acc, quantidade) => acc + quantidade, 0);
+    // Calcula figurinhas únicas (número de jogadores diferentes)
+    const figurinhasUnicas = jogadoresMap.size;
 
     // Calcula figurinhas repetidas
     const figurinhasRepetidas = Array.from(jogadoresMap.values())
       .reduce((acc, quantidade) => acc + Math.max(0, quantidade - 1), 0);
+
+    // Total de figurinhas é a soma das únicas mais as repetidas
+    const totalFigurinhas = figurinhasUnicas + figurinhasRepetidas;
 
     // Calcula times completos
     const timesFigurinhas = new Map();
