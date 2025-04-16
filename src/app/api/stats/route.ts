@@ -2,42 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import type { UserStats } from '@/types/stats';
-import type { User } from '@prisma/client';
-
-type UserWithPacotes = User & {
-  pacotes: {
-    figurinhas: {
-      id: string;
-      numero: number;
-      time: string;
-      repetida: boolean;
-    }[];
-  }[];
-};
-
-// Lista de times do Brasileirão 2025
-const TIMES_BRASILEIRAO = [
-  'Flamengo',
-  'Palmeiras',
-  'Grêmio',
-  'São Paulo',
-  'Fluminense',
-  'Atlético-MG',
-  'Corinthians',
-  'Internacional',
-  'Athletico-PR',
-  'Vasco',
-  'Botafogo',
-  'Santos',
-  'Cruzeiro',
-  'Bahia',
-  'Fortaleza',
-  'Red Bull Bragantino',
-  'Cuiabá',
-  'Atlético-GO',
-  'Vitória',
-  'Juventude'
-];
 
 export async function GET() {
   try {
@@ -55,11 +19,15 @@ export async function GET() {
       include: {
         pacotes: {
           include: {
-            figurinhas: true
+            figurinhas: {
+              include: {
+                jogador: true
+              }
+            }
           }
         }
       }
-    }) as UserWithPacotes | null;
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -73,33 +41,39 @@ export async function GET() {
     const totalFigurinhas = user.pacotes.reduce((acc, pacote) => 
       acc + pacote.figurinhas.length, 0
     );
-    const figurinhasRepetidas = user.pacotes.reduce((acc, pacote) => 
-      acc + pacote.figurinhas.filter(f => f.repetida).length, 0
-    );
 
-    // Calcula times completos
-    const figurinhasPorTime = new Map<string, Set<number>>();
-    
-    // Inicializa o Map com todos os times
-    TIMES_BRASILEIRAO.forEach(time => {
-      figurinhasPorTime.set(time, new Set());
-    });
-
-    // Preenche o Map com as figurinhas do usuário
+    // Conta figurinhas repetidas agrupando por jogador
+    const jogadoresMap = new Map();
     user.pacotes.forEach(pacote => {
       pacote.figurinhas.forEach(figurinha => {
-        if (!figurinha.repetida) {
-          const figurinhasDoTime = figurinhasPorTime.get(figurinha.time);
-          if (figurinhasDoTime) {
-            figurinhasDoTime.add(figurinha.numero);
-          }
+        const jogadorId = figurinha.jogador.id;
+        if (!jogadoresMap.has(jogadorId)) {
+          jogadoresMap.set(jogadorId, 1);
+        } else {
+          jogadoresMap.set(jogadorId, jogadoresMap.get(jogadorId) + 1);
         }
       });
     });
 
+    // Soma todas as figurinhas que aparecem mais de uma vez
+    const figurinhasRepetidas = Array.from(jogadoresMap.values())
+      .reduce((acc, quantidade) => acc + Math.max(0, quantidade - 1), 0);
+
+    // Calcula times completos
+    const timesFigurinhas = new Map();
+    user.pacotes.forEach(pacote => {
+      pacote.figurinhas.forEach(figurinha => {
+        const timeId = figurinha.jogador.timeId;
+        if (!timesFigurinhas.has(timeId)) {
+          timesFigurinhas.set(timeId, new Set());
+        }
+        timesFigurinhas.get(timeId).add(figurinha.jogador.numero);
+      });
+    });
+
     // Conta quantos times estão completos (assumindo que cada time tem 30 figurinhas)
-    const timesCompletos = Array.from(figurinhasPorTime.values())
-      .filter(figurinhas => figurinhas.size === 30)
+    const timesCompletos = Array.from(timesFigurinhas.values())
+      .filter(jogadores => jogadores.size === 30)
       .length;
 
     const stats: UserStats = {
@@ -107,7 +81,7 @@ export async function GET() {
       totalFigurinhas,
       figurinhasRepetidas,
       timesCompletos,
-      totalTimes: TIMES_BRASILEIRAO.length
+      totalTimes: 20 // Total de times no Brasileirão
     };
 
     return NextResponse.json(stats);
