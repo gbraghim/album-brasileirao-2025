@@ -73,21 +73,21 @@ export async function getTimes(): Promise<Time[]> {
     const campeonatos = await fetchWithErrorHandling(`${API_BASE_URL}/campeonatos`)
     console.log('Campeonatos disponíveis:', campeonatos)
     
-    // Tenta encontrar o campeonato brasileiro com diferentes variações do nome
-    const brasileirao = campeonatos.find((c: any) => 
-      c.nome.toLowerCase().includes('brasileiro') || 
-      c.nome.toLowerCase().includes('série a')
+    // Tenta encontrar o campeonato brasileiro série B
+    const brasileiraoB = campeonatos.find((c: any) => 
+      c.nome.toLowerCase().includes('brasileiro') && 
+      c.nome.toLowerCase().includes('série b')
     )
     
-    if (!brasileirao) {
+    if (!brasileiraoB) {
       console.error('Campeonatos disponíveis:', campeonatos.map((c: any) => c.nome))
-      throw new Error('Campeonato Brasileiro não encontrado')
+      throw new Error('Campeonato Brasileiro Série B não encontrado')
     }
 
-    console.log('Campeonato encontrado:', brasileirao)
+    console.log('Campeonato encontrado:', brasileiraoB)
     
     // Busca a tabela do campeonato para obter os times
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/campeonatos/${brasileirao.campeonato_id}/tabela`)
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/campeonatos/${brasileiraoB.campeonato_id}/tabela`)
     
     // Extrai os times da tabela
     const times = response.map((item: any) => item.time)
