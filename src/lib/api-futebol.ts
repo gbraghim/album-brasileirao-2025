@@ -86,9 +86,12 @@ export async function getTimes(): Promise<Time[]> {
 
     console.log('Campeonato encontrado:', brasileirao)
     
-    // Busca os times diretamente do endpoint /times
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/times`)
-    return response
+    // Busca a tabela do campeonato para obter os times
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/campeonatos/${brasileirao.campeonato_id}/tabela`)
+    
+    // Extrai os times da tabela
+    const times = response.map((item: any) => item.time)
+    return times
   } catch (error) {
     console.error('Erro ao buscar times:', error)
     throw error
