@@ -22,25 +22,28 @@ const CACHE_DURATION = 3600 * 1000 // 1 hora em milissegundos
 
 export async function getCachedData<T>(key: string, fetchFn: () => Promise<T>, ttl: number = 3600): Promise<T> {
   try {
-    // Tenta buscar do Redis primeiro
+    // Tenta buscar do cache em memória primeiro
+    const memoryCached = memoryCache.get(key)
+    if (memoryCached) {
+      console.log(`Cache hit em memória para ${key}`)
+      return memoryCached as T
+    }
+
+    // Se não encontrou no cache em memória, tenta buscar do Redis
     if (redis) {
       try {
         const cached = await redis.get<string>(key)
         if (cached) {
           console.log(`Cache hit para ${key}`)
-          return JSON.parse(cached) as T
+          const data = JSON.parse(cached) as T
+          // Salva no cache em memória para futuras requisições
+          memoryCache.set(key, data)
+          return data
         }
       } catch (redisError) {
         console.error('Erro ao acessar Redis:', redisError)
-        // Continua para o fallback em caso de erro no Redis
+        // Continua para buscar da API em caso de erro no Redis
       }
-    }
-
-    // Se não encontrou no Redis, tenta buscar do cache em memória
-    const memoryCached = memoryCache.get(key)
-    if (memoryCached) {
-      console.log(`Cache hit em memória para ${key}`)
-      return memoryCached as T
     }
 
     // Se não encontrou em nenhum cache, busca da API
