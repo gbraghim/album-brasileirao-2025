@@ -22,6 +22,7 @@ interface Jogador {
   time: {
     nome: string;
     escudo: string;
+    id: string;
   };
   figurinhas: Figurinha[];
 }
@@ -36,6 +37,7 @@ export default function MeuAlbum() {
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [timeSelecionado, setTimeSelecionado] = useState<{ nome: string; id: string } | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -68,6 +70,14 @@ export default function MeuAlbum() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const jogadoresDoTime = timeSelecionado 
+    ? jogadores.filter(jogador => jogador.time.nome === timeSelecionado.nome)
+    : [];
+
+  const getJogadoresDoTime = (timeId: string) => {
+    return jogadores.filter(jogador => jogador.time.id === timeId).length;
   };
 
   if (loading) {
