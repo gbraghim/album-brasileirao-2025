@@ -15,4 +15,26 @@ body {
     rgb(var(--background-end-rgb))
   );
   min-height: 100vh;
+}
+
+@keyframes pacoteAberto {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-pacote-aberto {
+  animation: pacoteAberto 1s ease-in-out;
 } 

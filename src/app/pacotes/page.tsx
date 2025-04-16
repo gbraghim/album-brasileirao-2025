@@ -29,6 +29,7 @@ export default function Pacotes() {
   const [modalAberto, setModalAberto] = useState(false);
   const [figurinhasAbertas, setFigurinhasAbertas] = useState<any[]>([]);
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
+  const [pacoteAbrindo, setPacoteAbrindo] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -102,6 +103,8 @@ export default function Pacotes() {
 
   const handleAbrirPacote = async (pacoteId: string) => {
     try {
+      setPacoteAbrindo(pacoteId);
+      
       const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
         headers: {
@@ -130,6 +133,8 @@ export default function Pacotes() {
     } catch (err) {
       console.error('Erro ao abrir pacote:', err);
       setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
+    } finally {
+      setPacoteAbrindo(null);
     }
   };
 
@@ -187,14 +192,14 @@ export default function Pacotes() {
             className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
             onClick={() => handleAbrirPacote(pacote.id)}
           >
-            <div className="relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+            <div className={`relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-500 ${pacoteAbrindo === pacote.id ? 'animate-pacote-aberto' : ''}`}>
               <Image
-                src="/pacote-figurinhas.png"
+                src={pacoteAbrindo === pacote.id ? "/pacote-figurinhas-aberto.png" : "/pacote-figurinhas.png"}
                 alt="Pacote de Figurinhas"
                 fill
                 className="object-contain p-4"
               />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brasil-blue/80 backdrop-blur-sm">
+              <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${pacoteAbrindo === pacote.id ? 'hidden' : ''}`}>
                 <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
                   Abrir Pacote
                 </button>
