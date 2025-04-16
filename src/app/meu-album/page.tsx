@@ -77,13 +77,16 @@ export default function MeuAlbum() {
       const timesUnicos = Array.from(
         new Set(data.jogadores.map(j => j.time.nome))
       ).map(nomeTime => {
-        const time = data.jogadores.find(j => j.time.nome === nomeTime)?.time;
+        const jogador = data.jogadores.find(j => j.time.nome === nomeTime);
+        if (!jogador) return null;
         return {
-          id: time?.id || nomeTime.toLowerCase().replace(/\s+/g, '-'),
-          nome: nomeTime,
-          escudo: time?.escudo || '/placeholder-time.png'
+          id: jogador.time.id,
+          nome: jogador.time.nome,
+          escudo: jogador.time.escudo || '/placeholder-time.png'
         };
-      }).sort((a, b) => a.nome.localeCompare(b.nome));
+      })
+      .filter((time): time is Time => time !== null)
+      .sort((a, b) => a.nome.localeCompare(b.nome));
       
       setTimes(timesUnicos);
       if (timesUnicos.length > 0) {
@@ -98,7 +101,7 @@ export default function MeuAlbum() {
   };
 
   const jogadoresDoTime = timeSelecionado 
-    ? jogadores.filter(j => j.time.id === timeSelecionado.id)
+    ? jogadores.filter(jogador => jogador.time.nome === timeSelecionado.nome)
     : [];
 
   if (loading) {
