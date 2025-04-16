@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -41,6 +42,15 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/logo.png"
+            alt="Álbum Brasileirão 2025"
+            width={200}
+            height={100}
+            className="object-contain"
+          />
+        </div>
         <h1 className="text-3xl font-bold text-center mb-8 text-brasil-blue">Login</h1>
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
