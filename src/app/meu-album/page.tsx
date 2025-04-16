@@ -46,6 +46,7 @@ export default function MeuAlbum() {
   const [timeSelecionado, setTimeSelecionado] = useState<Time | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [animacao, setAnimacao] = useState<'flip-page-right' | 'flip-page-left' | ''>('');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -89,6 +90,21 @@ export default function MeuAlbum() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTimeClick = (time: Time) => {
+    if (time.id === timeSelecionado?.id) return;
+    
+    // Determinar a direção da animação baseada na ordem alfabética
+    const direcao = time.nome.localeCompare(timeSelecionado?.nome || '') > 0 ? 'flip-page-right' : 'flip-page-left';
+    setAnimacao(direcao);
+    
+    // Resetar a animação após ela terminar
+    setTimeout(() => {
+      setAnimacao('');
+    }, 500);
+    
+    setTimeSelecionado(time);
   };
 
   const jogadoresDoTime = timeSelecionado 
@@ -147,7 +163,7 @@ export default function MeuAlbum() {
                   {times.map((time) => (
                     <button
                       key={time.id}
-                      onClick={() => setTimeSelecionado(time)}
+                      onClick={() => handleTimeClick(time)}
                       className={`w-full flex items-center space-x-3 p-2 rounded-lg transition-colors ${
                         timeSelecionado?.id === time.id
                           ? 'bg-brasil-blue/20 border border-brasil-blue'
@@ -171,7 +187,7 @@ export default function MeuAlbum() {
 
             {/* Álbum */}
             <div className="flex-1">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+              <div className={`bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20 ${animacao}`}>
                 {timeSelecionado && (
                   <div className="mb-6 flex items-center space-x-4">
                     <div className="w-16 h-16 relative">
