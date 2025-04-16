@@ -250,18 +250,21 @@ export default function Trocas() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-gradient-to-r from-green-500 to-yellow-300 p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-white">Quero trocar</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">Quero trocar</h2> 
           <button
             onClick={() => setShowModal(true)}
-            className="hover: text-white px-4 py-2 rounded-lg mb-4"
+            className="border-4 border-black-500 bg-blue-500 rounded-xl outline-4 outline-offset-2"
           >
-            Adicionar figurinha para troca
+            Adicionar figurinha para troca 
           </button>
+          <p> 
+                    
+          </p>
           <div className="grid grid-cols-2 gap-4">
             {minhasTrocas.map((troca) => (
               <div
                 key={troca.id}
-                className="bg-purple-700 p-4 rounded-lg"
+                className="border-4 border-black-500 bg-gradient-to-br from-blue via-blue-100 to-blue-500 p-4 rounded-lg"
               >
                 <h3 className="font-bold">{troca.figurinhaOferta.jogador.nome}</h3>
                 <p className="text-sm">{troca.figurinhaOferta.jogador.posicao}</p>
@@ -277,7 +280,7 @@ export default function Trocas() {
             {trocasDisponiveis.map((troca) => (
               <div
                 key={troca.id}
-                className="bg-purple-700 p-4 rounded-lg"
+                className="border-4 border-black-500 bg-gradient-to-br from-blue via-blue-100 to-blue-500 p-4 rounded-lg"
               >
                 <h3 className="font-bold">{troca.figurinhaOferta.jogador.nome}</h3>
                 <p className="text-sm">{troca.figurinhaOferta.jogador.posicao}</p>
