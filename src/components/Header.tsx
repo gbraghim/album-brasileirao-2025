@@ -28,7 +28,7 @@ export default function Header() {
                 <span className="text-xl font-bold text-gray-800">eBrasileirão 2025</span>
               </Link>
             </div>
-            {session && pathname !== '/' && (
+            {session && (
               <nav className="ml-6 flex space-x-8">
                 <Link 
                   href="/dashboard" 
