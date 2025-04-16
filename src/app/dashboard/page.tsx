@@ -4,18 +4,46 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+interface RankingItem {
+  id: string;
+  name: string;
+  figurinhas: number;
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [pacotes, setPacotes] = useState(0);
+  const [ranking, setRanking] = useState<RankingItem[]>([]);
+  const [loadingRanking, setLoadingRanking] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     } else if (status === 'authenticated') {
       carregarPacotes();
+      carregarRanking();
     }
   }, [status, router]);
+
+  const carregarRanking = async () => {
+    try {
+      const response = await fetch('/api/ranking', {
+        headers: {
+          'Authorization': `Bearer ${session?.user?.email}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRanking(data);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar ranking:', err);
+    } finally {
+      setLoadingRanking(false);
+    }
+  };
 
   const carregarPacotes = async () => {
     try {
@@ -48,30 +76,62 @@ export default function DashboardPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Bem-vindo, {session?.user?.name}!</h1>
       
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-6 border border-brasil-yellow/20">
-        <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Seu Álbum</h2>
-        <p className="text-brasil-blue/80 mb-4">
-          Aqui você pode gerenciar seu álbum de figurinhas do eBrasileirão 2025.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
-            className="bg-brasil-blue/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-blue/20 transition-colors"
-            onClick={() => router.push('/meu-album')}
-          >
-            <h3 className="font-medium text-brasil-blue mb-2">Suas Figurinhas</h3>
-            <p className="text-brasil-blue/80">Visualize todas as suas figurinhas</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Seu Álbum</h2>
+          <p className="text-brasil-blue/80 mb-4">
+            Aqui você pode gerenciar seu álbum de figurinhas do eBrasileirão 2025.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div 
+              className="bg-brasil-blue/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-blue/20 transition-colors"
+              onClick={() => router.push('/meu-album')}
+            >
+              <h3 className="font-medium text-brasil-blue mb-2">Suas Figurinhas</h3>
+              <p className="text-brasil-blue/80">Visualize todas as suas figurinhas</p>
+            </div>
+            <div 
+              className="bg-brasil-green/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-green/20 transition-colors"
+              onClick={() => router.push('/pacotes')}
+            >
+              <h3 className="font-medium text-brasil-green mb-2">Pacotes Disponíveis</h3>
+              <p className="text-brasil-green/80">
+                {pacotes === 0 
+                  ? "Compre pacotes para completar seu álbum!" 
+                  : "Abra seus pacotes e colecione mais craques!"}
+              </p>
+            </div>
           </div>
-          <div 
-            className="bg-brasil-green/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-green/20 transition-colors"
-            onClick={() => router.push('/pacotes')}
-          >
-            <h3 className="font-medium text-brasil-green mb-2">Pacotes Disponíveis</h3>
-            <p className="text-brasil-green/80">
-              {pacotes === 0 
-                ? "Compre pacotes para completar seu álbum!" 
-                : "Abra seus pacotes e colecione mais craques!"}
-            </p>
-          </div>
+        </div>
+
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
+          {loadingRanking ? (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brasil-blue"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {ranking.map((item, index) => (
+                <div 
+                  key={item.id}
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    item.id === session?.user?.id 
+                      ? 'bg-brasil-blue/20 border border-brasil-blue' 
+                      : 'bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <span className="text-brasil-blue font-bold mr-3">{index + 1}º</span>
+                    <span className={item.id === session?.user?.id ? 'font-bold text-brasil-blue' : ''}>
+                      {item.name}
+                    </span>
+                  </div>
+                  <span className="text-brasil-green font-bold">{item.figurinhas} figurinhas</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
