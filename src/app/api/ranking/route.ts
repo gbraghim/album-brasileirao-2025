@@ -39,28 +39,10 @@ export async function GET() {
     // Calcula o ranking ordenando por quantidade total de figurinhas
     const ranking = usuarios
       .map(usuario => {
-        // Conta todas as figurinhas do usuário
-        const jogadoresMap = new Map();
-        usuario.pacotes.forEach(pacote => {
-          pacote.figurinhas.forEach(figurinha => {
-            const jogadorId = figurinha.jogador.id;
-            if (!jogadoresMap.has(jogadorId)) {
-              jogadoresMap.set(jogadorId, 1);
-            } else {
-              jogadoresMap.set(jogadorId, jogadoresMap.get(jogadorId) + 1);
-            }
-          });
-        });
-
-        // Figurinhas únicas é o número de jogadores diferentes
-        const figurinhasUnicas = jogadoresMap.size;
-
-        // Figurinhas repetidas é a soma das quantidades extras de cada jogador
-        const figurinhasRepetidas = Array.from(jogadoresMap.values())
-          .reduce((acc, quantidade) => acc + Math.max(0, quantidade - 1), 0);
-
-        // Total é a soma das únicas mais as repetidas
-        const totalFigurinhas = figurinhasUnicas + figurinhasRepetidas;
+        // Total bruto de figurinhas (todas as figurinhas, incluindo repetidas)
+        const totalFigurinhas = usuario.pacotes.reduce((total, pacote) => 
+          total + pacote.figurinhas.length, 0
+        );
 
         return {
           id: usuario.id,

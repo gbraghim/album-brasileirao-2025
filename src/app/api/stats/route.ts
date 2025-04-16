@@ -39,6 +39,12 @@ export async function GET() {
     // Calcula as estatísticas
     const totalPacotes = user.pacotes.length;
 
+    // Total bruto de figurinhas (todas as figurinhas, incluindo repetidas)
+    const totalBruto = user.pacotes.reduce((acc, pacote) => 
+      acc + pacote.figurinhas.length, 0
+    );
+    console.log('Total bruto de figurinhas:', totalBruto);
+
     // Conta figurinhas por jogador
     const jogadoresMap = new Map();
     user.pacotes.forEach(pacote => {
@@ -52,15 +58,23 @@ export async function GET() {
       });
     });
 
-    // Calcula figurinhas únicas (número de jogadores diferentes)
+    // Log das quantidades por jogador
+    console.log('Quantidades por jogador:');
+    jogadoresMap.forEach((quantidade, jogadorId) => {
+      console.log(`Jogador ${jogadorId}: ${quantidade} figurinhas`);
+    });
+
+    // Figurinhas únicas (número de jogadores diferentes)
     const figurinhasUnicas = jogadoresMap.size;
+    console.log('Figurinhas únicas:', figurinhasUnicas);
 
-    // Calcula figurinhas repetidas
-    const figurinhasRepetidas = Array.from(jogadoresMap.values())
-      .reduce((acc, quantidade) => acc + Math.max(0, quantidade - 1), 0);
+    // Figurinhas repetidas (total bruto - únicas)
+    const figurinhasRepetidas = totalBruto - figurinhasUnicas;
+    console.log('Figurinhas repetidas:', figurinhasRepetidas);
 
-    // Total de figurinhas é a soma das únicas mais as repetidas
-    const totalFigurinhas = figurinhasUnicas + figurinhasRepetidas;
+    // Total de figurinhas é o total bruto
+    const totalFigurinhas = totalBruto;
+    console.log('Total de figurinhas:', totalFigurinhas);
 
     // Calcula times completos
     const timesFigurinhas = new Map();
@@ -87,6 +101,7 @@ export async function GET() {
       totalTimes: 20 // Total de times no Brasileirão
     };
 
+    console.log('Estatísticas finais:', stats);
     return NextResponse.json(stats);
   } catch (error) {
     console.error('Erro ao buscar estatísticas:', error);
