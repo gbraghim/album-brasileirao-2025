@@ -41,6 +41,7 @@ export default function Trocas() {
   const [trocasDisponiveis, setTrocasDisponiveis] = useState<Troca[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [figurinhasRepetidas, setFigurinhasRepetidas] = useState<Figurinha[]>([]);
+  const [figurinhasDisponiveisParaTroca, setFigurinhasDisponiveisParaTroca] = useState<Figurinha[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -54,6 +55,13 @@ export default function Trocas() {
       fetchFigurinhasRepetidas();
     }
   }, [session]);
+
+  useEffect(() => {
+    // Filtrar figurinhas que não estão listadas para troca
+    const figurinhasEmTrocas = new Set(minhasTrocas.map(troca => troca.figurinhaOferta.id));
+    const figurinhasDisponiveis = figurinhasRepetidas.filter(figurinha => !figurinhasEmTrocas.has(figurinha.id));
+    setFigurinhasDisponiveisParaTroca(figurinhasDisponiveis);
+  }, [figurinhasRepetidas, minhasTrocas]);
 
   const fetchTrocas = async () => {
     try {
@@ -249,75 +257,104 @@ export default function Trocas() {
       <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Área de Trocas</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-gradient-to-r from-green-500 to-yellow-300 p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-white">Quero trocar</h2> 
-          <button
-            onClick={() => setShowModal(true)}
-            className="border-4 border-black-500 bg-blue-500 rounded-xl outline-4 outline-offset-2"
-          >
-            Adicionar figurinha para troca 
-          </button>
-          <p> 
-                    
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            {minhasTrocas.map((troca) => (
-              <div
-                key={troca.id}
-                className="border-4 border-black-500 bg-gradient-to-br from-blue via-blue-100 to-blue-500 p-4 rounded-lg"
-              >
-                <h3 className="font-bold">{troca.figurinhaOferta.jogador.nome}</h3>
-                <p className="text-sm">{troca.figurinhaOferta.jogador.posicao}</p>
-                <p className="text-xs">#{troca.figurinhaOferta.jogador.numero}</p>
-              </div>
-            ))}
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-brasil-blue">Quero trocar</h2>
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-brasil-green hover:bg-brasil-green/90 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Adicionar figurinha para troca
+            </button>
           </div>
+
+          {minhasTrocas.length === 0 ? (
+            <p className="text-gray-600">Você ainda não adicionou nenhuma figurinha para troca.</p>
+          ) : (
+            <div className="space-y-4">
+              {minhasTrocas.map((troca) => (
+                <div key={troca.id} className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</p>
+                      <p className="text-sm text-gray-600">
+                        {troca.figurinhaOferta.jogador.posicao} - #{troca.figurinhaOferta.jogador.numero}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-yellow-300 p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-white">Trocas disponíveis</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {trocasDisponiveis.map((troca) => (
-              <div
-                key={troca.id}
-                className="border-4 border-black-500 bg-gradient-to-br from-blue via-blue-100 to-blue-500 p-4 rounded-lg"
-              >
-                <h3 className="font-bold">{troca.figurinhaOferta.jogador.nome}</h3>
-                <p className="text-sm">{troca.figurinhaOferta.jogador.posicao}</p>
-                <p className="text-xs">#{troca.figurinhaOferta.jogador.numero}</p>
-                <p className="text-xs mt-2">De: {troca.usuarioEnvia.name}</p>
-                <button
-                  onClick={() => {
-                    setTrocaSelecionada(troca);
-                    setShowProporTrocaModal(true);
-                  }}
-                  className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-                >
-                  Propor Troca
-                </button>
-              </div>
-            ))}
-          </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Trocas disponíveis</h2>
+          {trocasDisponiveis.length === 0 ? (
+            <p className="text-gray-600">Não há trocas disponíveis no momento.</p>
+          ) : (
+            <div className="space-y-4">
+              {trocasDisponiveis.map((troca) => (
+                <div key={troca.id} className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</p>
+                      <p className="text-sm text-gray-600">
+                        {troca.figurinhaOferta.jogador.posicao} - #{troca.figurinhaOferta.jogador.numero}
+                      </p>
+                      <p className="text-sm text-gray-600">Oferecido por: {troca.usuarioEnvia.name}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setTrocaSelecionada(troca);
+                        setShowProporTrocaModal(true);
+                      }}
+                      className="bg-brasil-blue hover:bg-brasil-blue/90 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Propor troca
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Modal de figurinhas repetidas */}
+      {/* Modal para adicionar figurinha para troca */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h2 className="text-2xl font-bold mb-4">Escolha uma figurinha para troca</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {figurinhasRepetidas.map((figurinha) => (
-            <div
-              key={figurinha.id}
-              className="bg-purple-700 p-4 rounded-lg cursor-pointer hover:bg-purple-600"
-              onClick={() => adicionarTroca(figurinha)}
-            >
-              <h3 className="font-bold">{figurinha.nome}</h3>
-              <p className="text-sm">{figurinha.posicao}</p>
-              <p className="text-xs">#{figurinha.numero}</p>
-              <p className="text-xs mt-1">Repetidas: {figurinha.quantidade}</p>
-            </div>
-          ))}
-        </div>
+        <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Adicionar figurinha para troca</h2>
+        {figurinhasDisponiveisParaTroca.length === 0 ? (
+          <p className="text-gray-600">Você não tem figurinhas disponíveis para troca.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {figurinhasDisponiveisParaTroca.map((figurinha) => (
+              <div
+                key={figurinha.id}
+                className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20 cursor-pointer hover:bg-white/70 transition-colors"
+                onClick={() => adicionarTroca(figurinha)}
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 relative">
+                    <Image
+                      src={figurinha.time.escudo}
+                      alt={figurinha.time.nome}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-brasil-blue">{figurinha.nome}</p>
+                    <p className="text-sm text-gray-600">
+                      {figurinha.posicao} - #{figurinha.numero}
+                    </p>
+                    <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Modal>
 
       {/* Modal de propor troca */}
