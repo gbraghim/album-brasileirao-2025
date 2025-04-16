@@ -37,7 +37,7 @@ export default function MeuAlbum() {
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeSelecionado, setTimeSelecionado] = useState<{ nome: string; id: string } | null>(null);
+  const [timeSelecionado, setTimeSelecionado] = useState<Jogador['time'] | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -73,7 +73,7 @@ export default function MeuAlbum() {
   };
 
   const jogadoresDoTime = timeSelecionado 
-    ? jogadores.filter(jogador => jogador.time.nome === timeSelecionado.nome)
+    ? jogadores.filter(jogador => jogador.time.id === timeSelecionado.id)
     : [];
 
   const getJogadoresDoTime = (timeId: string) => {
