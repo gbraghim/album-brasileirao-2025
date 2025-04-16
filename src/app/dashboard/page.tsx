@@ -3,147 +3,164 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Header from '@/components/Header';
+import UserStats from '@/components/UserStats';
+
+interface UserStats {
+  totalPacotes: number;
+  totalFigurinhas: number;
+  figurinhasRepetidas: number;
+  timesCompletos: number;
+  totalTimes: number;
+}
 
 interface RankingItem {
   id: string;
-  name: string;
-  figurinhas: number;
+  nome: string;
+  totalFigurinhas: number;
+  email: string;
 }
 
-export default function DashboardPage() {
+export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [pacotes, setPacotes] = useState(0);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [ranking, setRanking] = useState<RankingItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [loadingRanking, setLoadingRanking] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     } else if (status === 'authenticated') {
-      carregarPacotes();
-      carregarRanking();
+      fetchStats();
+      fetchRanking();
     }
   }, [status, router]);
 
-  const carregarRanking = async () => {
+  const fetchStats = async () => {
     try {
-      const response = await fetch('/api/ranking', {
-        headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
-        },
-      });
+      const response = await fetch('/api/stats');
+      if (!response.ok) throw new Error('Erro ao carregar estatísticas');
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        setRanking(data);
-      }
-    } catch (err) {
-      console.error('Erro ao carregar ranking:', err);
+  const fetchRanking = async () => {
+    try {
+      setLoadingRanking(true);
+      const response = await fetch('/api/ranking');
+      if (!response.ok) throw new Error('Erro ao carregar ranking');
+      const data = await response.json();
+      setRanking(data);
+    } catch (error) {
+      console.error('Erro ao carregar ranking:', error);
     } finally {
       setLoadingRanking(false);
     }
   };
 
-  const carregarPacotes = async () => {
-    try {
-      const response = await fetch('/api/pacotes', {
-        headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPacotes(data.filter((pacote: any) => !pacote.aberto).length);
-      }
-    } catch (err) {
-      console.error('Erro ao carregar pacotes:', err);
-    }
-  };
-
-  if (status === 'loading') {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Carregando...</h2>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Bem-vindo, {session?.user?.name}!</h1>
-      
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-        <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Seu Álbum</h2>
-        <p className="text-brasil-blue/80 mb-4">
-          Aqui você pode gerenciar seu álbum de figurinhas do eBrasileirão 2025.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div 
-            className="bg-brasil-blue/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-blue/20 transition-colors"
-            onClick={() => router.push('/meu-album')}
-          >
-            <h3 className="font-medium text-brasil-blue mb-2">Suas Figurinhas</h3>
-            <p className="text-brasil-blue/80">Visualize todas as suas figurinhas</p>
-          </div>
-          <div 
-            className="bg-brasil-green/10 p-4 rounded-lg cursor-pointer hover:bg-brasil-green/20 transition-colors"
-            onClick={() => router.push('/pacotes')}
-          >
-            <h3 className="font-medium text-brasil-green mb-2">Pacotes Disponíveis</h3>
-            <p className="text-brasil-green/80">
-              {pacotes === 0 
-                ? "Compre pacotes para completar seu álbum!" 
-                : "Abra seus pacotes e colecione mais craques!"}
-            </p>
-          </div>
-        </div>
+  if (!session) {
+    return null;
+  }
 
-        <div className="border-t border-brasil-yellow/20 pt-6">
-          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
-          {loadingRanking ? (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brasil-blue"></div>
-            </div>
-          ) : (
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
+      <Header />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Dashboard</h1>
+        
+        {stats && <UserStats stats={stats} />}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Seu Álbum */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+            <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Seu Álbum</h2>
             <div className="space-y-4">
-              {ranking.map((item, index) => (
-                <div 
-                  key={item.id}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
-                    item.id === session?.user?.id 
-                      ? 'bg-brasil-blue/20 border border-brasil-blue text-brasil-blue' 
-                      : 'bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    {index === 0 ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ) : index === 1 ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ) : index === 2 ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ) : (
-                      <span className="text-brasil-blue fon t-bold mr-3">{index + 1}º</span>
-                    )}
-                    <span className={item.id === session?.user?.id ? 'font-bold text-brasil-blue' : ''}>
-                      {item.name}
-                    </span>
-                  </div>
-                  <span className="text-brasil-green font-bold">{item.figurinhas} figurinhas</span>
-                </div>
-              ))}
+              <div className="flex items-center justify-between p-4 bg-brasil-green/10 rounded-lg">
+                <span className="text-brasil-blue font-medium">Progresso do Álbum</span>
+                <span className="text-brasil-green font-bold">
+                  {stats?.timesCompletos}/{stats?.totalTimes} times completos
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-brasil-yellow/10 rounded-lg">
+                <span className="text-brasil-blue font-medium">Figurinhas Únicas</span>
+                <span className="text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-red-100 rounded-lg">
+                <span className="text-brasil-blue font-medium">Figurinhas Repetidas</span>
+                <span className="text-red-600 font-bold">{stats?.figurinhasRepetidas}</span>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Ranking de Colecionadores */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+            <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
+            {loadingRanking ? (
+              <div className="flex justify-center items-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {ranking.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between p-4 rounded-lg ${
+                      item.email === session.user?.email
+                        ? 'bg-brasil-blue/20 border border-brasil-blue'
+                        : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      {index < 3 ? (
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          {index === 0 && (
+                            <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
+                            </svg>
+                          )}
+                          {index === 1 && (
+                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
+                            </svg>
+                          )}
+                          {index === 2 && (
+                            <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
+                            </svg>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="w-8 h-8 flex items-center justify-center text-gray-500 font-medium">
+                          {index + 1}
+                        </span>
+                      )}
+                      <span className={`font-medium ${
+                        item.email === session.user?.email ? 'text-brasil-blue' : 'text-gray-700'
+                      }`}>
+                        {item.nome}
+                      </span>
+                    </div>
+                    <span className="text-brasil-green font-bold">{item.totalFigurinhas} figurinhas</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
