@@ -26,7 +26,11 @@ export async function GET() {
         email: true,
         pacotes: {
           include: {
-            figurinhas: true
+            figurinhas: {
+              include: {
+                jogador: true
+              }
+            }
           }
         }
       }
@@ -34,14 +38,30 @@ export async function GET() {
 
     // Calcula o ranking ordenando por quantidade total de figurinhas
     const ranking = usuarios
-      .map(usuario => ({
-        id: usuario.id,
-        nome: usuario.name || '',
-        email: usuario.email || '',
-        totalFigurinhas: usuario.pacotes.reduce((total, pacote) => 
-          total + pacote.figurinhas.length, 0
-        )
-      }))
+      .map(usuario => {
+        // Conta todas as figurinhas do usuário, incluindo repetidas
+        const jogadoresMap = new Map();
+        usuario.pacotes.forEach(pacote => {
+          pacote.figurinhas.forEach(figurinha => {
+            const jogadorId = figurinha.jogador.id;
+            if (!jogadoresMap.has(jogadorId)) {
+              jogadoresMap.set(jogadorId, 1);
+            } else {
+              jogadoresMap.set(jogadorId, jogadoresMap.get(jogadorId) + 1);
+            }
+          });
+        });
+
+        const totalFigurinhas = Array.from(jogadoresMap.values())
+          .reduce((acc, quantidade) => acc + quantidade, 0);
+
+        return {
+          id: usuario.id,
+          nome: usuario.name || '',
+          email: usuario.email || '',
+          totalFigurinhas
+        };
+      })
       .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas);
 
     return NextResponse.json(ranking);

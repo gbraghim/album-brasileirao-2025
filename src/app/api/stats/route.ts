@@ -38,11 +38,8 @@ export async function GET() {
 
     // Calcula as estatísticas
     const totalPacotes = user.pacotes.length;
-    const totalFigurinhas = user.pacotes.reduce((acc, pacote) => 
-      acc + pacote.figurinhas.length, 0
-    );
 
-    // Conta figurinhas repetidas agrupando por jogador
+    // Conta figurinhas por jogador
     const jogadoresMap = new Map();
     user.pacotes.forEach(pacote => {
       pacote.figurinhas.forEach(figurinha => {
@@ -55,7 +52,11 @@ export async function GET() {
       });
     });
 
-    // Soma todas as figurinhas que aparecem mais de uma vez
+    // Calcula total de figurinhas (incluindo repetidas)
+    const totalFigurinhas = Array.from(jogadoresMap.values())
+      .reduce((acc, quantidade) => acc + quantidade, 0);
+
+    // Calcula figurinhas repetidas
     const figurinhasRepetidas = Array.from(jogadoresMap.values())
       .reduce((acc, quantidade) => acc + Math.max(0, quantidade - 1), 0);
 
