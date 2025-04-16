@@ -83,82 +83,80 @@ export default function Dashboard() {
         
         {stats && <UserStats stats={stats} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Seu Álbum */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-            <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Seu Álbum</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-brasil-green/10 rounded-lg">
-                <span className="text-brasil-blue font-medium">Progresso do Álbum</span>
-                <span className="text-brasil-green font-bold">
-                  {stats?.timesCompletos}/{stats?.totalTimes} times completos
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-brasil-yellow/10 rounded-lg">
-                <span className="text-brasil-blue font-medium">Figurinhas Únicas</span>
-                <span className="text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-red-100 rounded-lg">
-                <span className="text-brasil-blue font-medium">Figurinhas Repetidas</span>
-                <span className="text-red-600 font-bold">{stats?.figurinhasRepetidas}</span>
-              </div>
+        {/* Seu Álbum */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20 mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Seu Álbum</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-brasil-green/10 rounded-lg">
+              <span className="text-brasil-blue font-medium">Progresso do Álbum</span>
+              <span className="text-brasil-green font-bold">
+                {stats?.timesCompletos}/{stats?.totalTimes} times completos
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-brasil-yellow/10 rounded-lg">
+              <span className="text-brasil-blue font-medium">Figurinhas Únicas</span>
+              <span className="text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-red-100 rounded-lg">
+              <span className="text-brasil-blue font-medium">Figurinhas Repetidas</span>
+              <span className="text-red-600 font-bold">{stats?.figurinhasRepetidas}</span>
             </div>
           </div>
+        </div>
 
-          {/* Ranking de Colecionadores */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-            <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
-            {loadingRanking ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {ranking.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center justify-between p-4 rounded-lg ${
-                      item.email === session.user?.email
-                        ? 'bg-brasil-blue/20 border border-brasil-blue'
-                        : 'bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      {index < 3 ? (
-                        <div className="w-8 h-8 flex items-center justify-center">
-                          {index === 0 && (
-                            <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
-                            </svg>
-                          )}
-                          {index === 1 && (
-                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
-                            </svg>
-                          )}
-                          {index === 2 && (
-                            <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 0l2.5 6.5L20 7.5l-5 5 1.5 7.5L10 17l-6.5 3 1.5-7.5-5-5 7.5-1z" />
-                            </svg>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="w-8 h-8 flex items-center justify-center text-gray-500 font-medium">
-                          {index + 1}
-                        </span>
-                      )}
-                      <span className={`font-medium ${
-                        item.email === session.user?.email ? 'text-brasil-blue' : 'text-gray-700'
-                      }`}>
-                        {item.nome}
+        {/* Ranking de Colecionadores */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+          <h2 className="text-2xl font-bold mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
+          {loadingRanking ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {ranking.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`flex items-center justify-between p-4 rounded-lg ${
+                    item.email === session.user?.email
+                      ? 'bg-brasil-blue/20 border border-brasil-blue'
+                      : 'bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {index < 3 ? (
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        {index === 0 && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-yellow-500">
+                            <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {index === 1 && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-gray-400">
+                            <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {index === 2 && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-amber-600">
+                            <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="w-8 h-8 flex items-center justify-center text-gray-500 font-medium">
+                        {index + 1}
                       </span>
-                    </div>
-                    <span className="text-brasil-green font-bold">{item.totalFigurinhas} figurinhas</span>
+                    )}
+                    <span className={`font-medium ${
+                      item.email === session.user?.email ? 'text-brasil-blue' : 'text-gray-700'
+                    }`}>
+                      {item.nome}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <span className="text-brasil-green font-bold">{item.totalFigurinhas} figurinhas</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
