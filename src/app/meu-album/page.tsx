@@ -169,3 +169,18 @@ export default function MeuAlbum() {
     </div>
   );
 } 
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400">Sem foto</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+} 
