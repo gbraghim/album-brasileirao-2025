@@ -115,7 +115,7 @@ export default function DashboardPage() {
                   key={item.id}
                   className={`flex items-center justify-between p-3 rounded-lg ${
                     item.id === session?.user?.id 
-                      ? 'bg-brasil-blue/20 border border-brasil-blue' 
+                      ? 'bg-brasil-blue/20 border border-brasil-blue text-brasil-blue' 
                       : 'bg-gray-50'
                   }`}
                 >
