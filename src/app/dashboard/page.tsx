@@ -3,7 +3,6 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Header from '@/components/Header';
 import UserStats from '@/components/UserStats';
 
 interface UserStats {
@@ -79,7 +78,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <Header />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Dashboard</h1>
         
