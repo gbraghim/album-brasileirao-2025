@@ -259,70 +259,93 @@ export default function Trocas() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Área de Trocas</h1>
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Trocas</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-brasil-blue">Quero trocar</h2>
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-brasil-green hover:bg-brasil-green/90 text-white px-4 py-2 rounded-lg transition-colors"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {trocasDisponiveis.map((troca) => (
+            <div
+              key={troca.id}
+              className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20"
             >
-              Adicionar figurinha para troca
-            </button>
-          </div>
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <img
+                    src={troca.usuarioEnvia.image || '/default-avatar.png'}
+                    alt={troca.usuarioEnvia.name}
+                    className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+                  />
+                  <span className="text-sm md:text-base font-medium text-brasil-blue">
+                    {troca.usuarioEnvia.name}
+                  </span>
+                </div>
+                <span className={`text-xs md:text-sm px-2 py-1 rounded-full ${
+                  troca.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-800' :
+                  troca.status === 'ACEITO' ? 'bg-green-100 text-green-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {troca.status}
+                </span>
+              </div>
 
-          {minhasTrocas.length === 0 ? (
-            <p className="text-gray-600">Você ainda não adicionou nenhuma figurinha para troca.</p>
-          ) : (
-            <div className="space-y-4">
-              {minhasTrocas.map((troca) => (
-                <div key={troca.id} className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20">
-                  <div className="flex items-center justify-between">
+              <div className="space-y-3 md:space-y-4">
+                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                  <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Oferece:</h3>
+                  <div className="flex items-center space-x-2 md:space-x-3">
+                    {troca.figurinhaOferta.jogador.time.escudo && (
+                      <img
+                        src={troca.figurinhaOferta.jogador.time.escudo}
+                        alt={troca.figurinhaOferta.jogador.time.nome}
+                        className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                      />
+                    )}
                     <div>
-                      <p className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</p>
-                      <p className="text-sm text-gray-600">
-                        {troca.figurinhaOferta.jogador.posicao} - #{troca.figurinhaOferta.jogador.numero}
+                      <p className="text-sm md:text-base font-medium">{troca.figurinhaOferta.jogador.nome}</p>
+                      <p className="text-xs md:text-sm text-gray-600">
+                        #{troca.figurinhaOferta.jogador.numero} - {troca.figurinhaOferta.jogador.posicao}
                       </p>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Trocas disponíveis</h2>
-          {trocasDisponiveis.length === 0 ? (
-            <p className="text-gray-600">Não há trocas disponíveis no momento.</p>
-          ) : (
-            <div className="space-y-4">
-              {trocasDisponiveis.map((troca) => (
-                <div key={troca.id} className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20">
-                  <div className="flex items-center justify-between">
+                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                  <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Solicita:</h3>
+                  <div className="flex items-center space-x-2 md:space-x-3">
+                    {troca.figurinhaSolicitada.jogador.time.escudo && (
+                      <img
+                        src={troca.figurinhaSolicitada.jogador.time.escudo}
+                        alt={troca.figurinhaSolicitada.jogador.time.nome}
+                        className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                      />
+                    )}
                     <div>
-                      <p className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</p>
-                      <p className="text-sm text-gray-600">
-                        {troca.figurinhaOferta.jogador.posicao} - #{troca.figurinhaOferta.jogador.numero}
+                      <p className="text-sm md:text-base font-medium">{troca.figurinhaSolicitada.jogador.nome}</p>
+                      <p className="text-xs md:text-sm text-gray-600">
+                        #{troca.figurinhaSolicitada.jogador.numero} - {troca.figurinhaSolicitada.jogador.posicao}
                       </p>
-                      <p className="text-sm text-gray-600">Oferecido por: {troca.usuarioEnvia.name}</p>
                     </div>
+                  </div>
+                </div>
+
+                {troca.status === 'PENDENTE' && (
+                  <div className="flex space-x-2 md:space-x-3">
                     <button
-                      onClick={() => {
-                        setTrocaSelecionada(troca);
-                        setShowProporTrocaModal(true);
-                      }}
-                      className="bg-brasil-blue hover:bg-brasil-blue/90 text-white px-4 py-2 rounded-lg transition-colors"
+                      onClick={() => handleResponderTroca(troca.id, true)}
+                      className="flex-1 bg-brasil-green hover:bg-brasil-green/90 text-white text-sm md:text-base font-medium py-2 px-4 rounded-lg transition-colors"
                     >
-                      Propor troca
+                      Aceitar
+                    </button>
+                    <button
+                      onClick={() => handleResponderTroca(troca.id, false)}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm md:text-base font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Recusar
                     </button>
                   </div>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
 

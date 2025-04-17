@@ -147,24 +147,24 @@ export default function Repetidas() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
           {figurinhasFormatadas.map((figurinha) => (
-            <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-4 flex flex-col">
-              <div className="flex items-center mb-4">
+            <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-3 md:p-4 flex flex-col">
+              <div className="flex items-center mb-3 md:mb-4">
                 {figurinha.jogador.time.escudo && (
                   <img
                     src={figurinha.jogador.time.escudo}
                     alt={figurinha.jogador.time.nome}
-                    className="w-12 h-12 object-contain mr-4"
+                    className="w-10 h-10 md:w-12 md:h-12 object-contain mr-3 md:mr-4"
                   />
                 )}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">{figurinha.jogador.nome}</h3>
-                  <p className="text-gray-600">{figurinha.jogador.time.nome}</p>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-800">{figurinha.jogador.nome}</h3>
+                  <p className="text-sm md:text-base text-gray-600">{figurinha.jogador.time.nome}</p>
                 </div>
               </div>
               <div className="flex-grow">
@@ -172,13 +172,13 @@ export default function Repetidas() {
                   <img
                     src={figurinha.jogador.time.escudo}
                     alt={figurinha.jogador.nome}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
+                    className="w-full h-32 md:h-48 object-cover rounded-lg mb-3 md:mb-4"
                   />
                 )}
-                <div className="space-y-2">
-                  <p className="text-gray-800"><span className="font-semibold">Time:</span> {figurinha.jogador.time.nome}</p>
-                  <p className="text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.jogador.nacionalidade}</p>
-                  <p className="text-gray-800">
+                <div className="space-y-1 md:space-y-2">
+                  <p className="text-sm md:text-base text-gray-800"><span className="font-semibold">Time:</span> {figurinha.jogador.time.nome}</p>
+                  <p className="text-sm md:text-base text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.jogador.nacionalidade}</p>
+                  <p className="text-sm md:text-base text-gray-800">
                     <span className="font-semibold">Repetidas:</span> {figurinha.quantidade}
                   </p>
                 </div>

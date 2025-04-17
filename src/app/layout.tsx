@@ -30,8 +30,10 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
         <Providers session={session}>
-          <main className="relative">{children}</main>
-          <Footer />
+          <main className="relative min-h-screen flex flex-col">
+            {children}
+            <Footer />
+          </main>
         </Providers>
       </body>
     </html>

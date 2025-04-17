@@ -169,39 +169,39 @@ export default function Pacotes() {
   }
 
   return (
-    <div className="min-h-screen  bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Meus Pacotes</h1>
+    <div className="min-h-screen bg-gray-50">
+      <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
 
       {pacotes.length > 0 ? (
-        <div className="mb-4 p-4 bg- rounded-lg">
-          <p className="text-lg text-brasil-blue">
+        <div className="mb-4 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+          <p className="text-base md:text-lg text-brasil-blue">
             Você tem <span className="font-bold text-brasil-blue">{pacotes.length}</span> pacote{pacotes.length !== 1 ? 's' : ''} disponível{pacotes.length !== 1 ? 's' : ''}
           </p>
         </div>
       ) : (
-        <div className="mb-4 p-4 bg- rounded-lg">
-          <p className="text-lg text-brasil-blue">Você não tem pacotes disponíveis no momento.</p>
+        <div className="mb-4 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+          <p className="text-base md:text-lg text-brasil-blue">Você não tem pacotes disponíveis no momento.</p>
           <p className="text-sm mt-2 text-brasil-blue">Volte amanhã para receber seu pacote diário!</p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6">
         {pacotes.map((pacote) => (
           <div
             key={pacote.id}
             className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
             onClick={() => handleAbrirPacote(pacote.id)}
           >
-            <div className={`relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-500 ${pacoteAbrindo === pacote.id ? 'animate-pacote-aberto' : ''}`}>
+            <div className={`relative w-full h-[250px] md:h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-500 ${pacoteAbrindo === pacote.id ? 'animate-pacote-aberto' : ''}`}>
               <Image
                 src="/pacote-figurinhas.png"
                 alt="Pacote de figurinhas"
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-contain p-4"
               />
               <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${pacoteAbrindo === pacote.id ? 'hidden' : ''}`}>
-                <button className="bg-brasil-yellow text-brasil-blue font-bold py-3 px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110">
+                <button className="bg-brasil-yellow text-brasil-blue font-bold py-2 md:py-3 px-4 md:px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110 text-sm md:text-base">
                   Abrir Pacote
                 </button>
               </div>
