@@ -38,12 +38,20 @@ export default function Repetidas() {
 
   const fetchData = async () => {
     try {
+      console.log('Iniciando busca de figurinhas repetidas...');
       const [repetidasResponse, trocasResponse] = await Promise.all([
         fetch('/api/repetidas'),
         fetch('/api/trocas')
       ]);
 
+      console.log('Status das respostas:', {
+        repetidas: repetidasResponse.status,
+        trocas: trocasResponse.status
+      });
+
       if (!repetidasResponse.ok || !trocasResponse.ok) {
+        const errorData = await repetidasResponse.json();
+        console.error('Erro na resposta:', errorData);
         throw new Error('Erro ao buscar dados');
       }
 
@@ -51,6 +59,11 @@ export default function Repetidas() {
         repetidasResponse.json(),
         trocasResponse.json()
       ]);
+
+      console.log('Dados recebidos:', {
+        repetidas: repetidasData,
+        trocas: trocasData
+      });
 
       // Extrair IDs das figurinhas em troca do usuário atual
       const figurinhasEmTrocaIds = Array.isArray(trocasData.minhasTrocas) 
@@ -61,7 +74,13 @@ export default function Repetidas() {
       setFigurinhasEmTroca(figurinhasEmTrocaIds);
 
       // Mapear figurinhas repetidas
-      setFigurinhas(repetidasData);
+      if (Array.isArray(repetidasData)) {
+        console.log('Figurinhas repetidas recebidas:', repetidasData);
+        setFigurinhas(repetidasData);
+      } else {
+        console.error('Dados inválidos recebidos:', repetidasData);
+        setError('Formato de dados inválido');
+      }
       setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar figurinhas repetidas:', error);
@@ -131,20 +150,19 @@ export default function Repetidas() {
     );
   }
 
-  const figurinhasFormatadas = figurinhas.map((figurinha) => ({
-    id: figurinha.id,
-    jogador: {
-      id: figurinha.jogador.id,
-      nome: figurinha.jogador.nome,
-      nacionalidade: figurinha.jogador.nacionalidade,
-      time: {
-        nome: figurinha.jogador.time.nome,
-        escudo: figurinha.jogador.time.escudo,
-      },
-    },
-    quantidade: figurinha.quantidade,
-    raridade: figurinha.raridade,
-  }));
+  if (!loading && !error && figurinhas.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 text-center">
+            <p className="text-gray-600 mb-4">Você ainda não tem figurinhas repetidas.</p>
+            <p className="text-gray-600">Abra mais pacotes para conseguir figurinhas repetidas!</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
@@ -152,7 +170,7 @@ export default function Repetidas() {
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-          {figurinhasFormatadas.map((figurinha) => (
+          {figurinhas.map((figurinha) => (
             <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-3 md:p-4 flex flex-col">
               <div className="flex items-center mb-3 md:mb-4">
                 {figurinha.jogador.time.escudo && (
@@ -226,7 +244,7 @@ export default function Repetidas() {
       )}
 
       {/* Modal de sucesso */}
-      {showSuccessModal && selectedFigurinha && (
+      {showSuccessModal && (
         <Modal
           isOpen={showSuccessModal}
           onClose={() => setShowSuccessModal(false)}
@@ -234,7 +252,7 @@ export default function Repetidas() {
           <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
             <p className="mb-4 text-gray-800">
-              A figurinha {selectedFigurinha.jogador.nome} foi disponibilizada para troca com sucesso!
+              A figurinha {selectedFigurinha?.jogador.nome} foi disponibilizada para troca com sucesso!
             </p>
             <div className="flex justify-end">
               <button

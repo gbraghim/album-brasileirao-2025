@@ -20,8 +20,11 @@ export async function GET() {
     });
 
     // Converte o resultado para um objeto com o formato { timeId: total }
-    const resultado = totalJogadoresPorTime.reduce((acc: Record<string, number>, item: { timeId: string; _count: { id: number } }) => {
-      acc[item.timeId] = item._count.id;
+    const resultado = totalJogadoresPorTime.reduce((acc: Record<string, number>, item) => {
+      // Converte o ID do time para o formato usado no frontend (ex: 'flamengo', 'sao-paulo', etc)
+      const timeId = item.timeId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '-');
+      acc[timeId] = item._count.id;
       return acc;
     }, {} as Record<string, number>);
 

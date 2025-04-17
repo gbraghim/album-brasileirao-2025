@@ -8,21 +8,30 @@ export async function GET() {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
+      console.log('Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
+
+    console.log('Email do usuário:', session.user.email);
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
 
     if (!user) {
+      console.log('Usuário não encontrado no banco');
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
-    // Buscar todas as figurinhas do usuário
+    console.log('ID do usuário encontrado:', user.id);
+
+    // Buscar todas as figurinhas do usuário com quantidade > 1
     const todasFigurinhas = await prisma.userFigurinha.findMany({
       where: {
-        userId: user.id
+        userId: user.id,
+        quantidade: {
+          gt: 1
+        }
       },
       include: {
         figurinha: {
@@ -49,21 +58,15 @@ export async function GET() {
       }
     });
 
-    console.log('Usuário:', user.id);
     console.log('Total de figurinhas encontradas:', todasFigurinhas.length);
-
-    // Filtrar apenas as figurinhas que aparecem mais de uma vez
-    const figurinhasRepetidas = todasFigurinhas.filter(f => f.quantidade > 1);
-
-    console.log('Total de figurinhas repetidas:', figurinhasRepetidas.length);
-    console.log('Detalhes das figurinhas repetidas:', figurinhasRepetidas.map(f => ({
+    console.log('Detalhes das figurinhas:', todasFigurinhas.map(f => ({
       id: f.figurinha.id,
       jogador: f.figurinha.jogador?.nome,
       quantidade: f.quantidade
     })));
 
     // Formatar as figurinhas repetidas com todas as informações necessárias
-    const figurinhasFormatadas = figurinhasRepetidas.map(uf => ({
+    const figurinhasFormatadas = todasFigurinhas.map(uf => ({
       id: uf.figurinha.id,
       jogador: {
         id: uf.figurinha.jogador?.id || '',

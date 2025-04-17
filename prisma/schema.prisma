@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,80 +8,79 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(cuid())
-  name         String
-  email        String         @unique
-  password     String
-  pacotes      Pacote[]
-  figurinhas   UserFigurinha[] // Relação com as figurinhas do usuário
-  trocasEnviadas     Troca[]       @relation("TrocasEnviadas")
-  trocasRecebidas    Troca[]       @relation("TrocasRecebidas")
-  trocas        TrocaFigurinha[]
-  notificacoes  Notificacao[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  numeroDeLogins Int      @default(0)
-  primeiroAcesso Boolean  @default(true)
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  password        String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  numeroDeLogins  Int              @default(0)
+  primeiroAcesso  Boolean          @default(true)
+  notificacoes    Notificacao[]
+  pacotes         Pacote[]
+  trocasEnviadas  Troca[]          @relation("TrocasEnviadas")
+  trocasRecebidas Troca[]          @relation("TrocasRecebidas")
+  trocas          TrocaFigurinha[]
+  figurinhas      UserFigurinha[]
 }
 
 model Pacote {
-  id          String      @id @default(cuid())
-  userId      String
-  tipo        String      @default("DIARIO")
-  aberto      Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  user        User        @relation(fields: [userId], references: [id])
-  figurinhas  Figurinha[]
+  id         String      @id @default(cuid())
+  userId     String
+  tipo       String      @default("DIARIO")
+  aberto     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  figurinhas Figurinha[]
+  user       User        @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model Figurinha {
-  id         String         @id @default(cuid())
-  pacoteId   String
-  jogadorId  String
-  pacote     Pacote         @relation(fields: [pacoteId], references: [id])
-  jogador    Jogador        @relation(fields: [jogadorId], references: [id])
-  usuarios   UserFigurinha[] // Relação com os usuários que possuem esta figurinha
-  trocas     Troca[]
+  id              String           @id @default(cuid())
+  pacoteId        String
+  jogadorId       String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  jogador         Jogador          @relation(fields: [jogadorId], references: [id])
+  pacote          Pacote           @relation(fields: [pacoteId], references: [id])
+  trocas          Troca[]
   trocasFigurinha TrocaFigurinha[]
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  usuarios        UserFigurinha[]
 
   @@index([jogadorId])
   @@index([pacoteId])
 }
 
-// Tabela de junção para representar a quantidade de cada figurinha que um usuário possui
 model UserFigurinha {
   id          String    @id @default(cuid())
   userId      String
   figurinhaId String
-  quantidade  Int       @default(1) // A quantidade da figurinha que o usuário possui
-  user        User      @relation(fields: [userId], references: [id])
-  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
+  quantidade  Int       @default(1)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
-  @@unique([userId, figurinhaId]) // Um usuário só pode ter uma entrada para cada figurinha
+  @@unique([userId, figurinhaId])
   @@index([userId])
   @@index([figurinhaId])
 }
 
 model Troca {
-  id                String    @id @default(cuid())
-  figurinhaOfertaId String
+  id                  String        @id @default(cuid())
+  figurinhaOfertaId   String
   figurinhaDesejadaId String?
-  figurinhaOferta    Figurinha @relation(fields: [figurinhaOfertaId], references: [id])
-  usuarioEnviaId    String
-  usuarioRecebeId   String?
-  usuarioEnvia      User      @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
-  usuarioRecebe     User?     @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
-  status            String    // 'PENDENTE', 'ACEITA', 'RECUSADA'
-  notificacoes      Notificacao[]
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  usuarioEnviaId      String
+  usuarioRecebeId     String?
+  status              String
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  notificacoes        Notificacao[]
+  figurinhaOferta     Figurinha     @relation(fields: [figurinhaOfertaId], references: [id])
+  usuarioEnvia        User          @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
+  usuarioRecebe       User?         @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
 
   @@index([usuarioEnviaId])
   @@index([usuarioRecebeId])
@@ -95,39 +91,38 @@ model Time {
   id        String    @id @default(cuid())
   nome      String
   escudo    String?
-  apiId     Int       @unique
-  jogadores Jogador[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  apiId     Int       @unique
+  jogadores Jogador[]
 }
 
 model Jogador {
-  id           String      @id @default(cuid())
-  nome         String
-  numero       Int?
-  posicao      String?
+  id            String      @id @default(cuid())
+  nome          String
+  numero        Int?
+  posicao       String?
   nacionalidade String?
-  foto         String?
-  apiId        Int        @unique
-  timeId       String
-  time         Time       @relation(fields: [timeId], references: [id])
-  figurinhas   Figurinha[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  apiId         Int         @unique
+  timeId        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  foto          String?
+  figurinhas    Figurinha[]
+  time          Time        @relation(fields: [timeId], references: [id])
 
   @@index([timeId])
 }
 
 model TrocaFigurinha {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   usuarioId   String
   figurinhaId String
-  status      String   @default("DISPONIVEL") // DISPONIVEL, TROCADA
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  usuario     User     @relation(fields: [usuarioId], references: [id])
+  status      String    @default("DISPONIVEL")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
+  usuario     User      @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([figurinhaId])
@@ -135,16 +130,16 @@ model TrocaFigurinha {
 
 model Notificacao {
   id        String   @id @default(cuid())
-  tipo      String   // PROPOSTA_TROCA, TROCA_ACEITA, TROCA_RECUSADA
+  tipo      String
   mensagem  String
   lida      Boolean  @default(false)
   usuarioId String
   trocaId   String?
-  usuario   User     @relation(fields: [usuarioId], references: [id])
-  troca     Troca?   @relation(fields: [trocaId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  troca     Troca?   @relation(fields: [trocaId], references: [id])
+  usuario   User     @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([trocaId])
-} 
+}
