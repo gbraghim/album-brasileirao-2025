@@ -32,11 +32,30 @@ interface Troca {
       nome: string;
       posicao: string;
       numero: number;
+      time: {
+        id: string;
+        nome: string;
+        escudo: string;
+      };
     };
   };
   usuarioEnvia: {
     name: string;
     email: string;
+  };
+  status: 'PENDENTE' | 'ACEITO' | 'RECUSADO';
+  figurinhaSolicitada?: {
+    id: string;
+    jogador: {
+      nome: string;
+      posicao: string;
+      numero: number;
+      time: {
+        id: string;
+        nome: string;
+        escudo: string;
+      };
+    };
   };
 }
 
@@ -230,6 +249,28 @@ export default function Trocas() {
     }
   };
 
+  const handleResponderTroca = async (trocaId: string, aceitar: boolean) => {
+    try {
+      const response = await fetch(`/api/trocas/${trocaId}/responder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ aceitar }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao responder à troca');
+      }
+
+      // Recarregar as trocas após a resposta
+      fetchTrocas();
+    } catch (error) {
+      console.error('Erro ao responder à troca:', error);
+      setError('Erro ao responder à troca');
+    }
+  };
+
   if (!session) {
     return (
       <div className="min-h-screen  text-white p-8">
@@ -271,7 +312,7 @@ export default function Trocas() {
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div className="flex items-center space-x-2 md:space-x-3">
                   <img
-                    src={troca.usuarioEnvia.image || '/default-avatar.png'}
+                    src="/default-avatar.png"
                     alt={troca.usuarioEnvia.name}
                     className="w-8 h-8 md:w-10 md:h-10 rounded-full"
                   />
@@ -308,24 +349,26 @@ export default function Trocas() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Solicita:</h3>
-                  <div className="flex items-center space-x-2 md:space-x-3">
-                    {troca.figurinhaSolicitada.jogador.time.escudo && (
-                      <img
-                        src={troca.figurinhaSolicitada.jogador.time.escudo}
-                        alt={troca.figurinhaSolicitada.jogador.time.nome}
-                        className="w-6 h-6 md:w-8 md:h-8 object-contain"
-                      />
-                    )}
-                    <div>
-                      <p className="text-sm md:text-base font-medium">{troca.figurinhaSolicitada.jogador.nome}</p>
-                      <p className="text-xs md:text-sm text-gray-600">
-                        #{troca.figurinhaSolicitada.jogador.numero} - {troca.figurinhaSolicitada.jogador.posicao}
-                      </p>
+                {troca.figurinhaSolicitada && (
+                  <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Solicita:</h3>
+                    <div className="flex items-center space-x-2 md:space-x-3">
+                      {troca.figurinhaSolicitada.jogador.time.escudo && (
+                        <img
+                          src={troca.figurinhaSolicitada.jogador.time.escudo}
+                          alt={troca.figurinhaSolicitada.jogador.time.nome}
+                          className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                        />
+                      )}
+                      <div>
+                        <p className="text-sm md:text-base font-medium">{troca.figurinhaSolicitada.jogador.nome}</p>
+                        <p className="text-xs md:text-sm text-gray-600">
+                          #{troca.figurinhaSolicitada.jogador.numero} - {troca.figurinhaSolicitada.jogador.posicao}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {troca.status === 'PENDENTE' && (
                   <div className="flex space-x-2 md:space-x-3">
