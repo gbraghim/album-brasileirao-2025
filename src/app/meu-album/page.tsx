@@ -94,7 +94,7 @@ export default function MeuAlbum() {
           escudo: jogador.time.escudo
         };
       })
-      .filter((time): time is Time => time !== null)
+      .filter((time): time is NonNullable<typeof time> => time !== null)
       .sort((a, b) => a.nome.localeCompare(b.nome));
       
       console.log('Times processados:', timesUnicos);
