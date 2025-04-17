@@ -16,7 +16,6 @@ interface Jogador {
   nome: string;
   numero: number;
   posicao: string;
-  idade: number;
   nacionalidade: string;
   time: {
     id: string;
@@ -222,7 +221,6 @@ export default function MeuAlbum() {
                             <span className="text-brasil-yellow">{jogador.posicao}</span>
                           </div>
                           <div className="flex justify-between text-xs">
-                            <span>{jogador.idade} anos</span>
                             <span>{jogador.nacionalidade}</span>
                           </div>
                         </div>

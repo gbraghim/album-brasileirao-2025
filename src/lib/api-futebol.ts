@@ -19,7 +19,6 @@ export interface Jogador {
   atleta_id: number
   nome_popular: string
   posicao: string
-  idade: number
   nacionalidade: string
   altura: number
   peso: number

@@ -5,12 +5,15 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 interface Jogador {
   id: string;
   nome: string;
+  numero: number | null;
+  posicao: string | null;
+  nacionalidade: string | null;
+  foto: string | null;
   time: {
+    id: string;
     nome: string;
+    escudo: string | null;
   };
-  posicao: string;
-  idade: number;
-  numero: number;
 }
 
 interface Figurinha {
@@ -87,10 +90,6 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                               <p className="text-sm">
                                 <span className="font-medium text-brasil-green">Posição:</span>{' '}
                                 <span className="text-brasil-blue">{figurinha.jogador.posicao}</span>
-                              </p>
-                              <p className="text-sm">
-                                <span className="font-medium text-brasil-green">Idade:</span>{' '}
-                                <span className="text-brasil-blue">{figurinha.jogador.idade} anos</span>
                               </p>
                             </div>
                           </div>

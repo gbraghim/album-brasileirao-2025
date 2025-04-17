@@ -19,20 +19,29 @@ export async function GET() {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
-    // Buscar todas as figurinhas do usuário que estão repetidas
-    const figurinhasRepetidas = await prisma.userFigurinha.findMany({
+    // Buscar todas as figurinhas do usuário
+    const todasFigurinhas = await prisma.userFigurinha.findMany({
       where: {
-        userId: user.id,
-        quantidade: {
-          gt: 1
-        }
+        userId: user.id
       },
       include: {
         figurinha: {
           include: {
             jogador: {
-              include: {
-                time: true
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
               }
             }
           }
@@ -40,20 +49,37 @@ export async function GET() {
       }
     });
 
-    console.log('Figurinhas repetidas encontradas:', figurinhasRepetidas.length);
+    console.log('Usuário:', user.id);
+    console.log('Total de figurinhas encontradas:', todasFigurinhas.length);
+
+    // Filtrar apenas as figurinhas que aparecem mais de uma vez
+    const figurinhasRepetidas = todasFigurinhas.filter(f => f.quantidade > 1);
+
+    console.log('Total de figurinhas repetidas:', figurinhasRepetidas.length);
+    console.log('Detalhes das figurinhas repetidas:', figurinhasRepetidas.map(f => ({
+      id: f.figurinha.id,
+      jogador: f.figurinha.jogador?.nome,
+      quantidade: f.quantidade
+    })));
 
     // Formatar as figurinhas repetidas com todas as informações necessárias
     const figurinhasFormatadas = figurinhasRepetidas.map(uf => ({
       id: uf.figurinha.id,
-      numero: uf.figurinha.jogador?.numero || 0,
-      nome: uf.figurinha.jogador?.nome || '',
-      posicao: uf.figurinha.jogador?.posicao || '',
+      jogador: {
+        id: uf.figurinha.jogador?.id || '',
+        nome: uf.figurinha.jogador?.nome || '',
+        posicao: uf.figurinha.jogador?.posicao || '',
+        numero: uf.figurinha.jogador?.numero || 0,
+        nacionalidade: uf.figurinha.jogador?.nacionalidade || '',
+        foto: uf.figurinha.jogador?.foto || '',
+        time: {
+          id: uf.figurinha.jogador?.time?.id || '',
+          nome: uf.figurinha.jogador?.time?.nome || '',
+          escudo: uf.figurinha.jogador?.time?.escudo || ''
+        }
+      },
       quantidade: uf.quantidade,
-      time: {
-        id: uf.figurinha.jogador?.time?.id || '',
-        nome: uf.figurinha.jogador?.time?.nome || '',
-        escudo: uf.figurinha.jogador?.time?.escudo || ''
-      }
+      raridade: 'COMUM'
     }));
 
     console.log('Figurinhas formatadas:', figurinhasFormatadas);

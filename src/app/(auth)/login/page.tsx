@@ -52,10 +52,10 @@ export default function Login() {
         <div className="flex justify-center mb-8">
           <Image
             src="/logo.png"
-            alt="Álbum Brasileirão 2025"
+            alt="Logo"
             width={200}
-            height={100}
-            className="object-contain"
+            height={200}
+            className="mx-auto mb-8"
           />
         </div>
         <h1 className="text-3xl font-bold text-center mb-8 text-brasil-blue">Login</h1>

@@ -33,6 +33,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Excel files
+*.xlsx
+
+# Database
+*.db
+*.sqlite
+
 # IDE
 .vscode/
 .idea/

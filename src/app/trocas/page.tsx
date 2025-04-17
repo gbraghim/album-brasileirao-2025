@@ -8,15 +8,20 @@ import Modal from '@/components/Modal';
 
 interface Figurinha {
   id: string;
-  numero: number;
-  nome: string;
-  posicao: string;
-  quantidade: number;
-  time: {
+  jogador: {
     id: string;
     nome: string;
-    escudo: string;
+    posicao: string;
+    numero: number;
+    nacionalidade: string;
+    time: {
+      id: string;
+      nome: string;
+      escudo: string;
+    };
   };
+  quantidade: number;
+  raridade: string;
 }
 
 interface Troca {
@@ -335,19 +340,24 @@ export default function Trocas() {
                 onClick={() => adicionarTroca(figurinha)}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 relative">
-                    <Image
-                      src={figurinha.time.escudo}
-                      alt={figurinha.time.nome}
-                      fill
-                      className="object-contain"
-                    />
+                  <div className="w-12 h-12 relative flex items-center justify-center bg-gray-100 rounded-full">
+                    {figurinha.jogador?.time?.escudo ? (
+                      <Image
+                        src={figurinha.jogador.time.escudo}
+                        alt={figurinha.jogador.time.nome}
+                        fill
+                        className="object-contain p-1"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-500">{figurinha.jogador?.time?.nome?.substring(0, 3) || 'Time'}</span>
+                    )}
                   </div>
                   <div>
-                    <p className="font-semibold text-brasil-blue">{figurinha.nome}</p>
+                    <p className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</p>
                     <p className="text-sm text-gray-600">
-                      {figurinha.posicao} - #{figurinha.numero}
+                      {figurinha.jogador.posicao} - #{figurinha.jogador.numero}
                     </p>
+                    <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
                     <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</p>
                   </div>
                 </div>
@@ -370,9 +380,9 @@ export default function Trocas() {
               className="bg-purple-700 p-4 rounded-lg cursor-pointer hover:bg-purple-600"
               onClick={() => handleProporTroca(figurinha)}
             >
-              <h3 className="font-bold">{figurinha.nome}</h3>
-              <p className="text-sm">{figurinha.posicao}</p>
-              <p className="text-xs">#{figurinha.numero}</p>
+              <h3 className="font-bold">{figurinha.jogador.nome}</h3>
+              <p className="text-sm">{figurinha.jogador.posicao}</p>
+              <p className="text-xs">#{figurinha.jogador.numero}</p>
               <p className="text-xs mt-1">Repetidas: {figurinha.quantidade}</p>
             </div>
           ))}

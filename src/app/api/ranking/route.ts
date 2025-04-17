@@ -28,7 +28,17 @@ export async function GET() {
           include: {
             figurinhas: {
               include: {
-                jogador: true
+                jogador: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    numero: true,
+                    posicao: true,
+                    nacionalidade: true,
+                    foto: true,
+                    timeId: true
+                  }
+                }
               }
             }
           }

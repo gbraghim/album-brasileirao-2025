@@ -6,18 +6,17 @@ import Modal from '@/components/Modal';
 
 interface Figurinha {
   id: string;
-  numero: number;
-  nome: string;
-  posicao: string;
-  idade: number;
-  nacionalidade: string;
-  foto: string;
-  quantidade: number;
-  time: {
+  jogador: {
     id: string;
     nome: string;
-    escudo: string;
+    nacionalidade: string;
+    time: {
+      nome: string;
+      escudo: string;
+    };
   };
+  quantidade: number;
+  raridade: string;
 }
 
 export default function Repetidas() {
@@ -62,21 +61,7 @@ export default function Repetidas() {
       setFigurinhasEmTroca(figurinhasEmTrocaIds);
 
       // Mapear figurinhas repetidas
-      setFigurinhas(repetidasData.map((figurinha: any) => ({
-        id: figurinha.id,
-        numero: figurinha.numero || 0,
-        nome: figurinha.nome,
-        posicao: figurinha.posicao,
-        idade: figurinha.idade,
-        nacionalidade: figurinha.nacionalidade,
-        foto: figurinha.foto,
-        quantidade: figurinha.quantidade,
-        time: {
-          id: figurinha.time.id,
-          nome: figurinha.time.nome,
-          escudo: figurinha.time.escudo
-        }
-      })));
+      setFigurinhas(repetidasData);
       setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar figurinhas repetidas:', error);
@@ -146,37 +131,54 @@ export default function Repetidas() {
     );
   }
 
+  const figurinhasFormatadas = figurinhas.map((figurinha) => ({
+    id: figurinha.id,
+    jogador: {
+      id: figurinha.jogador.id,
+      nome: figurinha.jogador.nome,
+      nacionalidade: figurinha.jogador.nacionalidade,
+      time: {
+        nome: figurinha.jogador.time.nome,
+        escudo: figurinha.jogador.time.escudo,
+      },
+    },
+    quantidade: figurinha.quantidade,
+    raridade: figurinha.raridade,
+  }));
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
-          {figurinhas.map((figurinha) => (
+          {figurinhasFormatadas.map((figurinha) => (
             <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-4 flex flex-col">
               <div className="flex items-center mb-4">
-                <img
-                  src={figurinha.time.escudo}
-                  alt={figurinha.time.nome}
-                  className="w-12 h-12 object-contain mr-4"
-                />
+                {figurinha.jogador.time.escudo && (
+                  <img
+                    src={figurinha.jogador.time.escudo}
+                    alt={figurinha.jogador.time.nome}
+                    className="w-12 h-12 object-contain mr-4"
+                  />
+                )}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">{figurinha.nome}</h3>
-                  <p className="text-gray-600">{figurinha.time.nome}</p>
+                  <h3 className="text-lg font-semibold text-gray-800">{figurinha.jogador.nome}</h3>
+                  <p className="text-gray-600">{figurinha.jogador.time.nome}</p>
                 </div>
               </div>
               <div className="flex-grow">
-                <img
-                  src={figurinha.foto}
-                  alt={figurinha.nome}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <p className="text-gray-800"><span className="font-semibold">Número:</span> {figurinha.numero}</p>
-                  <p className="text-gray-800"><span className="font-semibold">Posição:</span> {figurinha.posicao}</p>
-                  <p className="text-gray-800"><span className="font-semibold">Idade:</span> {figurinha.idade}</p>
-                  <p className="text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.nacionalidade}</p>
-                  <p className="col-span-2 text-gray-800">
+                {figurinha.jogador.time.escudo && (
+                  <img
+                    src={figurinha.jogador.time.escudo}
+                    alt={figurinha.jogador.nome}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                )}
+                <div className="space-y-2">
+                  <p className="text-gray-800"><span className="font-semibold">Time:</span> {figurinha.jogador.time.nome}</p>
+                  <p className="text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.jogador.nacionalidade}</p>
+                  <p className="text-gray-800">
                     <span className="font-semibold">Repetidas:</span> {figurinha.quantidade}
                   </p>
                 </div>
@@ -232,7 +234,7 @@ export default function Repetidas() {
           <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
             <p className="mb-4 text-gray-800">
-              A figurinha {selectedFigurinha.nome} foi disponibilizada para troca com sucesso!
+              A figurinha {selectedFigurinha.jogador.nome} foi disponibilizada para troca com sucesso!
             </p>
             <div className="flex justify-end">
               <button

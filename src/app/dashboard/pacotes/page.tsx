@@ -18,7 +18,6 @@ interface Pacote {
         nome: string;
       };
       posicao: string;
-      idade: number;
     };
   }[];
 }

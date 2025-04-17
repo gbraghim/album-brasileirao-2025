@@ -35,8 +35,20 @@ export async function GET() {
         figurinha: {
           include: {
             jogador: {
-              include: {
-                time: true
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
               }
             }
           }
@@ -64,7 +76,6 @@ export async function GET() {
             nome: jogador.nome,
             numero: jogador.numero,
             posicao: jogador.posicao,
-            idade: jogador.idade,
             nacionalidade: jogador.nacionalidade,
             time: {
               id: jogador.time.id,

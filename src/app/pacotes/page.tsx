@@ -108,8 +108,8 @@ export default function Pacotes() {
       const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.user?.email}`,
         },
         body: JSON.stringify({ pacoteId }),
       });
@@ -194,9 +194,10 @@ export default function Pacotes() {
           >
             <div className={`relative w-full h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-500 ${pacoteAbrindo === pacote.id ? 'animate-pacote-aberto' : ''}`}>
               <Image
-                src={pacoteAbrindo === pacote.id ? "/pacote-figurinhas-aberto.png" : "/pacote-figurinhas.png"}
-                alt="Pacote de Figurinhas"
+                src="/pacote-figurinhas.png"
+                alt="Pacote de figurinhas"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-contain p-4"
               />
               <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${pacoteAbrindo === pacote.id ? 'hidden' : ''}`}>

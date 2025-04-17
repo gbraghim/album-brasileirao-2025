@@ -4,25 +4,29 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
-type TrocaComRelacoes = Prisma.TrocaGetPayload<{
-  include: {
-    usuarioEnvia: {
-      select: {
-        name: true;
-        email: true;
-      };
-    };
-    figurinhaOferta: {
-      include: {
-        jogador: {
-          include: {
-            time: true;
-          };
-        };
+type TrocaComRelacoes = {
+  id: string;
+  status: string;
+  figurinhaOferta: {
+    id: string;
+    jogador: {
+      id: string;
+      nome: string;
+      posicao: string | null;
+      numero: number | null;
+      foto: string | null;
+      time: {
+        id: string;
+        nome: string;
+        escudo: string | null;
       };
     };
   };
-}>;
+  usuarioEnvia: {
+    name: string | null;
+    email: string;
+  };
+};
 
 export async function GET() {
   try {
@@ -58,8 +62,19 @@ export async function GET() {
         figurinhaOferta: {
           include: {
             jogador: {
-              include: {
-                time: true
+              select: {
+                id: true,
+                nome: true,
+                posicao: true,
+                numero: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
               }
             }
           }
@@ -83,8 +98,19 @@ export async function GET() {
         figurinhaOferta: {
           include: {
             jogador: {
-              include: {
-                time: true
+              select: {
+                id: true,
+                nome: true,
+                posicao: true,
+                numero: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
               }
             }
           }
@@ -193,8 +219,19 @@ export async function POST(request: Request) {
         figurinhaOferta: {
           include: {
             jogador: {
-              include: {
-                time: true
+              select: {
+                id: true,
+                nome: true,
+                posicao: true,
+                numero: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
               }
             }
           }

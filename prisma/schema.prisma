@@ -106,7 +106,6 @@ model Jogador {
   nome         String
   numero       Int?
   posicao      String?
-  idade        Int?
   nacionalidade String?
   foto         String?
   apiId        Int        @unique

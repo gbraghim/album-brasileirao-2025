@@ -12,7 +12,9 @@
     "populate:times": "node scripts/populate-times.js",
     "populate:flamengo": "node scripts/populate-flamengo.js",
     "populate:sao-paulo": "node scripts/populate-sao-paulo.js",
-    "populate:gremio": "node scripts/populate-gremio.js"
+    "populate:gremio": "node scripts/populate-gremio.js",
+    "import-times": "node scripts/import-times.js",
+    "import-jogadores": "node scripts/import-jogadores.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.1",
@@ -27,7 +29,8 @@
     "next-auth": "^4.24.6",
     "next-cloudinary": "^6.16.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
