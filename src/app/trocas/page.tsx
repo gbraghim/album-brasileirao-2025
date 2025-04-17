@@ -99,6 +99,8 @@ export default function Trocas() {
         throw new Error(data.error);
       }
 
+      console.log('Dados recebidos da API:', data);
+
       // Adicionar verificações e valores padrão
       const trocasFormatadas: Troca[] = (data.trocasDisponiveis || []).map((troca: any) => ({
         id: troca.id || '',
@@ -106,7 +108,6 @@ export default function Trocas() {
         figurinhaOferta: {
           id: troca.figurinha?.id || '',
           jogador: {
-            id: troca.figurinha?.jogador?.id || '',
             nome: troca.figurinha?.jogador?.nome || '',
             posicao: troca.figurinha?.jogador?.posicao || '',
             numero: troca.figurinha?.jogador?.numero || 0,
@@ -118,19 +119,17 @@ export default function Trocas() {
           }
         },
         usuarioEnvia: {
-          id: troca.usuarioEnvia?.id || '',
           name: troca.usuarioEnvia?.name || '',
           email: troca.usuarioEnvia?.email || ''
         }
       }));
 
-      const minhasTrocas = (data.minhasTrocas || []).map((troca: any) => ({
+      const minhasTrocasFormatadas = (data.minhasTrocas || []).map((troca: any) => ({
         id: troca.id || '',
         status: troca.status || 'PENDENTE',
         figurinhaOferta: {
           id: troca.figurinha?.id || '',
           jogador: {
-            id: troca.figurinha?.jogador?.id || '',
             nome: troca.figurinha?.jogador?.nome || '',
             posicao: troca.figurinha?.jogador?.posicao || '',
             numero: troca.figurinha?.jogador?.numero || 0,
@@ -142,13 +141,15 @@ export default function Trocas() {
           }
         },
         usuarioEnvia: {
-          id: troca.usuarioEnvia?.id || '',
           name: troca.usuarioEnvia?.name || '',
           email: troca.usuarioEnvia?.email || ''
         }
       }));
 
-      setMinhasTrocas(minhasTrocas);
+      console.log('Trocas formatadas:', trocasFormatadas);
+      console.log('Minhas trocas formatadas:', minhasTrocasFormatadas);
+
+      setMinhasTrocas(minhasTrocasFormatadas);
       setTrocasDisponiveis(trocasFormatadas);
       setLoading(false);
     } catch (error) {
@@ -172,7 +173,27 @@ export default function Trocas() {
         return;
       }
 
-      setFigurinhasRepetidas(data);
+      // Mapear os dados recebidos para o formato esperado
+      const figurinhasFormatadas = data.map((figurinha: any) => ({
+        id: figurinha.id,
+        jogador: {
+          id: figurinha.jogador.id,
+          nome: figurinha.jogador.nome,
+          posicao: figurinha.jogador.posicao,
+          numero: figurinha.jogador.numero,
+          nacionalidade: figurinha.jogador.nacionalidade,
+          time: {
+            id: figurinha.jogador.time.id,
+            nome: figurinha.jogador.time.nome,
+            escudo: figurinha.jogador.time.escudo || ''
+          }
+        },
+        quantidade: figurinha.quantidade,
+        raridade: figurinha.raridade
+      }));
+
+      console.log('Figurinhas repetidas formatadas:', figurinhasFormatadas);
+      setFigurinhasRepetidas(figurinhasFormatadas);
       setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar figurinhas repetidas:', error);
@@ -299,115 +320,156 @@ export default function Trocas() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Trocas</h1>
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-brasil-blue">Trocas</h1>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-brasil-green hover:bg-brasil-green/90 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Adicionar Troca
+          </button>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {trocasDisponiveis.map((troca) => (
-            <div
-              key={troca.id}
-              className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20"
-            >
-              <div className="flex items-center justify-between mb-3 md:mb-4">
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <img
-                    src="/default-avatar.png"
-                    alt={troca.usuarioEnvia.name}
-                    className="w-8 h-8 md:w-10 md:h-10 rounded-full"
-                  />
-                  <span className="text-sm md:text-base font-medium text-brasil-blue">
-                    {troca.usuarioEnvia.name}
-                  </span>
-                </div>
-                <span className={`text-xs md:text-sm px-2 py-1 rounded-full ${
-                  troca.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-800' :
-                  troca.status === 'ACEITO' ? 'bg-green-100 text-green-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {troca.status}
-                </span>
-              </div>
-
-              <div className="space-y-3 md:space-y-4">
-                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Oferece:</h3>
-                  <div className="flex items-center space-x-2 md:space-x-3">
-                    {troca.figurinhaOferta.jogador.time.escudo && (
-                      <img
-                        src={troca.figurinhaOferta.jogador.time.escudo}
-                        alt={troca.figurinhaOferta.jogador.time.nome}
-                        className="w-6 h-6 md:w-8 md:h-8 object-contain"
-                      />
-                    )}
-                    <div>
-                      <p className="text-sm md:text-base font-medium">{troca.figurinhaOferta.jogador.nome}</p>
-                      <p className="text-xs md:text-sm text-gray-600">
-                        #{troca.figurinhaOferta.jogador.numero} - {troca.figurinhaOferta.jogador.posicao}
-                      </p>
-                    </div>
+        {/* Seção de Minhas Trocas */}
+        {minhasTrocas.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Minhas Trocas</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {minhasTrocas.map((troca) => (
+                <div
+                  key={troca.id}
+                  className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-brasil-yellow/20"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      troca.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-800' :
+                      troca.status === 'ACEITO' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {troca.status}
+                    </span>
                   </div>
-                </div>
-
-                {troca.figurinhaSolicitada && (
-                  <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
-                    <h3 className="text-sm md:text-base font-semibold text-brasil-blue mb-2">Solicita:</h3>
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                      {troca.figurinhaSolicitada.jogador.time.escudo && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h3 className="text-sm font-semibold text-brasil-blue mb-2">Oferecendo:</h3>
+                    <div className="flex items-center space-x-2 text-brasil-blue">
+                      {troca.figurinhaOferta.jogador.time.escudo && (
                         <img
-                          src={troca.figurinhaSolicitada.jogador.time.escudo}
-                          alt={troca.figurinhaSolicitada.jogador.time.nome}
-                          className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                          src={troca.figurinhaOferta.jogador.time.escudo}
+                          alt={troca.figurinhaOferta.jogador.time.nome}
+                          className="w-8 h-8 object-contain"
                         />
                       )}
                       <div>
-                        <p className="text-sm md:text-base font-medium">{troca.figurinhaSolicitada.jogador.nome}</p>
-                        <p className="text-xs md:text-sm text-gray-600">
-                          #{troca.figurinhaSolicitada.jogador.numero} - {troca.figurinhaSolicitada.jogador.posicao}
+                        <p className="font-medium">{troca.figurinhaOferta.jogador.nome}</p>
+                        <p className="text-sm text-gray-600">
+                          #{troca.figurinhaOferta.jogador.numero} - {troca.figurinhaOferta.jogador.posicao}
                         </p>
                       </div>
                     </div>
                   </div>
-                )}
-
-                {troca.status === 'PENDENTE' && (
-                  <div className="flex space-x-2 md:space-x-3">
-                    <button
-                      onClick={() => handleResponderTroca(troca.id, true)}
-                      className="flex-1 bg-brasil-green hover:bg-brasil-green/90 text-white text-sm md:text-base font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Aceitar
-                    </button>
-                    <button
-                      onClick={() => handleResponderTroca(troca.id, false)}
-                      className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm md:text-base font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Recusar
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+        )}
+
+        {/* Seção de Trocas Disponíveis */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Trocas Disponíveis</h2>
+          {trocasDisponiveis.length === 0 ? (
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 text-center">
+              <p className="text-gray-600 mb-4">Não há trocas disponíveis no momento.</p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-brasil-green hover:bg-brasil-green/90 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center"
+              >
+                Seja o primeiro a propor uma troca
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {trocasDisponiveis.map((troca) => (
+                <div
+                  key={troca.id}
+                  className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-brasil-yellow/20"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <img
+                        src="/default-avatar.png"
+                        alt={troca.usuarioEnvia.name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <span className="font-medium text-brasil-blue">
+                        {troca.usuarioEnvia.name}
+                      </span>
+                    </div>
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      troca.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-800' :
+                      troca.status === 'ACEITO' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {troca.status}
+                    </span>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h3 className="text-sm font-semibold text-brasil-blue mb-2">Oferece:</h3>
+                    <div className="flex items-center space-x-2">
+                      {troca.figurinhaOferta.jogador.time.escudo && (
+                        <img
+                          src={troca.figurinhaOferta.jogador.time.escudo}
+                          alt={troca.figurinhaOferta.jogador.time.nome}
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium">{troca.figurinhaOferta.jogador.nome}</p>
+                        <p className="text-sm text-gray-600">
+                          #{troca.figurinhaOferta.jogador.numero} - {troca.figurinhaOferta.jogador.posicao}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {troca.status === 'PENDENTE' && (
+                    <div className="mt-4 flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setTrocaSelecionada(troca);
+                          setShowProporTrocaModal(true);
+                        }}
+                        className="flex-1 bg-brasil-green hover:bg-brasil-green/90 text-white py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Propor Troca
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Modal para adicionar figurinha para troca */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Adicionar figurinha para troca</h2>
-        {figurinhasDisponiveisParaTroca.length === 0 ? (
-          <p className="text-gray-600">Você não tem figurinhas disponíveis para troca.</p>
+        {figurinhasRepetidas.length === 0 ? (
+          <p className="text-gray-600">Você não tem figurinhas repetidas disponíveis para troca.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {figurinhasDisponiveisParaTroca.map((figurinha) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+            {figurinhasRepetidas.map((figurinha) => (
               <div
                 key={figurinha.id}
-                className="bg-white/50 p-4 rounded-lg border border-brasil-yellow/20 cursor-pointer hover:bg-white/70 transition-colors"
+                className="bg-white p-4 rounded-lg border border-brasil-yellow/20 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => adicionarTroca(figurinha)}
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 relative flex items-center justify-center bg-gray-100 rounded-full">
-                    {figurinha.jogador?.time?.escudo ? (
+                    {figurinha.jogador.time.escudo ? (
                       <Image
                         src={figurinha.jogador.time.escudo}
                         alt={figurinha.jogador.time.nome}
@@ -415,7 +477,9 @@ export default function Trocas() {
                         className="object-contain p-1"
                       />
                     ) : (
-                      <span className="text-xs text-gray-500">{figurinha.jogador?.time?.nome?.substring(0, 3) || 'Time'}</span>
+                      <span className="text-xs text-gray-500">
+                        {figurinha.jogador.time.nome?.substring(0, 3) || 'Time'}
+                      </span>
                     )}
                   </div>
                   <div>
@@ -438,21 +502,45 @@ export default function Trocas() {
         setShowProporTrocaModal(false);
         setTrocaSelecionada(null);
       }}>
-        <h2 className="text-2xl font-bold mb-4">Escolha uma figurinha para propor troca</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {figurinhasRepetidas.map((figurinha) => (
-            <div
-              key={figurinha.id}
-              className="bg-purple-700 p-4 rounded-lg cursor-pointer hover:bg-purple-600"
-              onClick={() => handleProporTroca(figurinha)}
-            >
-              <h3 className="font-bold">{figurinha.jogador.nome}</h3>
-              <p className="text-sm">{figurinha.jogador.posicao}</p>
-              <p className="text-xs">#{figurinha.jogador.numero}</p>
-              <p className="text-xs mt-1">Repetidas: {figurinha.quantidade}</p>
-            </div>
-          ))}
-        </div>
+        <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Escolha uma figurinha para propor troca</h2>
+        {figurinhasRepetidas.length === 0 ? (
+          <p className="text-gray-600">Você não tem figurinhas repetidas disponíveis para troca.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+            {figurinhasRepetidas.map((figurinha) => (
+              <div
+                key={figurinha.id}
+                className="bg-white p-4 rounded-lg border border-brasil-yellow/20 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => handleProporTroca(figurinha)}
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 relative flex items-center justify-center bg-gray-100 rounded-full">
+                    {figurinha.jogador.time.escudo ? (
+                      <Image
+                        src={figurinha.jogador.time.escudo}
+                        alt={figurinha.jogador.time.nome}
+                        fill
+                        className="object-contain p-1"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-500">
+                        {figurinha.jogador.time.nome?.substring(0, 3) || 'Time'}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</p>
+                    <p className="text-sm text-gray-600">
+                      {figurinha.jogador.posicao} - #{figurinha.jogador.numero}
+                    </p>
+                    <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
+                    <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Modal>
 
       {/* Modal de sucesso */}

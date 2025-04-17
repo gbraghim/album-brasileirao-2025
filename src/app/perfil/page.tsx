@@ -108,18 +108,28 @@ export default function PerfilPage() {
               </div>
 
               <div className="bg-white/50 p-3 md:p-4 rounded-lg">
-                <h3 className="text-sm md:text-base font-medium text-brasil-blue mb-2">Progresso do Álbum</h3>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 md:h-3">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm md:text-base font-medium text-brasil-blue">Progresso do Álbum</h3>
+                  <span className="text-sm md:text-base font-medium text-brasil-green">
+                    {stats?.timesCompletos}/{stats?.totalTimes} times completos
+                  </span>
+                </div>
+                <div className="relative w-full bg-gray-200 rounded-full h-2.5 md:h-3 overflow-hidden">
                   <div
-                    className="bg-brasil-green h-2.5 md:h-3 rounded-full"
+                    className="absolute left-0 top-0 bg-brasil-green h-full rounded-full transition-all duration-300 ease-in-out"
                     style={{
-                      width: `${((stats?.totalFigurinhas || 0) / (stats?.totalJogadores || 1)) * 100}%`,
+                      width: `${Math.min(((stats?.timesCompletos || 0) / (stats?.totalTimes || 1)) * 100, 100)}%`,
                     }}
                   ></div>
                 </div>
-                <p className="text-sm md:text-base text-brasil-green mt-2">
-                  {stats?.totalFigurinhas} de {stats?.totalJogadores} figurinhas
-                </p>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-sm md:text-base text-brasil-green">
+                    {stats?.totalFigurinhas || 0} de {stats?.totalJogadoresBase || 0} figurinhas coletadas
+                  </p>
+                  <p className="text-sm md:text-base font-medium text-brasil-green">
+                    {Math.round(((stats?.timesCompletos || 0) / (stats?.totalTimes || 1)) * 100)}%
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -115,12 +115,16 @@ export async function GET() {
     // Busca o total de times no banco de dados
     const totalTimes = await prisma.time.count();
 
+    // Busca o total de jogadores no banco de dados
+    const totalJogadoresBase = await prisma.jogador.count();
+
     const stats: UserStats = {
       totalPacotes,
       totalFigurinhas,
       figurinhasRepetidas,
       timesCompletos,
-      totalTimes
+      totalTimes,
+      totalJogadoresBase
     };
 
     console.log('Estatísticas finais:', stats);

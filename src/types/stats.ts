@@ -4,6 +4,7 @@ export interface UserStats {
   figurinhasRepetidas: number;
   timesCompletos: number;
   totalTimes: number;
+  totalJogadoresBase: number;
 }
 
 export interface TimeStats {

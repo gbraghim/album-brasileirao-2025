@@ -8,6 +8,12 @@ interface RankingItem {
   nome: string;
   totalFigurinhas: number;
   email: string;
+  posicao: number;
+}
+
+interface RankingResponse {
+  ranking: RankingItem[];
+  usuarioAtual?: RankingItem;
 }
 
 export async function GET() {
@@ -26,30 +32,15 @@ export async function GET() {
         email: true,
         pacotes: {
           include: {
-            figurinhas: {
-              include: {
-                jogador: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    numero: true,
-                    posicao: true,
-                    nacionalidade: true,
-                    foto: true,
-                    timeId: true
-                  }
-                }
-              }
-            }
+            figurinhas: true
           }
         }
       }
     });
 
     // Calcula o ranking ordenando por quantidade total de figurinhas
-    const ranking = usuarios
+    const rankingCompleto = usuarios
       .map(usuario => {
-        // Total bruto de figurinhas (todas as figurinhas, incluindo repetidas)
         const totalFigurinhas = usuario.pacotes.reduce((total, pacote) => 
           total + pacote.figurinhas.length, 0
         );
@@ -61,9 +52,27 @@ export async function GET() {
           totalFigurinhas
         };
       })
-      .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas);
+      .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas)
+      .map((usuario, index) => ({
+        ...usuario,
+        posicao: index + 1
+      }));
 
-    return NextResponse.json(ranking);
+    // Encontra a posição do usuário atual
+    const usuarioAtual = rankingCompleto.find(u => u.email === session.user?.email);
+
+    // Limita o ranking aos 20 primeiros
+    const rankingLimitado = rankingCompleto.slice(0, 20);
+
+    // Se o usuário atual não está no top 20 e existe, adiciona sua posição
+    const response: RankingResponse = {
+      ranking: rankingLimitado,
+      usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email) 
+        ? usuarioAtual 
+        : undefined
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Erro ao buscar ranking:', error);
     return NextResponse.json({ error: 'Erro ao buscar ranking' }, { status: 500 });
