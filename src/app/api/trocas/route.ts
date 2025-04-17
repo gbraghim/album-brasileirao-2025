@@ -121,10 +121,9 @@ export async function GET() {
     const formatarTroca = (troca: any) => ({
       id: troca.id,
       status: troca.status,
-      figurinha: {
+      figurinhaOferta: {
         id: troca.figurinhaOferta.id,
         jogador: {
-          id: troca.figurinhaOferta.jogador.id,
           nome: troca.figurinhaOferta.jogador.nome,
           posicao: troca.figurinhaOferta.jogador.posicao,
           numero: troca.figurinhaOferta.jogador.numero,

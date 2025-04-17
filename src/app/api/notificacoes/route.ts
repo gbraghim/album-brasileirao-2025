@@ -23,7 +23,23 @@ export async function POST(req: Request) {
         usuarioRecebe: true,
         figurinhaOferta: {
           include: {
-            jogador: true
+            jogador: {
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -89,10 +105,32 @@ export async function GET() {
           include: {
             figurinhaOferta: {
               include: {
-                jogador: true
+                jogador: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    numero: true,
+                    posicao: true,
+                    nacionalidade: true,
+                    foto: true,
+                    time: {
+                      select: {
+                        id: true,
+                        nome: true,
+                        escudo: true
+                      }
+                    }
+                  }
+                }
               }
             },
-            usuarioEnvia: true
+            usuarioEnvia: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
           }
         }
       }

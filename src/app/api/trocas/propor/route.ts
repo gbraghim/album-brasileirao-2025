@@ -40,7 +40,23 @@ export async function POST(request: Request) {
       include: {
         figurinha: {
           include: {
-            jogador: true
+            jogador: {
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -64,7 +80,23 @@ export async function POST(request: Request) {
       include: {
         figurinhaOferta: {
           include: {
-            jogador: true
+            jogador: {
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
+              }
+            }
           }
         },
         usuarioEnvia: true
@@ -94,7 +126,23 @@ export async function POST(request: Request) {
       include: {
         figurinhaOferta: {
           include: {
-            jogador: true
+            jogador: {
+              select: {
+                id: true,
+                nome: true,
+                numero: true,
+                posicao: true,
+                nacionalidade: true,
+                foto: true,
+                time: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    escudo: true
+                  }
+                }
+              }
+            }
           }
         },
         usuarioEnvia: {
