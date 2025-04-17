@@ -84,21 +84,33 @@ export async function GET() {
         if (!timesFigurinhas.has(timeId)) {
           timesFigurinhas.set(timeId, new Set());
         }
-        timesFigurinhas.get(timeId).add(figurinha.jogador.numero);
+        timesFigurinhas.get(timeId).add(figurinha.jogador.id);
       });
     });
 
-    // Conta quantos times estão completos (assumindo que cada time tem 30 figurinhas)
-    const timesCompletos = Array.from(timesFigurinhas.values())
-      .filter(jogadores => jogadores.size === 30)
-      .length;
+    // Para cada time, verifica se o usuário possui todos os jogadores
+    const timesCompletos = await Promise.all(
+      Array.from(timesFigurinhas.keys()).map(async (timeId) => {
+        // Busca o total de jogadores do time
+        const totalJogadoresTime = await prisma.jogador.count({
+          where: { timeId }
+        });
+
+        // Verifica se o usuário possui todos os jogadores do time
+        const jogadoresPossuidos = timesFigurinhas.get(timeId).size;
+        return jogadoresPossuidos === totalJogadoresTime;
+      })
+    ).then(results => results.filter(Boolean).length);
+
+    // Busca o total de times no banco de dados
+    const totalTimes = await prisma.time.count();
 
     const stats: UserStats = {
       totalPacotes,
       totalFigurinhas,
       figurinhasRepetidas,
       timesCompletos,
-      totalTimes: 20 // Total de times no Brasileirão
+      totalTimes
     };
 
     console.log('Estatísticas finais:', stats);
