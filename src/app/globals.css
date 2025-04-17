@@ -37,4 +37,49 @@ body {
 
 .animate-pacote-aberto {
   animation: pacoteAberto 1s ease-in-out;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: absolute;
+  animation: confetti-fall 2s linear forwards;
+}
+
+@keyframes pacote-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-pacote-bounce {
+  animation: pacote-bounce 1s ease-in-out infinite;
+}
+
+@keyframes pacote-open {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pacote-open {
+  animation: pacote-open 0.5s ease-in-out;
 } 

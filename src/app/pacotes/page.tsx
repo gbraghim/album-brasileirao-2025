@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ModalFigurinhas from '@/components/ModalFigurinhas';
+import PacoteAnimation from '@/components/PacoteAnimation';
 import Image from 'next/image';
 import { Pacote as PacoteType } from '@/types/pacote';
 
@@ -30,6 +31,7 @@ export default function Pacotes() {
   const [figurinhasAbertas, setFigurinhasAbertas] = useState<any[]>([]);
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
   const [pacoteAbrindo, setPacoteAbrindo] = useState<string | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -104,6 +106,7 @@ export default function Pacotes() {
   const handleAbrirPacote = async (pacoteId: string) => {
     try {
       setPacoteAbrindo(pacoteId);
+      setShowAnimation(true);
       
       const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
@@ -123,19 +126,25 @@ export default function Pacotes() {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || 'Erro ao abrir pacote';
         setError(errorMessage);
+        setShowAnimation(false);
         return;
       }
 
       const data = await response.json();
       setFigurinhasAbertas(data.figurinhas);
-      setModalAberto(true);
       carregarPacotes();
     } catch (err) {
       console.error('Erro ao abrir pacote:', err);
       setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
+      setShowAnimation(false);
     } finally {
       setPacoteAbrindo(null);
     }
+  };
+
+  const handleAnimationComplete = () => {
+    setShowAnimation(false);
+    setModalAberto(true);
   };
 
   const handleFecharModal = () => {
@@ -185,7 +194,7 @@ export default function Pacotes() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 md:p-6">
         {pacotes.map((pacote) => (
           <div
             key={pacote.id}
@@ -209,6 +218,11 @@ export default function Pacotes() {
           </div>
         ))}
       </div>
+
+      <PacoteAnimation
+        isOpen={showAnimation}
+        onAnimationComplete={handleAnimationComplete}
+      />
 
       <ModalFigurinhas
         isOpen={modalAberto}
