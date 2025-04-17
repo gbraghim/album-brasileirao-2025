@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  name            String
-  email           String           @unique
-  password        String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  numeroDeLogins  Int              @default(0)
-  primeiroAcesso  Boolean          @default(true)
-  notificacoes    Notificacao[]
-  pacotes         Pacote[]
-  trocasEnviadas  Troca[]          @relation("TrocasEnviadas")
-  trocasRecebidas Troca[]          @relation("TrocasRecebidas")
-  trocas          TrocaFigurinha[]
-  figurinhas      UserFigurinha[]
+  id                String        @id @default(cuid())
+  name              String?
+  email             String        @unique
+  emailVerified     DateTime?
+  image             String?
+  accounts          Account[]
+  sessions          Session[]
+  userFigurinhas    UserFigurinha[]
+  trocasEnviadas    Troca[]       @relation("TrocasEnviadas")
+  trocasRecebidas   Troca[]       @relation("TrocasRecebidas")
+  notificacoes      Notificacao[]
+  numeroDeLogins    Int             @default(0)
+  primeiroAcesso    Boolean         @default(true)
+  pacotes           Pacote[]
+  trocas            TrocaFigurinha[]
+  figurinhas        UserFigurinha[]
 }
 
 model Pacote {
@@ -38,19 +40,21 @@ model Pacote {
 }
 
 model Figurinha {
-  id              String           @id @default(cuid())
-  pacoteId        String
-  jogadorId       String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  jogador         Jogador          @relation(fields: [jogadorId], references: [id])
-  pacote          Pacote           @relation(fields: [pacoteId], references: [id])
-  trocas          Troca[]
-  trocasFigurinha TrocaFigurinha[]
-  usuarios        UserFigurinha[]
+  id                String        @id @default(cuid())
+  nome              String
+  posicao           String?
+  numero            Int?
+  nacionalidade     String?
+  foto              String?
+  time              Time         @relation(fields: [timeId], references: [id])
+  timeId            String
+  userFigurinhas    UserFigurinha[]
+  trocasOfertadas   Troca[]      @relation("FigurinhaOferta")
+  trocasSolicitadas Troca[]      @relation("FigurinhaSolicitada")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
-  @@index([jogadorId])
-  @@index([pacoteId])
+  @@index([timeId])
 }
 
 model UserFigurinha {
@@ -69,22 +73,23 @@ model UserFigurinha {
 }
 
 model Troca {
-  id                  String        @id @default(cuid())
-  figurinhaOfertaId   String
-  figurinhaDesejadaId String?
-  usuarioEnviaId      String
-  usuarioRecebeId     String?
-  status              String
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  notificacoes        Notificacao[]
-  figurinhaOferta     Figurinha     @relation(fields: [figurinhaOfertaId], references: [id])
-  usuarioEnvia        User          @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
-  usuarioRecebe       User?         @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  status            String   @default("PENDENTE")
+  figurinhaOferta   Figurinha @relation("FigurinhaOferta", fields: [figurinhaOfertaId], references: [id])
+  figurinhaOfertaId String
+  figurinhaSolicitada Figurinha? @relation("FigurinhaSolicitada", fields: [figurinhaSolicitadaId], references: [id])
+  figurinhaSolicitadaId String?
+  usuarioEnvia      User     @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
+  usuarioEnviaId    String
+  usuarioRecebe     User?    @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
+  usuarioRecebeId   String?
 
+  @@index([figurinhaOfertaId])
+  @@index([figurinhaSolicitadaId])
   @@index([usuarioEnviaId])
   @@index([usuarioRecebeId])
-  @@index([figurinhaOfertaId])
 }
 
 model Time {
@@ -133,12 +138,15 @@ model Notificacao {
   tipo      String
   mensagem  String
   lida      Boolean  @default(false)
-  usuarioId String
-  trocaId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  troca     Troca?   @relation(fields: [trocaId], references: [id])
+
+  // Relacionamentos
   usuario   User     @relation(fields: [usuarioId], references: [id])
+  usuarioId String
+
+  troca     Troca?   @relation(fields: [trocaId], references: [id])
+  trocaId   String?
 
   @@index([usuarioId])
   @@index([trocaId])

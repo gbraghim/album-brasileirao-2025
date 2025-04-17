@@ -4,145 +4,91 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
-type TrocaComRelacoes = {
-  id: string;
-  status: string;
+const trocaInclude = {
   figurinhaOferta: {
-    id: string;
-    jogador: {
-      id: string;
-      nome: string;
-      posicao: string | null;
-      numero: number | null;
-      foto: string | null;
-      time: {
-        id: string;
-        nome: string;
-        escudo: string | null;
-      };
-    };
-  };
+    include: {
+      jogador: {
+        select: {
+          id: true,
+          nome: true,
+          posicao: true,
+          numero: true,
+          foto: true,
+          time: {
+            select: {
+              id: true,
+              nome: true,
+              escudo: true
+            }
+          }
+        }
+      }
+    }
+  },
   usuarioEnvia: {
-    name: string | null;
-    email: string;
-  };
-};
+    select: {
+      id: true,
+      name: true,
+      email: true
+    }
+  },
+  usuarioRecebe: {
+    select: {
+      id: true,
+      name: true,
+      email: true
+    }
+  }
+} satisfies Prisma.TrocaInclude;
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
+    if (!session) {
+      console.log('1. Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
+    console.log('2. Usuário autenticado:', session.user.id);
 
-    if (!user) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
-    }
-
-    // Buscar trocas disponíveis (não enviadas pelo usuário atual)
-    const trocasDisponiveis = await prisma.troca.findMany({
+    const trocas = await prisma.troca.findMany({
       where: {
-        NOT: {
-          usuarioEnviaId: user.id
-        },
+        OR: [
+          { usuarioEnviaId: session.user.id },
+          { usuarioRecebeId: session.user.id }
+        ],
         status: 'PENDENTE'
       },
-      include: {
-        usuarioEnvia: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        figurinhaOferta: {
-          include: {
-            jogador: {
-              select: {
-                id: true,
-                nome: true,
-                posicao: true,
-                numero: true,
-                foto: true,
-                time: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    escudo: true
-                  }
-                }
-              }
-            }
-          }
-        }
+      include: trocaInclude,
+      orderBy: {
+        createdAt: 'desc'
       }
     });
 
-    // Buscar trocas do usuário atual
-    const minhasTrocas = await prisma.troca.findMany({
-      where: {
-        usuarioEnviaId: user.id,
-        status: 'PENDENTE'
-      },
-      include: {
-        usuarioEnvia: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        figurinhaOferta: {
-          include: {
-            jogador: {
-              select: {
-                id: true,
-                nome: true,
-                posicao: true,
-                numero: true,
-                foto: true,
-                time: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    escudo: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
+    console.log('3. Trocas encontradas no banco:', trocas);
 
-    const formatarTroca = (troca: any) => ({
-      id: troca.id,
-      status: troca.status,
-      figurinhaOferta: {
-        id: troca.figurinhaOferta.id,
-        jogador: {
-          nome: troca.figurinhaOferta.jogador.nome,
-          posicao: troca.figurinhaOferta.jogador.posicao,
-          numero: troca.figurinhaOferta.jogador.numero,
-          time: {
-            id: troca.figurinhaOferta.jogador.time.id,
-            nome: troca.figurinhaOferta.jogador.time.nome,
-            escudo: troca.figurinhaOferta.jogador.time.escudo
-          }
-        }
-      },
-      usuarioEnvia: troca.usuarioEnvia
+    // Separar as trocas em diferentes categorias
+    const minhasTrocas = trocas.filter(troca => troca.usuarioEnviaId === session.user.id);
+    const trocasRecebidas = trocas.filter(troca => troca.usuarioRecebeId === session.user.id);
+    const trocasDisponiveis = trocas.filter(troca => 
+      troca.usuarioEnviaId !== session.user.id && 
+      (!troca.usuarioRecebeId || troca.usuarioRecebeId === session.user.id)
+    );
+
+    console.log('4. Trocas separadas:', {
+      minhasTrocas,
+      trocasRecebidas,
+      trocasDisponiveis
     });
 
     return NextResponse.json({
-      trocasDisponiveis: trocasDisponiveis.map(formatarTroca),
-      minhasTrocas: minhasTrocas.map(formatarTroca)
+      minhasTrocas,
+      trocasRecebidas,
+      trocasDisponiveis
     });
   } catch (error) {
-    console.error('Erro ao buscar trocas:', error);
+    console.error('5. Erro ao buscar trocas:', error);
     return NextResponse.json(
       { error: 'Erro ao buscar trocas' },
       { status: 500 }
@@ -150,45 +96,23 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { figurinhaId } = await request.json();
+    const { figurinhaId } = await req.json();
 
-    const usuario = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!usuario) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    if (!figurinhaId) {
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
 
-    // Verificar se o usuário tem a figurinha repetida
-    const usuarioFigurinha = await prisma.userFigurinha.findFirst({
-      where: {
-        userId: usuario.id,
-        figurinhaId,
-        quantidade: {
-          gt: 1
-        }
-      }
-    });
-
-    if (!usuarioFigurinha) {
-      return NextResponse.json(
-        { error: 'Figurinha não encontrada ou não está disponível para troca' },
-        { status: 404 }
-      );
-    }
-
-    // Verificar se a figurinha já está em uma troca pendente
+    // Verifica se a figurinha já está em uma troca pendente
     const trocaExistente = await prisma.troca.findFirst({
       where: {
-        usuarioEnviaId: usuario.id,
         figurinhaOfertaId: figurinhaId,
         status: 'PENDENTE'
       }
@@ -201,62 +125,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Criar nova troca
-    const novaTroca = await prisma.troca.create({
+    const troca = await prisma.troca.create({
       data: {
-        usuarioEnviaId: usuario.id,
         figurinhaOfertaId: figurinhaId,
+        usuarioEnviaId: session.user.id,
         status: 'PENDENTE'
       },
-      include: {
-        usuarioEnvia: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        figurinhaOferta: {
-          include: {
-            jogador: {
-              select: {
-                id: true,
-                nome: true,
-                posicao: true,
-                numero: true,
-                foto: true,
-                time: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    escudo: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      include: trocaInclude
     });
 
-    return NextResponse.json({
-      id: novaTroca.id,
-      figurinha: {
-        id: novaTroca.figurinhaOferta.id,
-        jogador: {
-          id: novaTroca.figurinhaOferta.jogador.id,
-          nome: novaTroca.figurinhaOferta.jogador.nome,
-          posicao: novaTroca.figurinhaOferta.jogador.posicao,
-          numero: novaTroca.figurinhaOferta.jogador.numero,
-          foto: novaTroca.figurinhaOferta.jogador.foto,
-          time: {
-            id: novaTroca.figurinhaOferta.jogador.time.id,
-            nome: novaTroca.figurinhaOferta.jogador.time.nome,
-            escudo: novaTroca.figurinhaOferta.jogador.time.escudo
-          }
-        }
-      },
-      usuarioEnvia: novaTroca.usuarioEnvia
-    });
+    return NextResponse.json(troca);
   } catch (error) {
     console.error('Erro ao criar troca:', error);
     return NextResponse.json(
