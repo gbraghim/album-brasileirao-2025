@@ -167,7 +167,7 @@ export default function MeuAlbum() {
                 <button
                   key={time.id}
                   onClick={() => setTimeSelecionado(time)}
-                  className={`w-full text-left p-2 md:p-3 rounded-lg transition-colors ${
+                  className={`w-full text-left p-2 md:p-3 rounded-lg text-brasil-blue transition-colors hover:bg-gray-200 ${
                     timeSelecionado?.id === time.id
                       ? 'bg-brasil-blue text-white'
                       : 'hover:bg-gray-100'
