@@ -18,6 +18,18 @@ export async function GET() {
       where: {
         email: session.user.email,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        image: true,
+        password: true,
+        numeroDeLogins: true,
+        primeiroAcesso: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
 
     if (!user) {

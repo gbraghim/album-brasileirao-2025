@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 export default function PerfilPage() {
   const { data: session } = useSession();
