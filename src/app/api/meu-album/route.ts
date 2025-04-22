@@ -66,6 +66,10 @@ export async function GET() {
           console.warn('Figurinha sem jogador:', uf);
           return;
         }
+        if (!uf.figurinha.jogador.time) {
+          console.warn('Jogador sem time:', uf.figurinha.jogador);
+          return;
+        }
 
         const jogador = uf.figurinha.jogador;
         const jogadorId = jogador.id;
@@ -74,12 +78,13 @@ export async function GET() {
           jogadoresMap.set(jogadorId, {
             id: jogadorId,
             nome: jogador.nome,
-            numero: jogador.numero,
-            posicao: jogador.posicao,
-            nacionalidade: jogador.nacionalidade,
+            numero: jogador.numero || 0,
+            posicao: jogador.posicao || '',
+            nacionalidade: jogador.nacionalidade || '',
             time: {
               id: jogador.time.id,
-              nome: jogador.time.nome
+              nome: jogador.time.nome,
+              escudo: jogador.time.escudo || ''
             },
             figurinhas: [{
               id: uf.figurinha.id,

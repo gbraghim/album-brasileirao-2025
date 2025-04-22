@@ -37,30 +37,14 @@ interface ModalProporTrocaProps {
   loading?: boolean;
 }
 
-export default function ModalProporTroca({ 
-  isOpen, 
-  onClose, 
-  troca,
-  onProporTroca,
-  loading = false 
-}: ModalProporTrocaProps) {
-  const handleClose = () => {
-    onClose();
-  };
-
-  const handleProporTroca = () => {
-    if (troca) {
-      onProporTroca(troca.figurinhaOferta);
-    }
-  };
-
+export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca, loading = false }: ModalProporTrocaProps) {
   if (!troca) {
     return null;
   }
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={handleClose}>
+      <Dialog as="div" className="relative z-10" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -84,37 +68,46 @@ export default function ModalProporTroca({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
                     type="button"
-                    className="rounded-md bg-white text-brasil-blue hover:text-brasil-green focus:outline-none focus:ring-2 focus:ring-brasil-green focus:ring-offset-2"
-                    onClick={handleClose}
+                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={onClose}
                   >
                     <span className="sr-only">Fechar</span>
                     <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
-                
-                <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-brasil-blue mb-4">
-                  Propor Troca para {troca.figurinhaOferta.jogador.nome}
-                </Dialog.Title>
-                
-                <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Você está propondo uma troca para a figurinha #{troca.figurinhaOferta.jogador.numero} - {troca.figurinhaOferta.jogador.nome} ({troca.figurinhaOferta.jogador.time.nome})
-                  </p>
-                  
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={handleProporTroca}
-                      disabled={loading}
-                      className="w-full bg-brasil-green hover:bg-brasil-green/90 text-white py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading ? 'Processando...' : 'Confirmar Troca'}
-                    </button>
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left">
+                    <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                      Propor Troca
+                    </Dialog.Title>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Você está propondo uma troca para a figurinha de {troca.figurinhaOferta.jogador.nome}
+                      </p>
+                    </div>
                   </div>
+                </div>
+                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="button"
+                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                    onClick={() => onProporTroca(troca.figurinhaOferta)}
+                    disabled={loading}
+                  >
+                    {loading ? 'Carregando...' : 'Confirmar Troca'}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={onClose}
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

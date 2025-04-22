@@ -152,16 +152,28 @@ const jogadoresPorTime = {
 async function main() {
   console.log('Iniciando seed do banco de dados...');
 
-  // Limpar o banco de dados
-  await prisma.userFigurinha.deleteMany();
-  await prisma.trocaFigurinha.deleteMany();
+  // Limpar o banco de dados na ordem correta
   await prisma.notificacao.deleteMany();
   await prisma.troca.deleteMany();
+  await prisma.trocaFigurinha.deleteMany();
+  await prisma.userFigurinha.deleteMany();
   await prisma.figurinha.deleteMany();
-  await prisma.jogador.deleteMany();
   await prisma.pacote.deleteMany();
+  await prisma.jogador.deleteMany();
   await prisma.time.deleteMany();
   await prisma.user.deleteMany();
+
+  // Criar um usuário de teste
+  const hashedPassword = await bcrypt.hash('123456', 10);
+  await prisma.user.create({
+    data: {
+      name: 'Usuário Teste',
+      email: 'teste@teste.com',
+      password: hashedPassword,
+      numeroDeLogins: 0,
+      primeiroAcesso: true,
+    },
+  });
 
   // Criar times
   for (const time of times) {

@@ -59,6 +59,10 @@ export async function GET() {
     const jogadoresMap = new Map();
     user.pacotes.forEach(pacote => {
       pacote.figurinhas.forEach(figurinha => {
+        if (!figurinha.jogador) {
+          console.warn('Figurinha sem jogador:', figurinha);
+          return;
+        }
         const jogadorId = figurinha.jogador.id;
         if (!jogadoresMap.has(jogadorId)) {
           jogadoresMap.set(jogadorId, 1);
@@ -90,7 +94,15 @@ export async function GET() {
     const timesFigurinhas = new Map();
     user.pacotes.forEach(pacote => {
       pacote.figurinhas.forEach(figurinha => {
+        if (!figurinha.jogador) {
+          console.warn('Figurinha sem jogador:', figurinha);
+          return;
+        }
         const timeId = figurinha.jogador.timeId;
+        if (!timeId) {
+          console.warn('Jogador sem timeId:', figurinha.jogador);
+          return;
+        }
         if (!timesFigurinhas.has(timeId)) {
           timesFigurinhas.set(timeId, new Set());
         }

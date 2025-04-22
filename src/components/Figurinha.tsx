@@ -10,7 +10,7 @@ interface FigurinhaProps {
       id: string;
       nome: string;
       time: string;
-    };
+    } | null;
   };
   onClick?: () => void;
   className?: string;
@@ -18,6 +18,11 @@ interface FigurinhaProps {
 
 export default function Figurinha({ figurinha, onClick, className = '' }: FigurinhaProps) {
   const [isLoading, setIsLoading] = useState(true);
+
+  if (!figurinha.jogador) {
+    console.warn('Figurinha sem jogador:', figurinha);
+    return null;
+  }
 
   return (
     <div

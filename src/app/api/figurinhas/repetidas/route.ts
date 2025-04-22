@@ -67,7 +67,36 @@ export async function GET() {
       .filter(fig => fig.quantidade > 1)
       .sort((a, b) => b.quantidade - a.quantidade);
 
-    return NextResponse.json(figurinhasRepetidas);
+    const figurinhasFormatadas = figurinhasRepetidas.map(uf => {
+      if (!uf.jogadorId) {
+        console.warn('Figurinha sem jogador:', uf);
+        return null;
+      }
+      if (!uf.jogador) {
+        console.warn('Jogador sem informações:', uf);
+        return null;
+      }
+      return {
+        id: uf.jogadorId,
+        jogador: {
+          id: uf.jogadorId,
+          nome: uf.nome,
+          posicao: uf.posicao || '',
+          numero: 0,
+          nacionalidade: '',
+          foto: '',
+          time: {
+            id: '',
+            nome: '',
+            escudo: ''
+          }
+        },
+        quantidade: uf.quantidade,
+        raridade: 'COMUM'
+      };
+    }).filter(Boolean);
+
+    return NextResponse.json(figurinhasFormatadas);
   } catch (error) {
     console.error('Erro ao buscar figurinhas repetidas:', error);
     return NextResponse.json(

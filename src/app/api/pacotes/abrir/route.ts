@@ -142,6 +142,15 @@ export async function POST(request: Request) {
           }
         });
 
+        if (!figurinha.jogador) {
+          console.warn('Figurinha criada sem jogador:', figurinha);
+          continue;
+        }
+        if (!figurinha.jogador.time) {
+          console.warn('Jogador sem time:', figurinha.jogador);
+          continue;
+        }
+
         // Criar ou atualizar a relação com o usuário
         const userFigurinha = await tx.userFigurinha.upsert({
           where: {
@@ -162,9 +171,21 @@ export async function POST(request: Request) {
           }
         });
 
-        // Adicionar a quantidade atual à figurinha criada
         figurinhasCriadas.push({
-          ...figurinha,
+          id: figurinha.id,
+          jogador: {
+            id: figurinha.jogador.id,
+            nome: figurinha.jogador.nome,
+            numero: figurinha.jogador.numero || 0,
+            posicao: figurinha.jogador.posicao || '',
+            nacionalidade: figurinha.jogador.nacionalidade || '',
+            foto: figurinha.jogador.foto || '',
+            time: {
+              id: figurinha.jogador.time.id,
+              nome: figurinha.jogador.time.nome,
+              escudo: figurinha.jogador.time.escudo || ''
+            }
+          },
           quantidadeAtual: figurinhaExistente ? figurinhaExistente.quantidade + 1 : 1
         });
       }
