@@ -85,7 +85,7 @@ export default function PerfilPage() {
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg">
                   <span className="text-sm md:text-base text-brasil-blue font-medium">Data de Cadastro</span>
                   <span className="text-sm md:text-base text-brasil-green font-bold">
-                    Não disponível
+                    {user ? 'Não disponível' : 'Não disponível'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg">
