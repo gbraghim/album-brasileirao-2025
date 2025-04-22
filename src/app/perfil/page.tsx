@@ -2,7 +2,17 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import type { User } from '@prisma/client';
+
+type User = {
+  id: string;
+  name: string | null;
+  email: string;
+  emailVerified: Date | null;
+  image: string | null;
+  password: string;
+  numeroDeLogins: number;
+  primeiroAcesso: boolean;
+};
 
 export default function PerfilPage() {
   const { data: session } = useSession();

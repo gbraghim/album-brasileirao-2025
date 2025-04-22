@@ -26,9 +26,7 @@ export async function GET() {
         image: true,
         password: true,
         numeroDeLogins: true,
-        primeiroAcesso: true,
-        createdAt: true,
-        updatedAt: true
+        primeiroAcesso: true
       }
     });
 
