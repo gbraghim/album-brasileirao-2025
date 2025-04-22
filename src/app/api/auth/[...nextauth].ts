@@ -10,6 +10,17 @@ interface UserStatus {
   primeiroAcesso: boolean;
 }
 
+interface UserWithPassword {
+  id: string;
+  name: string | null;
+  email: string;
+  emailVerified: Date | null;
+  image: string | null;
+  numeroDeLogins: number;
+  primeiroAcesso: boolean;
+  password: string;
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
@@ -25,7 +36,17 @@ export const authOptions: AuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-        });
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            emailVerified: true,
+            image: true,
+            numeroDeLogins: true,
+            primeiroAcesso: true,
+            password: true,
+          },
+        }) as UserWithPassword | null;
 
         if (!user) {
           throw new Error('Usuário não encontrado');
