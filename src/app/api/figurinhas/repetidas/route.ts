@@ -3,6 +3,21 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+interface FigurinhaRepetida {
+  jogadorId: string;
+  nome: string;
+  posicao: string | null;
+  quantidade: number;
+}
+
+interface FigurinhaComJogador {
+  jogadorId: string | null;
+  jogador: {
+    nome: string;
+    posicao: string | null;
+  } | null;
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -29,7 +44,11 @@ export async function GET() {
     });
 
     // Conta quantas vezes cada jogador aparece
-    const contagemJogadores = figurinhas.reduce((acc, figurinha) => {
+    const contagemJogadores = figurinhas.reduce((acc: Record<string, FigurinhaRepetida>, figurinha: FigurinhaComJogador) => {
+      if (!figurinha.jogadorId || !figurinha.jogador) {
+        return acc;
+      }
+
       const jogadorId = figurinha.jogadorId;
       if (!acc[jogadorId]) {
         acc[jogadorId] = {
@@ -41,10 +60,10 @@ export async function GET() {
       }
       acc[jogadorId].quantidade++;
       return acc;
-    }, {} as Record<string, any>);
+    }, {});
 
     // Filtra apenas as figurinhas que aparecem mais de uma vez
-    const figurinhasRepetidas = Object.values(contagemJogadores)
+    const figurinhasRepetidas = (Object.values(contagemJogadores) as FigurinhaRepetida[])
       .filter(fig => fig.quantidade > 1)
       .sort((a, b) => b.quantidade - a.quantidade);
 
