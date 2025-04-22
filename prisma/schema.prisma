@@ -79,6 +79,7 @@ model Jogador {
   numero        Int?
   posicao       String?
   nacionalidade String?
+  idade         Int?
   apiId         Int         @unique
   timeId        String
   createdAt     DateTime    @default(now())
