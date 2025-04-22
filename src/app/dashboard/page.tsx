@@ -96,9 +96,9 @@ export default function Dashboard() {
               </div>
             </Link>
             <Link href="/meu-album" className="block">
-              <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg hover:bg-brasil-yellow/20 transition-colors">
+              <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-blue/10 rounded-lg hover:bg-brasil-blue/20 transition-colors">
                 <span className="text-sm md:text-base text-brasil-blue font-medium">Figurinhas Únicas</span>
-                <span className="text-sm md:text-base text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
+                <span className="text-sm md:text-base text-brasil-blue font-bold">{stats?.totalFigurinhas}</span>
               </div>
             </Link>
             <Link href="/repetidas" className="block">

@@ -234,7 +234,11 @@ export default function MeuAlbum() {
                             )}
                           </div>
                           <div className="mt-2 text-xs bg-brasil-blue/10 px-2 py-1 rounded text-brasil-blue">
-                            {jogador.figurinhas?.length || 0} repetida(s)
+                            {jogador.figurinhas?.some(f => f.quantidade > 1) && (
+                              <Link href="/repetidas" className="hover:underline">
+                                {jogador.figurinhas?.reduce((total, f) => total + (f.quantidade - 1), 0)} repetida(s)
+                              </Link>
+                            )}
                           </div>
                         </div>
                       </div>

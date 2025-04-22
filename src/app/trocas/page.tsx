@@ -427,22 +427,22 @@ export default function Trocas() {
 
         {/* Seção de Minhas Figurinhas Repetidas */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Minhas Figurinhas Repetidas</h2>
+          <h2 className="text-2xl font-semibold text-brasil-blue mb-4">Minhas Figurinhas Repetidas</h2>
           {repetidas.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {repetidas.map((figurinha) => (
                 <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xl font-bold">{figurinha.jogador.numero}</span>
+                      <span className="text-xl font-bold text-brasil-blue">{figurinha.jogador.numero}</span>
                     </div>
                     <div className="ml-4">
-                      <h3 className="font-semibold">{figurinha.jogador.nome}</h3>
+                      <h3 className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</h3>
                       <p className="text-sm text-gray-600">{figurinha.jogador.posicao}</p>
                     </div>
                   </div>
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</p>
+                    <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade - 1}</p>
                     <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
                   </div>
                   {figurinhasEmTroca.includes(figurinha.id) ? (
@@ -481,17 +481,17 @@ export default function Trocas() {
 
         {/* Seção de Propostas Recebidas */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Propostas Recebidas</h2>
+          <h2 className="text-2xl font-semibold text-brasil-blue mb-4">Propostas Recebidas</h2>
           {propostasRecebidas.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {propostasRecebidas.map((troca) => (
                 <div key={troca.id} className="bg-white rounded-lg shadow-md p-4">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xl font-bold">{troca.figurinhaOferta.jogador.numero}</span>
+                      <span className="text-xl font-bold text-brasil-blue">{troca.figurinhaOferta.jogador.numero}</span>
                     </div>
                     <div className="ml-4">
-                      <h3 className="font-semibold">{troca.figurinhaOferta.jogador.nome}</h3>
+                      <h3 className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</h3>
                       <p className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.posicao}</p>
                     </div>
                   </div>
@@ -536,17 +536,17 @@ export default function Trocas() {
 
         {/* Seção de Trocas Disponíveis */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Trocas Disponíveis</h2>
+          <h2 className="text-2xl font-semibold text-brasil-blue mb-4">Trocas Disponíveis</h2>
           {trocasDisponiveis.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {trocasDisponiveis.map((troca) => (
                 <div key={troca.id} className="bg-white rounded-lg shadow-md p-4">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xl font-bold">{troca.figurinhaOferta.jogador.numero}</span>
+                      <span className="text-xl font-bold text-brasil-blue">{troca.figurinhaOferta.jogador.numero}</span>
                     </div>
                     <div className="ml-4">
-                      <h3 className="font-semibold">{troca.figurinhaOferta.jogador.nome}</h3>
+                      <h3 className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</h3>
                       <p className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.posicao}</p>
                     </div>
                   </div>
@@ -572,17 +572,17 @@ export default function Trocas() {
 
         {/* Seção de Minhas Trocas */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Minhas Trocas</h2>
+          <h2 className="text-2xl font-semibold text-brasil-blue mb-4">Minhas Trocas</h2>
           {minhasTrocas.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {minhasTrocas.map((troca) => (
                 <div key={troca.id} className="bg-white rounded-lg shadow-md p-4">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xl font-bold">{troca.figurinhaOferta.jogador.numero}</span>
+                      <span className="text-xl font-bold text-brasil-blue">{troca.figurinhaOferta.jogador.numero}</span>
                     </div>
                     <div className="ml-4">
-                      <h3 className="font-semibold">{troca.figurinhaOferta.jogador.nome}</h3>
+                      <h3 className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</h3>
                       <p className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.posicao}</p>
                     </div>
                   </div>
@@ -612,10 +612,10 @@ export default function Trocas() {
               >
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-xl font-bold">{figurinha.jogador.numero}</span>
+                    <span className="text-xl font-bold text-brasil-blue">{figurinha.jogador.numero}</span>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-semibold">{figurinha.jogador.nome}</h3>
+                    <h3 className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</h3>
                     <p className="text-sm text-gray-600">{figurinha.jogador.posicao}</p>
                   </div>
                 </div>

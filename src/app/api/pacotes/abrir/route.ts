@@ -82,6 +82,39 @@ export async function POST(request: Request) {
       // Criar as figurinhas no pacote e a relação com o usuário
       const figurinhasCriadas = [];
       for (const jogadorId of jogadoresSelecionados) {
+        // Verificar se o usuário já tem figurinhas deste jogador
+        const figurinhaExistente = await tx.userFigurinha.findFirst({
+          where: {
+            userId: user.id,
+            figurinha: {
+              jogadorId: jogadorId
+            }
+          },
+          include: {
+            figurinha: {
+              include: {
+                jogador: {
+                  select: {
+                    id: true,
+                    nome: true,
+                    numero: true,
+                    posicao: true,
+                    nacionalidade: true,
+                    foto: true,
+                    time: {
+                      select: {
+                        id: true,
+                        nome: true,
+                        escudo: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+
         // Criar a figurinha
         const figurinha = await tx.figurinha.create({
           data: {
@@ -110,7 +143,7 @@ export async function POST(request: Request) {
         });
 
         // Criar ou atualizar a relação com o usuário
-        await tx.userFigurinha.upsert({
+        const userFigurinha = await tx.userFigurinha.upsert({
           where: {
             userId_figurinhaId: {
               userId: user.id,
@@ -129,7 +162,11 @@ export async function POST(request: Request) {
           }
         });
 
-        figurinhasCriadas.push(figurinha);
+        // Adicionar a quantidade atual à figurinha criada
+        figurinhasCriadas.push({
+          ...figurinha,
+          quantidadeAtual: figurinhaExistente ? figurinhaExistente.quantidade + 1 : 1
+        });
       }
 
       console.log('Atualizando pacote...');
