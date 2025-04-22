@@ -11,16 +11,16 @@ export function CardJogador({ jogador, quantidade }: CardJogadorProps) {
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <img
-            src={jogador.time.escudo}
+            src={jogador.time.escudo || '/placeholder.png'}
             alt={jogador.time.nome}
             className="w-8 h-8 object-contain"
           />
-          <span className="text-sm text-gray-600">#{jogador.numero}</span>
+          <span className="text-sm text-gray-600">#{jogador.numero || 'N/A'}</span>
         </div>
 
         <div className="flex justify-center mb-4">
           <img
-            src={jogador.foto}
+            src={jogador.foto || '/placeholder.png'}
             alt={jogador.nome}
             className="w-32 h-32 object-cover rounded-full"
           />
@@ -28,8 +28,8 @@ export function CardJogador({ jogador, quantidade }: CardJogadorProps) {
 
         <div className="text-center">
           <h3 className="font-bold text-lg mb-1">{jogador.nome}</h3>
-          <p className="text-sm text-gray-600 mb-1">{jogador.posicao}</p>
-          <p className="text-sm text-gray-600 mb-2">{jogador.nacionalidade}</p>
+          <p className="text-sm text-gray-600 mb-1">{jogador.posicao || 'N/A'}</p>
+          <p className="text-sm text-gray-600 mb-2">{jogador.nacionalidade || 'N/A'}</p>
           <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block">
             x{quantidade}
           </div>
