@@ -1,18 +1,26 @@
-const { PrismaClient } = require('@prisma/client');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const path = require('path');
-
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function importTimes() {
   try {
-    // Lê o arquivo Excel
     const filePath = path.join(__dirname, '..', 'popular_times.xlsx');
-    console.log('Lendo arquivo:', filePath);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
     
-    const workbook = XLSX.readFile(filePath);
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json(worksheet);
+    const worksheet = workbook.getWorksheet(1);
+    const data = [];
+    
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 1) { // Pula o cabeçalho
+        data.push({
+          nome: row.getCell(1).value,
+          escudo: row.getCell(2).value,
+          apiId: row.getCell(3).value
+        });
+      }
+    });
 
     console.log('Dados lidos do Excel:', data);
 
