@@ -55,9 +55,9 @@ export async function PATCH(
     await prisma.notificacao.create({
       data: {
         tipo: status === 'ACEITA' ? 'TROCA_ACEITA' : 'TROCA_RECUSADA',
-        mensagem: status === 'ACEITA' 
-          ? `${session.user.name} aceitou sua proposta de troca da figurinha ${troca.figurinhaOferta.jogador.nome}`
-          : `${session.user.name} recusou sua proposta de troca da figurinha ${troca.figurinhaOferta.jogador.nome}`,
+        mensagem: status === 'ACEITA'
+          ? `${session.user.name} aceitou sua proposta de troca da figurinha ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'}`
+          : `${session.user.name} recusou sua proposta de troca da figurinha ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'}`,
         usuarioId: troca.usuarioEnviaId,
         trocaId: troca.id
       }
