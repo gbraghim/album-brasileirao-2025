@@ -3,9 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+type RouteParams = {
+  id: string;
+};
+
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: RouteParams }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,7 +18,7 @@ export async function POST(
     }
 
     const { aceitar } = await request.json();
-    const trocaId = context.params.id;
+    const trocaId = params.id;
 
     // Buscar o usuário atual
     const user = await prisma.user.findUnique({
