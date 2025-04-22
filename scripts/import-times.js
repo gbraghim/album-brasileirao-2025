@@ -5,6 +5,13 @@ const prisma = new PrismaClient();
 
 async function importTimes() {
   try {
+    // Primeiro, limpa os dados existentes
+    await prisma.jogador.deleteMany();
+    console.log('Jogadores removidos');
+    
+    await prisma.time.deleteMany();
+    console.log('Times removidos');
+
     const filePath = path.join(__dirname, '..', 'popular_times.xlsx');
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(filePath);
@@ -15,9 +22,9 @@ async function importTimes() {
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber > 1) { // Pula o cabeçalho
         data.push({
-          nome: row.getCell(1).value,
-          escudo: row.getCell(2).value,
-          apiId: row.getCell(3).value
+          id: row.getCell(1).value,
+          nome: row.getCell(2).value,
+          escudo: row.getCell(3).value
         });
       }
     });
@@ -26,11 +33,10 @@ async function importTimes() {
 
     // Insere os times no banco de dados
     for (const row of data) {
-      // Acessa as colunas pelos nomes corretos do Excel
       const time = {
-        id: row['id'].toString(), // ID é a coluna 'id'
-        nome: row['nome'], // Nome é a coluna 'nome'
-        apiId: parseInt(row['id']) // apiId é o mesmo número do id
+        id: row.id.toString(),
+        nome: row.nome,
+        apiId: parseInt(row.id)
       };
 
       console.log('Processando time:', time);

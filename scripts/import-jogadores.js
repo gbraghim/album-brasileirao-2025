@@ -60,11 +60,11 @@ async function importJogadores() {
       const apiId = time.apiId * 1000 + index + 1;
 
       const jogador = {
-        nome: row['Nome'],
-        numero: numero,
-        posicao: row['Posição'],
-        nacionalidade: row['Nacionalidade'] || 'Brasileiro',
-        foto: row['Foto'] || null,
+        nome: row.nome,
+        numero: Number(row.numero) || null,
+        posicao: row.posicao,
+        nacionalidade: row.nacionalidade,
+        foto: row.foto,
         apiId: apiId,
         timeId: time.id
       };
@@ -76,9 +76,27 @@ async function importJogadores() {
         continue;
       }
 
-      await prisma.jogador.create({
-        data: jogador
+      // Verificar se o jogador já existe
+      const jogadorExistente = await prisma.jogador.findUnique({
+        where: {
+          apiId: apiId
+        }
       });
+
+      if (jogadorExistente) {
+        console.log(`Jogador com apiId ${apiId} já existe, atualizando...`);
+        await prisma.jogador.update({
+          where: {
+            apiId: apiId
+          },
+          data: jogador
+        });
+      } else {
+        console.log(`Criando novo jogador com apiId ${apiId}...`);
+        await prisma.jogador.create({
+          data: jogador
+        });
+      }
 
       console.log(`Jogador ${jogador.nome} importado com sucesso!`);
     }
