@@ -461,13 +461,22 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {repetidas.map((figurinha) => (
               <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                   <Image
-                    src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                    src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                     alt={figurinha.jogador.nome}
                     fill
+                    sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
+                      if (img.src.includes(caminhos[0])) {
+                        img.src = caminhos[1];
+                      } else {
+                        img.src = '/placeholder.jpg';
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
@@ -525,13 +534,22 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {minhasTrocas.map((troca) => (
               <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                   <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                     alt={troca.figurinhaOferta.jogador.nome}
                     fill
+                    sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const caminhos = formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
+                      if (img.src.includes(caminhos[0])) {
+                        img.src = caminhos[1];
+                      } else {
+                        img.src = '/placeholder.jpg';
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
@@ -577,13 +595,22 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {trocasDisponiveis.map((troca) => (
               <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                   <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                     alt={troca.figurinhaOferta.jogador.nome}
                     fill
+                    sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const caminhos = formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
+                      if (img.src.includes(caminhos[0])) {
+                        img.src = caminhos[1];
+                      } else {
+                        img.src = '/placeholder.jpg';
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
@@ -632,13 +659,22 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {propostasRecebidas.map((troca) => (
               <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                   <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                     alt={troca.figurinhaOferta.jogador.nome}
                     fill
+                    sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const caminhos = formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
+                      if (img.src.includes(caminhos[0])) {
+                        img.src = caminhos[1];
+                      } else {
+                        img.src = '/placeholder.jpg';
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
