@@ -81,6 +81,7 @@ export async function POST(request: Request) {
 
       console.log('Criando figurinhas...');
       const figurinhasCriadas = [];
+      const userFigurinhasParaAtualizar = [];
       
       for (const jogador of jogadoresSelecionados) {
         console.log('Criando figurinha para jogador:', jogador.nome);
@@ -100,12 +101,18 @@ export async function POST(request: Request) {
         });
 
         // Criar a relação com o usuário
-        await tx.userFigurinha.create({
+        const userFigurinha = await tx.userFigurinha.create({
           data: {
             userId: user.id,
             figurinhaId: figurinha.id,
             quantidade: 1
           }
+        });
+
+        userFigurinhasParaAtualizar.push({
+          id: userFigurinha.id,
+          nomeJogador: jogador.nome,
+          nomeTime: jogador.time.nome
         });
 
         // Verificar a figurinha criada
@@ -141,6 +148,15 @@ export async function POST(request: Request) {
           },
           quantidadeAtual: 1
         });
+      }
+
+      // Atualizar os nomes das UserFigurinhas em lote
+      for (const uf of userFigurinhasParaAtualizar) {
+        await tx.$executeRaw`
+          UPDATE "UserFigurinha"
+          SET "nomeJogador" = ${uf.nomeJogador}, "nomeTime" = ${uf.nomeTime}
+          WHERE id = ${uf.id}
+        `;
       }
 
       console.log('Atualizando pacote...');

@@ -55,7 +55,6 @@ model User {
   primeiroAcesso    Boolean         @default(true)
   pacotes           Pacote[]
   trocas            TrocaFigurinha[]
-  figurinhas        UserFigurinha[] @relation("FigurinhasDoUsuario")
 
   @@index([email])
 }
@@ -129,15 +128,16 @@ model Pacote {
 }
 
 model UserFigurinha {
-  id          String    @id @default(cuid())
-  userId      String
-  figurinhaId String
-  quantidade  Int       @default(1)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
-  user        User      @relation("UserFigurinhas", fields: [userId], references: [id], map: "UserFigurinha_userId_fkey1")
-  usuario     User      @relation("FigurinhasDoUsuario", fields: [userId], references: [id], map: "UserFigurinha_userId_fkey2")
+  id            String   @id @default(cuid())
+  userId        String
+  figurinhaId  String
+  quantidade    Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  nomeJogador   String   @default("")
+  nomeTime      String   @default("")
+  user          User     @relation("UserFigurinhas", fields: [userId], references: [id], onDelete: Cascade)
+  figurinha     Figurinha @relation(fields: [figurinhaId], references: [id], onDelete: Cascade)
 
   @@unique([userId, figurinhaId])
   @@index([userId])
