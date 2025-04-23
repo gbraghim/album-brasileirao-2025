@@ -2,7 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['s.glbimg.com', 'res.cloudinary.com', 'localhost', 'logodetimes.com', 'api.dicebear.com', 'img.a.transfermarkt.technology'],
+    domains: [
+      's.glbimg.com',
+      'res.cloudinary.com',
+      'localhost',
+      'logodetimes.com',
+      'api.dicebear.com',
+      'img.a.transfermarkt.technology',
+      'www.escudosfc.com.br',
+      'www.escudosfc.com',
+      'escudosfc.com.br',
+      'escudosfc.com'
+    ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
