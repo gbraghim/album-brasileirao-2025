@@ -196,13 +196,22 @@ export default function Repetidas() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {figurinhas.map((figurinha) => (
             <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-              <div className="relative w-full aspect-[3/4] mb-2">
+              <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                 <Image
-                  src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                  src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                   alt={figurinha.jogador.nome}
                   fill
-                  className="object-cover rounded-lg"
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                  className="object-cover"
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
+                    if (img.src.includes(caminhos[0])) {
+                      img.src = caminhos[1];
+                    } else {
+                      img.src = '/placeholder.jpg';
+                    }
+                  }}
                 />
               </div>
               <div className="flex items-center space-x-2">

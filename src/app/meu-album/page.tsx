@@ -317,11 +317,18 @@ export default function MeuAlbum() {
                             onError={(e) => {
                               const img = e.currentTarget as HTMLImageElement;
                               const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
-                              if (img.src.includes(caminhos[0])) {
-                                img.src = caminhos[1];
-                              } else {
-                                img.src = '/placeholder.jpg';
-                              }
+                              let index = 0;
+                              const tryNextPath = () => {
+                                index++;
+                                if (index < caminhos.length) {
+                                  img.src = caminhos[index];
+                                  img.onerror = tryNextPath;
+                                } else {
+                                  img.src = '/placeholder.jpg';
+                                  img.onerror = null;
+                                }
+                              };
+                              tryNextPath();
                             }}
                           />
                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
