@@ -587,7 +587,7 @@ export default function Trocas() {
                     </div>
                   </div>
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600">Status: {troca.status}</p>
+                    <p className="text-sm text-gray-600">Status: {troca.status === 'PENDENTE' ? 'sem propostas recebidas' : troca.status}</p>
                   </div>
                 </div>
               ))}
