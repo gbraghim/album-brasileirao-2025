@@ -70,6 +70,7 @@ export default function MeuAlbum() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
+  const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -79,6 +80,25 @@ export default function MeuAlbum() {
       fetchTotalJogadoresTime();
     }
   }, [status, router]);
+
+  useEffect(() => {
+    // Reordena os times quando um time é selecionado
+    if (timeSelecionado) {
+      console.log('Reordenando times - Time selecionado:', timeSelecionado.nome);
+      
+      const timesRestantes = TIMES_SERIE_A
+        .filter(time => time.id !== timeSelecionado.id)
+        .sort((a, b) => a.nome.localeCompare(b.nome));
+      
+      const novaOrdem = [timeSelecionado, ...timesRestantes];
+      console.log('Nova ordem dos times:', novaOrdem.map(t => t.nome));
+      
+      setTimesOrdenados(novaOrdem);
+    } else {
+      console.log('Nenhum time selecionado, ordenando alfabeticamente');
+      setTimesOrdenados([...TIMES_SERIE_A].sort((a, b) => a.nome.localeCompare(b.nome)));
+    }
+  }, [timeSelecionado]);
 
   const fetchJogadores = async () => {
     try {
@@ -167,7 +187,7 @@ export default function MeuAlbum() {
           <div className="w-full md:w-1/4 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
             <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-brasil-blue">Times</h2>
             <div className="space-y-2 md:space-y-3">
-              {TIMES_SERIE_A.map((time) => (
+              {timesOrdenados.map((time) => (
                 <button
                   key={time.id}
                   onClick={() => setTimeSelecionado(time)}
