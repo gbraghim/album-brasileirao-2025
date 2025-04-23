@@ -98,12 +98,13 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                               {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
                             </span>
                           </div>
-                          <div className="relative w-full h-48 mb-2">
+                          <div className="relative w-full aspect-[3/4] mb-2">
                             <Image
                               src={`/players/${figurinha.jogador.time.nome}/${figurinha.jogador.nome.replace(/\s+/g, '')}.jpg`}
                               alt={figurinha.jogador.nome}
                               fill
                               className="object-cover rounded-lg"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             />
                           </div>
                           <div className="flex items-center space-x-2">
