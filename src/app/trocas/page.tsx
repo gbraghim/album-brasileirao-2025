@@ -448,165 +448,29 @@ export default function Trocas() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Trocas</h1>
-
-        {/* Minhas Trocas */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Minhas Trocas</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {minhasTrocas.map((troca) => (
-              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-                <div className="relative w-full aspect-[3/4] mb-2">
-                  <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
-                    alt={troca.figurinhaOferta.jogador.nome}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
-                </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
-                </div>
-                <div className="mt-2">
-                  <button
-                    onClick={() => removerTroca(troca.figurinhaOferta)}
-                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
-                  >
-                    Remover da Troca
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trocas Disponíveis */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Trocas Disponíveis</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {trocasDisponiveis.map((troca) => (
-              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-                <div className="relative w-full aspect-[3/4] mb-2">
-                  <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
-                    alt={troca.figurinhaOferta.jogador.nome}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
-                </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
-                </div>
-                <div className="mt-2">
-                  <button
-                    onClick={() => {
-                      setTrocaSelecionada(troca);
-                      setShowProporTrocaModal(true);
-                    }}
-                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
-                  >
-                    Propor Troca
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Propostas Recebidas */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Propostas Recebidas</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {propostasRecebidas.map((troca) => (
-              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-                <div className="relative w-full aspect-[3/4] mb-2">
-                  <Image
-                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
-                    alt={troca.figurinhaOferta.jogador.nome}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
-                </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
-                </div>
-                <div className="mt-2 flex space-x-2">
-                  <button
-                    onClick={() => handleResponderTroca(troca.id, true)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-sm"
-                  >
-                    Aceitar
-                  </button>
-                  <button
-                    onClick={() => handleResponderTroca(troca.id, false)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
-                  >
-                    Recusar
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <h1 className="text-2xl md:text-3xl font-bold mb-8 text-brasil-blue">Trocas</h1>
 
         {/* Minhas Figurinhas Repetidas */}
-        <div>
-          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Minhas Figurinhas Repetidas</h2>
+        <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Minhas Figurinhas Repetidas
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {repetidas.map((figurinha) => (
-              <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-                <div className="relative w-full aspect-[3/4] mb-2">
+              <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
+                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
                   <Image
                     src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
                     alt={figurinha.jogador.nome}
                     fill
-                    className="object-cover rounded-lg"
+                    className="object-cover"
                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                   />
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 mb-2">
                   {figurinha.jogador.time.escudo && (
                     <Image
                       src={figurinha.jogador.time.escudo}
@@ -622,22 +486,196 @@ export default function Trocas() {
                   <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
                   <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                 </div>
-                <div className="mt-2">
+                <div className="mt-3">
                   {figurinhasEmTroca.includes(figurinha.id) ? (
                     <button
                       onClick={() => removerTroca(figurinha)}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
+                      className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
                     >
-                      Remover da Troca
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Remover
                     </button>
                   ) : (
                     <button
                       onClick={() => adicionarTroca(figurinha)}
-                      className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
+                      className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
                     >
-                      Disponibilizar para Troca
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Disponibilizar
                     </button>
                   )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Minhas Trocas */}
+        <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            Minhas Trocas
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {minhasTrocas.map((troca) => (
+              <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
+                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2 mb-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => removerTroca(troca.figurinhaOferta)}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Remover
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trocas Disponíveis */}
+        <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Trocas Disponíveis
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {trocasDisponiveis.map((troca) => (
+              <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
+                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2 mb-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => {
+                      setTrocaSelecionada(troca);
+                      setShowProporTrocaModal(true);
+                    }}
+                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    Propor Troca
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Propostas Recebidas */}
+        <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Propostas Recebidas
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {propostasRecebidas.map((troca) => (
+              <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
+                <div className="relative w-full aspect-[3/4] mb-2 rounded-lg overflow-hidden">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2 mb-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-3 flex space-x-2">
+                  <button
+                    onClick={() => handleResponderTroca(troca.id, true)}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Aceitar
+                  </button>
+                  <button
+                    onClick={() => handleResponderTroca(troca.id, false)}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Recusar
+                  </button>
                 </div>
               </div>
             ))}
