@@ -59,134 +59,87 @@ export async function POST(request: Request) {
       }
 
       console.log('Buscando jogadores...');
-      // Buscar todos os IDs dos jogadores
-      const jogadoresIds = await tx.jogador.findMany({
-        select: { id: true }
+      // Buscar todos os jogadores com seus dados completos
+      const jogadores = await tx.jogador.findMany({
+        include: {
+          time: true
+        }
       });
 
-      if (jogadoresIds.length === 0) {
+      if (jogadores.length === 0) {
         console.log('Nenhum jogador encontrado');
         throw new Error('Nenhum jogador encontrado');
       }
 
       console.log('Selecionando jogadores aleatórios...');
-      // Selecionar 4 jogadores aleatórios
       const jogadoresSelecionados = [];
-      for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
-        const randomIndex = Math.floor(Math.random() * jogadoresIds.length);
-        const jogadorId = jogadoresIds[randomIndex].id;
-        jogadoresSelecionados.push(jogadorId);
+      for (let i = 0; i < 4; i++) {
+        const randomIndex = Math.floor(Math.random() * jogadores.length);
+        const jogador = jogadores[randomIndex];
+        jogadoresSelecionados.push(jogador);
       }
 
       console.log('Criando figurinhas...');
-      // Criar as figurinhas no pacote e a relação com o usuário
       const figurinhasCriadas = [];
-      for (const jogadorId of jogadoresSelecionados) {
-        // Verificar se o usuário já tem figurinhas deste jogador
-        const figurinhaExistente = await tx.userFigurinha.findFirst({
-          where: {
-            userId: user.id,
-            figurinha: {
-              jogadorId: jogadorId
-            }
-          },
-          include: {
-            figurinha: {
-              include: {
-                jogador: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    numero: true,
-                    posicao: true,
-                    nacionalidade: true,
-                    foto: true,
-                    time: {
-                      select: {
-                        id: true,
-                        nome: true,
-                        escudo: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        });
-
-        // Criar a figurinha
+      
+      for (const jogador of jogadoresSelecionados) {
+        console.log('Criando figurinha para jogador:', jogador.nome);
+        
+        // Criar a figurinha com todos os dados do jogador
         const figurinha = await tx.figurinha.create({
           data: {
-            pacoteId: pacote.id,
-            jogadorId: jogadorId
-          },
-          include: {
-            jogador: {
-              select: {
-                id: true,
-                nome: true,
-                numero: true,
-                posicao: true,
-                nacionalidade: true,
-                foto: true,
-                time: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    escudo: true
-                  }
-                }
-              }
-            }
+            nome: jogador.nome,
+            numero: jogador.numero,
+            posicao: jogador.posicao,
+            nacionalidade: jogador.nacionalidade,
+            foto: jogador.foto,
+            timeId: jogador.timeId,
+            jogadorId: jogador.id,
+            pacoteId: pacote.id
           }
         });
 
-        if (!figurinha.jogador) {
-          console.warn('Figurinha criada sem jogador:', figurinha);
-          continue;
-        }
-        if (!figurinha.jogador.time) {
-          console.warn('Jogador sem time:', figurinha.jogador);
-          continue;
-        }
-
-        // Criar ou atualizar a relação com o usuário
-        const userFigurinha = await tx.userFigurinha.upsert({
-          where: {
-            userId_figurinhaId: {
-              userId: user.id,
-              figurinhaId: figurinha.id
-            }
-          },
-          update: {
-            quantidade: {
-              increment: 1
-            }
-          },
-          create: {
+        // Criar a relação com o usuário
+        await tx.userFigurinha.create({
+          data: {
             userId: user.id,
             figurinhaId: figurinha.id,
             quantidade: 1
           }
         });
 
+        // Verificar a figurinha criada
+        const figurinhaCompleta = await tx.figurinha.findUnique({
+          where: { id: figurinha.id },
+          include: {
+            jogador: {
+              include: {
+                time: true
+              }
+            }
+          }
+        });
+
+        if (!figurinhaCompleta || !figurinhaCompleta.nome) {
+          throw new Error(`Erro ao criar figurinha para ${jogador.nome}`);
+        }
+
         figurinhasCriadas.push({
           id: figurinha.id,
           jogador: {
-            id: figurinha.jogador.id,
-            nome: figurinha.jogador.nome,
-            numero: figurinha.jogador.numero || 0,
-            posicao: figurinha.jogador.posicao || '',
-            nacionalidade: figurinha.jogador.nacionalidade || '',
-            foto: figurinha.jogador.foto || '',
+            id: jogador.id,
+            nome: jogador.nome,
+            numero: jogador.numero || 0,
+            posicao: jogador.posicao || '',
+            nacionalidade: jogador.nacionalidade || '',
+            foto: jogador.foto || '',
             time: {
-              id: figurinha.jogador.time.id,
-              nome: figurinha.jogador.time.nome,
-              escudo: figurinha.jogador.time.escudo || ''
+              id: jogador.time.id,
+              nome: jogador.time.nome,
+              escudo: jogador.time.escudo || ''
             }
           },
-          quantidadeAtual: figurinhaExistente ? figurinhaExistente.quantidade + 1 : 1
+          quantidadeAtual: 1
         });
       }
 

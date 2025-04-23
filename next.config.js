@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['s.glbimg.com', 'res.cloudinary.com', 'localhost', 'logodetimes.com', 'api.dicebear.com'],
+    domains: ['s.glbimg.com', 'res.cloudinary.com', 'localhost', 'logodetimes.com', 'api.dicebear.com', 'img.a.transfermarkt.technology'],
   },
   env: {
     JWT_SECRET: process.env.JWT_SECRET,

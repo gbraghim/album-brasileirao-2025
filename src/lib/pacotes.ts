@@ -16,6 +16,12 @@ interface FigurinhaRaw {
   id: string;
   pacoteId: string;
   jogadorId: string;
+  nome: string;
+  numero: number | null;
+  posicao: string | null;
+  nacionalidade: string | null;
+  foto: string | null;
+  timeId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -106,55 +112,98 @@ export async function verificarPacotesDiarios(userId: string) {
 
 async function gerarFigurinhasParaPacote(pacoteId: string, userId: string) {
   try {
-    // Buscar todos os IDs dos jogadores
-    const jogadoresIds = await prisma.jogador.findMany({
-      select: { id: true }
+    // Buscar todos os jogadores com seus dados e times
+    const jogadores = await prisma.jogador.findMany({
+      include: {
+        time: true
+      }
     });
 
-    if (jogadoresIds.length === 0) {
+    if (jogadores.length === 0) {
       throw new Error('Nenhum jogador encontrado no banco de dados');
     }
+
+    console.log('Total de jogadores encontrados:', jogadores.length);
+    console.log('Exemplo de jogador:', {
+      id: jogadores[0].id,
+      nome: jogadores[0].nome,
+      numero: jogadores[0].numero,
+      posicao: jogadores[0].posicao,
+      nacionalidade: jogadores[0].nacionalidade,
+      foto: jogadores[0].foto,
+      timeId: jogadores[0].timeId
+    });
 
     // Selecionar 4 jogadores aleatórios
     const jogadoresSelecionados = [];
     for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
-      const randomIndex = Math.floor(Math.random() * jogadoresIds.length);
-      const jogadorId = jogadoresIds[randomIndex].id;
-      jogadoresSelecionados.push(jogadorId);
+      const randomIndex = Math.floor(Math.random() * jogadores.length);
+      const jogador = jogadores[randomIndex];
+      jogadoresSelecionados.push(jogador);
     }
 
-    // Criar as figurinhas no pacote e a relação com o usuário
-    for (const jogadorId of jogadoresSelecionados) {
-      // Criar a figurinha
-      const [figurinha] = await prisma.$queryRaw<FigurinhaRaw[]>`
-        INSERT INTO "Figurinha" ("id", "pacoteId", "jogadorId", "createdAt", "updatedAt")
-        VALUES (
-          ${Prisma.sql`gen_random_uuid()`},
-          ${pacoteId},
-          ${jogadorId},
-          CURRENT_TIMESTAMP,
-          CURRENT_TIMESTAMP
-        )
-        RETURNING *
-      `;
+    const figurinhasCriadas = [];
 
-      // Criar ou atualizar a relação com o usuário
-      await prisma.$executeRaw`
-        INSERT INTO "UserFigurinha" ("id", "userId", "figurinhaId", "quantidade", "createdAt", "updatedAt")
-        VALUES (
-          ${Prisma.sql`gen_random_uuid()`},
-          ${userId},
-          ${figurinha.id},
-          1,
-          CURRENT_TIMESTAMP,
-          CURRENT_TIMESTAMP
-        )
-        ON CONFLICT ("userId", "figurinhaId")
-        DO UPDATE SET
-          "quantidade" = "UserFigurinha"."quantidade" + 1,
-          "updatedAt" = CURRENT_TIMESTAMP
-      `;
+    // Criar as figurinhas uma por uma
+    for (const jogador of jogadoresSelecionados) {
+      console.log('Criando figurinha para jogador:', jogador.nome);
+      
+      // Primeiro, criar a figurinha
+      const figurinha = await prisma.figurinha.create({
+        data: {
+          nome: jogador.nome,
+          numero: jogador.numero,
+          posicao: jogador.posicao,
+          nacionalidade: jogador.nacionalidade,
+          foto: jogador.foto,
+          timeId: jogador.timeId,
+          jogadorId: jogador.id,
+          pacoteId: pacoteId
+        }
+      });
+
+      console.log('Figurinha base criada:', {
+        id: figurinha.id,
+        nome: figurinha.nome,
+        numero: figurinha.numero,
+        posicao: figurinha.posicao
+      });
+
+      // Depois, criar a relação com o usuário separadamente
+      const userFigurinha = await prisma.userFigurinha.create({
+        data: {
+          userId: userId,
+          figurinhaId: figurinha.id,
+          quantidade: 1
+        }
+      });
+
+      console.log('UserFigurinha criada:', {
+        id: userFigurinha.id,
+        userId: userFigurinha.userId,
+        figurinhaId: userFigurinha.figurinhaId
+      });
+
+      // Verificar se a figurinha foi criada corretamente
+      const figurinhaVerificada = await prisma.figurinha.findUnique({
+        where: { id: figurinha.id },
+        include: {
+          jogador: true,
+          time: true,
+          userFigurinhas: true
+        }
+      });
+
+      if (!figurinhaVerificada || !figurinhaVerificada.nome) {
+        throw new Error(`Erro na criação da figurinha para ${jogador.nome}`);
+      }
+
+      figurinhasCriadas.push(figurinhaVerificada);
     }
+
+    console.log(`${figurinhasCriadas.length} figurinhas criadas com sucesso`);
+    return figurinhasCriadas;
+
   } catch (error) {
     console.error('Erro ao gerar figurinhas para pacote:', error);
     throw error;

@@ -453,13 +453,13 @@ export default function Trocas() {
                       >
                         Figurinha já disponibilizada para troca
                       </button>
-                      <button
+            <button
                         onClick={() => removerTroca(figurinha)}
                         className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                      >
+            >
                         Remover da troca
-                      </button>
-                    </div>
+            </button>
+          </div>
                   ) : (
                     <button
                       onClick={() => {
@@ -552,16 +552,16 @@ export default function Trocas() {
                   </div>
                   <div className="mb-4">
                     <p className="text-sm text-gray-600">Oferecido por: {troca.usuarioEnvia.nome}</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setTrocaSelecionada(troca);
-                      setShowProporTrocaModal(true);
-                    }}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setTrocaSelecionada(troca);
+                        setShowProporTrocaModal(true);
+                      }}
                     className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
+                    >
                     Propor Troca
-                  </button>
+                    </button>
                 </div>
               ))}
             </div>
@@ -595,7 +595,7 @@ export default function Trocas() {
           ) : (
             <p className="text-gray-600">Você não tem nenhuma troca ativa.</p>
           )}
-        </div>
+      </div>
 
         {/* Modais */}
         <Modal
@@ -622,7 +622,7 @@ export default function Trocas() {
               </div>
             ))}
           </div>
-        </Modal>
+      </Modal>
 
         <ModalProporTroca
           isOpen={showProporTrocaModal}
@@ -640,14 +640,14 @@ export default function Trocas() {
           <div className="p-6">
             <p className="text-green-600">{successMessage}</p>
             <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowSuccessModal(false)}
+            <button
+              onClick={() => setShowSuccessModal(false)}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-              >
+            >
                 OK
-              </button>
-            </div>
+            </button>
           </div>
+        </div>
         </Modal>
       </div>
     </div>

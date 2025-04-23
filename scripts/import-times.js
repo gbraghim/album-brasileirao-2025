@@ -1,6 +1,10 @@
-const ExcelJS = require('exceljs');
-const path = require('path');
-const { PrismaClient } = require('@prisma/client');
+import ExcelJS from 'exceljs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { PrismaClient } from '@prisma/client';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const prisma = new PrismaClient();
 
 async function importTimes() {

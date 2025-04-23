@@ -1,96 +1,72 @@
-const fs = require('fs');
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import { parse } from 'csv-parse/sync';
+
 const prisma = new PrismaClient();
 
-async function normalizarNomeTime(nome) {
-  // Remove acentos
-  return nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    // Remove caracteres especiais e espaços extras
-    .replace(/[^\w\s]/g, '')
-    // Converte para minúsculas
-    .toLowerCase()
-    // Remove espaços extras
-    .trim();
-}
-
-async function processarCSV() {
+async function processarCsv() {
   try {
-    // Limpa os registros existentes
+    // Limpar registros existentes
     await prisma.jogador.deleteMany();
-    console.log('Registros existentes removidos com sucesso.');
-
-    // Busca todos os times do banco de dados
-    const times = await prisma.time.findMany();
     
-    // Cria um mapa de nomes normalizados para IDs dos times
-    const timeMap = {};
-    for (const time of times) {
-      const nomeNormalizado = await normalizarNomeTime(time.nome);
-      timeMap[nomeNormalizado] = time.id;
-    }
-
-    // Lê o arquivo CSV
+    // Ler arquivo CSV
     const conteudo = fs.readFileSync('jogadores_importacao.csv', 'utf-8');
-    const linhas = conteudo.split('\n');
-    const cabecalho = linhas[0].split(',');
+    const registros = parse(conteudo, {
+      columns: true,
+      skip_empty_lines: true
+    });
 
-    // Índices das colunas
-    const indices = {
-      time: cabecalho.indexOf('Time'),
-      nome: cabecalho.indexOf('nome'),
-      numero: cabecalho.indexOf('numero'),
-      posicao: cabecalho.indexOf('posicao'),
-      nacionalidade: cabecalho.indexOf('nacionalidade'),
-      foto: cabecalho.indexOf('foto'),
-      apiId: cabecalho.indexOf('apiId')
-    };
+    // Buscar todos os times
+    const times = await prisma.time.findMany();
+    const mapaTimes = new Map(times.map(time => [time.nome, time.id]));
 
-    // Processa cada linha do CSV
-    const jogadores = [];
-    for (let i = 1; i < linhas.length; i++) {
-      if (!linhas[i].trim()) continue;
-      
-      const valores = linhas[i].split(',');
-      const nomeTime = valores[indices.time].trim();
-      const nomeTimeNormalizado = await normalizarNomeTime(nomeTime);
-      const timeId = timeMap[nomeTimeNormalizado];
-
-      if (!timeId) {
-        console.log(`Time não encontrado após normalização: ${nomeTime} (normalizado: ${nomeTimeNormalizado})`);
-        console.log('Times disponíveis:', Object.keys(timeMap).join(', '));
-        continue;
-      }
-
-      const jogador = {
-        nome: valores[indices.nome].trim(),
-        numero: parseInt(valores[indices.numero]),
-        posicao: valores[indices.posicao].trim(),
-        nacionalidade: valores[indices.nacionalidade].trim(),
-        foto: valores[indices.foto].trim(),
-        apiId: valores[indices.apiId].trim() || null,
-        time: {
-          connect: {
-            id: timeId
+    let apiIdCounter = 1;
+    
+    // Processar cada registro
+    for (const registro of registros) {
+      try {
+        // Converter número para inteiro
+        let numero = null;
+        if (registro.numero && registro.numero !== '-') {
+          numero = parseInt(registro.numero, 10);
+          if (isNaN(numero)) {
+            console.log(`Número inválido para jogador ${registro.nome}: ${registro.numero}`);
+            continue;
           }
         }
-      };
 
-      try {
-        const jogadorCriado = await prisma.jogador.create({
-          data: jogador
+        // Encontrar ID do time
+        const timeId = mapaTimes.get(registro.Time);
+        if (!timeId) {
+          console.log(`Time não encontrado: ${registro.Time} para jogador ${registro.nome}`);
+          continue;
+        }
+
+        // Criar jogador
+        await prisma.jogador.create({
+          data: {
+            nome: registro.nome.trim(),
+            numero: numero,
+            posicao: registro.posicao.trim(),
+            nacionalidade: registro.nacionalidade.trim(),
+            foto: registro.foto.trim(),
+            apiId: apiIdCounter++,
+            timeId: timeId
+          }
         });
-        console.log(`Jogador ${jogador.nome} criado com sucesso para o time ID ${timeId}`);
-      } catch (error) {
-        console.error(`Erro ao criar jogador ${jogador.nome}:`, error);
+
+      } catch (erro) {
+        console.log(`Erro ao processar jogador ${registro.nome} do time ${registro.Time}:`, erro);
       }
     }
 
-    console.log('Processamento do CSV concluído.');
-  } catch (error) {
-    console.error('Erro ao processar o CSV:', error);
+    console.log('Importação concluída! Total de jogadores importados:', apiIdCounter - 1);
+
+  } catch (erro) {
+    console.error('Erro ao processar CSV:', erro);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-processarCSV(); 
+processarCsv(); 
