@@ -7,7 +7,7 @@ async function atualizarEscudos() {
     const escudosMap = {
       1: '/escudos/america-mineiro.png',
       2: '/escudos/atletico-paranaense.png',
-      3: '/escudos/atletico-mineiro.png',
+      3: '/escudos/atletico_mg.png',
       4: '/escudos/bahia.png',
       5: '/escudos/botafogo.png',
       6: '/escudos/corinthians.png',
@@ -23,7 +23,7 @@ async function atualizarEscudos() {
       16: '/escudos/palmeiras.png',
       17: '/escudos/bragantino.png',
       18: '/escudos/santos.png',
-      19: '/escudos/sao-paulo.png',
+      19: '/escudos/sao_paulo.png',
       20: '/escudos/vasco.png'
     };
 

@@ -6,13 +6,13 @@ const prisma = new PrismaClient();
 const times = [
   { nome: 'Flamengo', escudo: '/escudos/flamengo.png', apiId: 1 },
   { nome: 'Palmeiras', escudo: '/escudos/palmeiras.png', apiId: 2 },
-  { nome: 'São Paulo', escudo: '/escudos/sao-paulo.png', apiId: 3 },
+  { nome: 'São Paulo', escudo: '/escudos/sao_paulo.png', apiId: 3 },
   { nome: 'Corinthians', escudo: '/escudos/corinthians.png', apiId: 4 },
   { nome: 'Fluminense', escudo: '/escudos/fluminense.png', apiId: 5 },
   { nome: 'Vasco', escudo: '/escudos/vasco.png', apiId: 6 },
   { nome: 'Grêmio', escudo: '/escudos/gremio.png', apiId: 7 },
   { nome: 'Internacional', escudo: '/escudos/internacional.png', apiId: 8 },
-  { nome: 'Atlético Mineiro', escudo: '/escudos/atletico-mineiro.png', apiId: 9 },
+  { nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png', apiId: 9 },
   { nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png', apiId: 10 }
 ];
 
