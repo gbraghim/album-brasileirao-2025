@@ -12,6 +12,7 @@ type User = {
   password: string;
   numeroDeLogins: number;
   primeiroAcesso: boolean;
+  createdAt: Date;
 };
 
 export default function PerfilPage() {
@@ -22,9 +23,17 @@ export default function PerfilPage() {
   useEffect(() => {
     const fetchUser = async () => {
       if (session?.user?.email) {
-        const response = await fetch('/api/user');
-        const data = await response.json();
-        setUser(data);
+        try {
+          const response = await fetch('/api/user');
+          if (!response.ok) {
+            throw new Error('Erro ao carregar dados do usuário');
+          }
+          const data = await response.json();
+          setUser(data);
+        } catch (error) {
+          console.error('Erro ao carregar dados do usuário:', error);
+          setUser(null);
+        }
       }
     };
 
@@ -46,7 +55,6 @@ export default function PerfilPage() {
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
-       
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
             Acesso Negado
@@ -70,11 +78,7 @@ export default function PerfilPage() {
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Informações Pessoais</h2>
             <div className="space-y-3 md:space-y-4">
               <div className="flex items-center space-x-3 md:space-x-4">
-                <img
-                  src={session?.user?.image || '/default-avatar.png'}
-                  alt={session?.user?.name || 'Avatar'}
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full"
-                />
+
                 <div>
                   <h3 className="text-lg md:text-xl font-semibold text-brasil-blue">{session?.user?.name}</h3>
                   <p className="text-sm md:text-base text-gray-600">{session?.user?.email}</p>
@@ -85,16 +89,12 @@ export default function PerfilPage() {
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg">
                   <span className="text-sm md:text-base text-brasil-blue font-medium">Data de Cadastro</span>
                   <span className="text-sm md:text-base text-brasil-green font-bold">
-                    {user ? 'Não disponível' : 'Não disponível'}
+                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'Não disponível'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg">
                   <span className="text-sm md:text-base text-brasil-blue font-medium">Total de Figurinhas</span>
                   <span className="text-sm md:text-base text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
-                </div>
-                <div className="flex items-center justify-between p-3 md:p-4 bg-red-100 rounded-lg">
-                  <span className="text-sm md:text-base text-brasil-blue font-medium">Figurinhas Repetidas</span>
-                  <span className="text-sm md:text-base text-red-600 font-bold">{stats?.figurinhasRepetidas}</span>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function PerfilPage() {
                     {stats?.totalFigurinhas || 0} de {stats?.totalJogadoresBase || 0} figurinhas coletadas
                   </p>
                   <p className="text-sm md:text-base font-medium text-brasil-green">
-                    {Math.round(((stats?.timesCompletos || 0) / (stats?.totalTimes || 1)) * 100)}%
+                    {Math.round(((stats?.totalFigurinhas || 0) / (stats?.totalJogadoresBase || 1)) * 100)}%
                   </p>
                 </div>
               </div>

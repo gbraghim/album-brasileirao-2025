@@ -18,15 +18,15 @@ export async function GET() {
       where: {
         email: session.user.email,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        password: true,
-        numeroDeLogins: true,
-        primeiroAcesso: true
+      include: {
+        accounts: false,
+        sessions: false,
+        userFigurinhas: false,
+        trocasEnviadas: false,
+        trocasRecebidas: false,
+        notificacoes: false,
+        pacotes: false,
+        trocas: false
       }
     });
 

@@ -10,6 +10,8 @@ interface Figurinha {
     id: string;
     nome: string;
     nacionalidade: string;
+    numero: number;
+    posicao: string;
     time: {
       nome: string;
       escudo: string;
@@ -190,37 +192,21 @@ export default function Repetidas() {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {figurinhas.map((figurinha) => (
-            <div key={figurinha.id} className="bg-gradient-to-br from-white via-blue-100 to-blue-500 rounded-lg shadow-md p-3 md:p-4 flex flex-col">
-              <div className="flex items-center mb-3 md:mb-4">
-                {figurinha.jogador.time.escudo && (
-                  <img
-                    src={figurinha.jogador.time.escudo}
-                    alt={figurinha.jogador.time.nome}
-                    className="w-10 h-10 md:w-12 md:h-12 object-contain mr-3 md:mr-4"
-                  />
-                )}
-                <div>
-                  <h3 className="text-base md:text-lg font-semibold text-gray-800">{figurinha.jogador.nome}</h3>
-                  <p className="text-sm md:text-base text-gray-600">{figurinha.jogador.time.nome}</p>
+            <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-xl font-bold text-brasil-blue">{figurinha.jogador.numero}</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</h3>
+                  <p className="text-sm text-gray-600">{figurinha.jogador.posicao}</p>
                 </div>
               </div>
-              <div className="flex-grow">
-                {figurinha.jogador.time.escudo && (
-                  <img
-                    src={figurinha.jogador.time.escudo}
-                    alt={figurinha.jogador.nome}
-                    className="w-full h-32 md:h-48 object-cover rounded-lg mb-3 md:mb-4"
-                  />
-                )}
-                <div className="space-y-1 md:space-y-2">
-                  <p className="text-sm md:text-base text-gray-800"><span className="font-semibold">Time:</span> {figurinha.jogador.time.nome}</p>
-                  <p className="text-sm md:text-base text-gray-800"><span className="font-semibold">Nacionalidade:</span> {figurinha.jogador.nacionalidade}</p>
-                  <p className="text-sm md:text-base text-gray-800">
-                    <span className="font-semibold">Repetidas:</span> {figurinha.quantidade - 1}
-                  </p>
-                </div>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade - 1}</p>
+                <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
               </div>
               {figurinhasEmTroca.includes(figurinha.id) ? (
                 <div className="flex flex-col gap-2">
@@ -240,10 +226,12 @@ export default function Repetidas() {
               ) : (
                 <button
                   onClick={() => enviarParaTroca(figurinha)}
-                  className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                  disabled={loading}
+                  className="bg-brasil-yellow hover:bg-brasil-yellow-dark text-brasil-blue font-bold py-2 px-4 rounded"
+                  disabled={loading || figurinhasEmTroca.includes(figurinha.id)}
                 >
-                  {loading ? 'Processando...' : 'Disponibilizar para Troca'}
+                  {figurinhasEmTroca.includes(figurinha.id)
+                    ? 'Em Troca'
+                    : 'Disponibilizar para Troca'}
                 </button>
               )}
             </div>
@@ -251,46 +239,29 @@ export default function Repetidas() {
         </div>
       </div>
 
-      {/* Modal de erro */}
-      {showErrorModal && (
+      {/* Modais */}
+      {showSuccessModal && selectedFigurinha && (
         <Modal
-          isOpen={showErrorModal}
-          onClose={() => setShowErrorModal(false)}
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          title="Sucesso!"
         >
-          <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-red-500">Atenção!</h2>
-            <p className="mb-4 text-gray-800">{errorMessage}</p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                OK
-              </button>
-            </div>
+          <div className="p-6">
+            <p className="text-green-600">
+              Figurinha {selectedFigurinha.jogador.nome} disponibilizada para troca com sucesso!
+            </p>
           </div>
         </Modal>
       )}
 
-      {/* Modal de sucesso */}
-      {showSuccessModal && (
+      {showErrorModal && (
         <Modal
-          isOpen={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
+          isOpen={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+          title="Erro"
         >
-          <div className="bg-gradient-to-br from-white via-blue-100 to-blue-500 p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-green-500">Sucesso!</h2>
-            <p className="mb-4 text-gray-800">
-              A figurinha {selectedFigurinha?.jogador.nome} foi disponibilizada para troca com sucesso!
-            </p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                OK
-              </button>
-            </div>
+          <div className="p-6">
+            <p className="text-red-500">{errorMessage}</p>
           </div>
         </Modal>
       )}

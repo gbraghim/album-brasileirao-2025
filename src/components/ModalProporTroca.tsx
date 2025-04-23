@@ -35,9 +35,10 @@ interface ModalProporTrocaProps {
   } | null;
   onProporTroca: (figurinha: Figurinha) => void;
   loading?: boolean;
+  figurinhasRepetidas: Figurinha[];
 }
 
-export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca, loading = false }: ModalProporTrocaProps) {
+export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca, loading = false, figurinhasRepetidas }: ModalProporTrocaProps) {
   if (!troca) {
     return null;
   }

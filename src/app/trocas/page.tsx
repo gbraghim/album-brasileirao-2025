@@ -91,16 +91,15 @@ export default function Trocas() {
   const [minhasTrocas, setMinhasTrocas] = useState<Troca[]>([]);
   const [trocasDisponiveis, setTrocasDisponiveis] = useState<Troca[]>([]);
   const [propostasRecebidas, setPropostasRecebidas] = useState<Troca[]>([]);
-  const [showModal, setShowModal] = useState(false);
   const [repetidas, setRepetidas] = useState<Figurinha[]>([]);
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
   const [showProporTrocaModal, setShowProporTrocaModal] = useState(false);
   const [trocaSelecionada, setTrocaSelecionada] = useState<Troca | null>(null);
   const [selectedFigurinha, setSelectedFigurinha] = useState<Figurinha | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -214,7 +213,7 @@ export default function Trocas() {
         throw new Error(data.error);
       }
 
-      // Extrair IDs das figurinhas em troca (tanto das minhas trocas quanto das disponíveis)
+      // Extrair IDs das figurinhas em troca
       const figurinhasEmTrocaIds = new Set([
         ...(data.minhasTrocas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
         ...(data.trocasRecebidas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
@@ -222,8 +221,8 @@ export default function Trocas() {
       ]);
       setFigurinhasEmTroca(Array.from(figurinhasEmTrocaIds));
 
-      // Formatar e atualizar as trocas disponíveis
-      const trocasFormatadas = (data.trocasDisponiveis || []).map((troca: any) => ({
+      // Formatar e atualizar todas as trocas
+      const formatarTroca = (troca: any) => ({
         id: troca.id || '',
         status: troca.status || 'PENDENTE',
         figurinhaOferta: {
@@ -246,13 +245,19 @@ export default function Trocas() {
         figurinhaSolicitada: troca.figurinhaSolicitada || null,
         usuarioEnvia: {
           id: troca.usuarioEnvia?.id || '',
-          nome: troca.usuarioEnvia?.nome || '',
+          nome: troca.usuarioEnvia?.name || '',
         },
         usuarioRecebe: troca.usuarioRecebe || { id: '', nome: '' },
         createdAt: troca.createdAt || ''
-      }));
+      });
 
-      setTrocasDisponiveis(trocasFormatadas);
+      const minhasTrocasFormatadas = (data.minhasTrocas || []).map(formatarTroca);
+      const trocasRecebidasFormatadas = (data.trocasRecebidas || []).map(formatarTroca);
+      const trocasDisponiveisFormatadas = (data.trocasDisponiveis || []).map(formatarTroca);
+
+      setMinhasTrocas(minhasTrocasFormatadas);
+      setPropostasRecebidas(trocasRecebidasFormatadas);
+      setTrocasDisponiveis(trocasDisponiveisFormatadas);
       setLoading(false);
     } catch (error) {
       console.error('Erro:', error);
@@ -268,7 +273,9 @@ export default function Trocas() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ figurinhaId: figurinha.id }),
+        body: JSON.stringify({
+          figurinhaId: figurinha.id,
+        }),
       });
 
       if (!response.ok) {
@@ -276,12 +283,23 @@ export default function Trocas() {
         throw new Error(errorData.error || 'Erro ao adicionar troca');
       }
 
-      await fetchTrocas(); // Recarrega as trocas após adicionar uma nova
+      // Recarrega as trocas e as repetidas
+      const [repetidasResponse] = await Promise.all([
+        fetch('/api/repetidas'),
+        fetchTrocas()
+      ]);
+
+      if (!repetidasResponse.ok) {
+        throw new Error('Erro ao atualizar repetidas');
+      }
+
+      const repetidasData = await repetidasResponse.json();
+      setRepetidas(repetidasData);
       setFigurinhasEmTroca([...figurinhasEmTroca, figurinha.id]);
-      setShowModal(false);
     } catch (error) {
       console.error('Erro ao adicionar troca:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao adicionar troca');
+      setErrorMessage(error instanceof Error ? error.message : 'Erro ao adicionar troca');
+      setShowErrorModal(true);
     }
   };
 
@@ -310,9 +328,6 @@ export default function Trocas() {
 
       const data = await response.json();
       setTrocasDisponiveis(trocasDisponiveis.filter(t => t.id !== trocaSelecionada.id));
-      setSuccessMessage('Troca proposta com sucesso!');
-      setShowSuccessModal(true);
-      setShowProporTrocaModal(false);
       setTrocaSelecionada(null);
       setFigurinhasEmTroca([...figurinhasEmTroca, figurinha.id]);
       
@@ -356,8 +371,7 @@ export default function Trocas() {
       // Recarregar as trocas
       await fetchTrocas();
       
-      setSuccessMessage(aceitar ? 'Troca aceita com sucesso!' : 'Troca recusada com sucesso!');
-      setShowSuccessModal(true);
+      setError(null);
     } catch (error) {
       console.error('Erro ao responder troca:', error);
       setError(error instanceof Error ? error.message : 'Erro ao responder troca');
@@ -381,9 +395,19 @@ export default function Trocas() {
         throw new Error(errorData.error || 'Erro ao remover troca');
       }
 
-      await fetchTrocas(); // Recarrega as trocas após remover uma nova
+      // Recarrega as trocas e as repetidas
+      const [repetidasResponse] = await Promise.all([
+        fetch('/api/repetidas'),
+        fetchTrocas()
+      ]);
+
+      if (!repetidasResponse.ok) {
+        throw new Error('Erro ao atualizar repetidas');
+      }
+
+      const repetidasData = await repetidasResponse.json();
+      setRepetidas(repetidasData);
       setFigurinhasEmTroca(figurinhasEmTroca.filter(id => id !== figurinha.id));
-      setShowModal(false);
     } catch (error) {
       console.error('Erro ao remover troca:', error);
       setError(error instanceof Error ? error.message : 'Erro ao remover troca');
@@ -462,13 +486,13 @@ export default function Trocas() {
           </div>
                   ) : (
                     <button
-                      onClick={() => {
-                        setSelectedFigurinha(figurinha);
-                        setShowModal(true);
-                      }}
-                      className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      onClick={() => adicionarTroca(figurinha)}
+                      className="bg-brasil-yellow hover:bg-brasil-yellow-dark text-brasil-blue font-bold py-2 px-4 rounded"
+                      disabled={loading || figurinhasEmTroca.includes(figurinha.id)}
                     >
-                      Disponibilizar para Troca
+                      {figurinhasEmTroca.includes(figurinha.id)
+                        ? 'Em Troca'
+                        : 'Disponibilizar para Troca'}
                     </button>
                   )}
                 </div>
@@ -599,16 +623,20 @@ export default function Trocas() {
 
         {/* Modais */}
         <Modal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title="Adicionar Troca"
+          isOpen={showProporTrocaModal}
+          onClose={() => setShowProporTrocaModal(false)}
+          title="Propor Troca"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {repetidas.map((figurinha) => (
               <div
                 key={figurinha.id}
                 className="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => adicionarTroca(figurinha)}
+                onClick={() => {
+                  setSelectedFigurinha(figurinha);
+                  setTrocaSelecionada(null);
+                  setShowProporTrocaModal(true);
+                }}
               >
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
@@ -622,33 +650,27 @@ export default function Trocas() {
               </div>
             ))}
           </div>
-      </Modal>
+        </Modal>
 
         <ModalProporTroca
           isOpen={showProporTrocaModal}
           onClose={() => setShowProporTrocaModal(false)}
           troca={trocaSelecionada}
           onProporTroca={handleProporTroca}
-          loading={loading}
+          figurinhasRepetidas={repetidas}
         />
 
-        <Modal
-          isOpen={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
-          title="Sucesso"
-        >
-          <div className="p-6">
-            <p className="text-green-600">{successMessage}</p>
-            <div className="mt-4 flex justify-end">
-            <button
-              onClick={() => setShowSuccessModal(false)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-            >
-                OK
-            </button>
-          </div>
-        </div>
-        </Modal>
+        {showErrorModal && (
+          <Modal
+            isOpen={showErrorModal}
+            onClose={() => setShowErrorModal(false)}
+            title="Erro"
+          >
+            <div className="p-6">
+              <p className="text-red-500">{errorMessage}</p>
+            </div>
+          </Modal>
+        )}
       </div>
     </div>
   );
