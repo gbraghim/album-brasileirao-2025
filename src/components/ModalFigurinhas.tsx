@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
@@ -44,6 +44,27 @@ interface ModalFigurinhasProps {
 }
 
 export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigurinhas }: ModalFigurinhasProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (jogadorId: string, time: string, nome: string) => {
+    const caminhos = formatarCaminhoImagem(time, nome);
+    const currentIndex = currentImageIndex[jogadorId] || 0;
+    
+    if (currentIndex < caminhos.length - 1) {
+      setCurrentImageIndex(prev => ({
+        ...prev,
+        [jogadorId]: currentIndex + 1
+      }));
+    } else {
+      console.error(`Erro ao carregar imagem do jogador ${nome} do time ${time}`);
+      setImageErrors(prev => ({
+        ...prev,
+        [jogadorId]: true
+      }));
+    }
+  };
+
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -88,52 +109,64 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                 
                 <div className="mt-2">
                   <div className="grid grid-cols-1 gap-3">
-                    {figurinhas.map((figurinha) => (
-                      <div key={figurinha.id} className="relative">
-                        <div className="bg-white rounded-lg shadow-md p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-900">
-                              {figurinha.jogador.nome}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
-                            </span>
-                          </div>
-                          <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
-                            <Image
-                              src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
-                              alt={figurinha.jogador.nome}
-                              fill
-                              className="object-cover rounded-lg"
-                              sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
-                              priority
-                              onError={(e) => {
-                                console.error('Erro ao carregar imagem:', e);
-                                e.currentTarget.src = '/placeholder.jpg';
-                              }}
-                            />
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {figurinha.jogador.time.escudo && (
+                    {figurinhas.map((figurinha) => {
+                      const caminhos = formatarCaminhoImagem(
+                        figurinha.jogador.time.nome,
+                        figurinha.jogador.nome
+                      );
+                      const currentIndex = currentImageIndex[figurinha.jogador.id] || 0;
+                      const imagemAtual = imageErrors[figurinha.jogador.id]
+                        ? '/placeholder.jpg'
+                        : caminhos[currentIndex];
+
+                      return (
+                        <div key={figurinha.jogador.id} className="relative">
+                          <div className="bg-white rounded-lg shadow-md p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-900">
+                                {figurinha.jogador.nome}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
+                              </span>
+                            </div>
+                            <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
                               <Image
-                                src={figurinha.jogador.time.escudo}
-                                alt={figurinha.jogador.time.nome}
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
+                                src={imagemAtual}
+                                alt={`${figurinha.jogador.nome} - ${figurinha.jogador.time.nome}`}
+                                fill
+                                className="object-cover rounded-lg"
+                                sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
                                 priority
+                                onError={() => handleImageError(
+                                  figurinha.jogador.id.toString(),
+                                  figurinha.jogador.time.nome,
+                                  figurinha.jogador.nome
+                                )}
                               />
-                            )}
-                            <span className="text-sm text-gray-500">
-                              {figurinha.jogador.time.nome}
-                            </span>
-                          </div>
-                          <div className="mt-2 text-sm text-gray-500">
-                            Quantidade: {figurinha.quantidadeAtual}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {figurinha.jogador.time.escudo && (
+                                <Image
+                                  src={figurinha.jogador.time.escudo}
+                                  alt={figurinha.jogador.time.nome}
+                                  width={24}
+                                  height={24}
+                                  className="w-6 h-6"
+                                  priority
+                                />
+                              )}
+                              <span className="text-sm text-gray-500">
+                                {figurinha.jogador.time.nome}
+                              </span>
+                            </div>
+                            <div className="mt-2 text-sm text-gray-500">
+                              Quantidade: {figurinha.quantidadeAtual}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 
