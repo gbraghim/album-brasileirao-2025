@@ -12,8 +12,8 @@ const times = [
   { nome: 'Vasco', escudo: '/escudos/vasco.png', apiId: 6 },
   { nome: 'Grêmio', escudo: '/escudos/gremio.png', apiId: 7 },
   { nome: 'Internacional', escudo: '/escudos/internacional.png', apiId: 8 },
-  { nome: 'Atlético-MG', escudo: '/escudos/atletico-mg.png', apiId: 9 },
-  { nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png', apiId: 10 },
+  { nome: 'Atlético-MG', escudo: '/escudos/atletico-mineiro.png', apiId: 9 },
+  { nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png', apiId: 10 }
 ];
 
 const jogadoresPorTime = {
