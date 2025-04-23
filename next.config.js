@@ -13,7 +13,9 @@ const nextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
   experimental: {
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['localhost:3000', '*.vercel.app'],
+    },
   },
   output: 'standalone',
 };
