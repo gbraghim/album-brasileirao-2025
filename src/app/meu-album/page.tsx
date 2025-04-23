@@ -12,7 +12,7 @@ const TIMES_SERIE_A: Time[] = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
   { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },
   { id: '3', nome: 'Botafogo', escudo: '/escudos/botafogo.png' },
-  { id: '4', nome: 'Bragantino', escudo: '/escudos/bragantino.png' },
+  { id: '4', nome: 'Bragantino', escudo: '/escudos/Bragantino.jpg' },
   { id: '5', nome: 'Ceará', escudo: '/escudos/ceara.png' },
   { id: '6', nome: 'Corinthians', escudo: '/escudos/corinthians.png' },
   { id: '7', nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png' },
