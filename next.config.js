@@ -11,7 +11,11 @@ const nextConfig = {
   env: {
     JWT_SECRET: process.env.JWT_SECRET,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  }
+  },
+  experimental: {
+    serverActions: true,
+  },
+  output: 'standalone',
 };
 
 module.exports = nextConfig; 

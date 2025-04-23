@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
@@ -64,6 +64,14 @@ interface TotalJogadoresTime {
 }
 
 export default function MeuAlbum() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <MeuAlbumContent />
+    </Suspense>
+  );
+}
+
+function MeuAlbumContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
