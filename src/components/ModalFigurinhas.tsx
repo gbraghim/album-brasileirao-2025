@@ -108,7 +108,7 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                           </div>
                           <div className="flex items-center space-x-2">
                             <Image
-                              src={figurinha.jogador.time.escudo || '/default-shield.png'}
+                              src={`/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
                               alt={figurinha.jogador.time.nome}
                               width={24}
                               height={24}
