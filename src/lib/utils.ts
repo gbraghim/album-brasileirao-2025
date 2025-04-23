@@ -30,9 +30,4 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
   
   console.log(`Caminhos gerados para ${nome} do ${time}:`, caminhos);
   return caminhos;
-}
-
-export function formatarCaminhoEscudo(time: string): string {
-  const nomeTime = removerAcentos(time.toLowerCase().replace(/\s+/g, '_'));
-  return `https://www.escudosfc.com.br/escudos/${nomeTime}.png`;
 } 

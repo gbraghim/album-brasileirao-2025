@@ -8,11 +8,7 @@ const nextConfig = {
       'localhost',
       'logodetimes.com',
       'api.dicebear.com',
-      'img.a.transfermarkt.technology',
-      'www.escudosfc.com.br',
-      'www.escudosfc.com',
-      'escudosfc.com.br',
-      'escudosfc.com'
+      'img.a.transfermarkt.technology'
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
