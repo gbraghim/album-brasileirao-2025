@@ -449,52 +449,224 @@ export default function Trocas() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Trocas</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {repetidas.map((figurinha) => (
-            <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-              <div className="relative w-full aspect-[3/4] mb-2">
-                <Image
-                  src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
-                  alt={figurinha.jogador.nome}
-                  fill
-                  className="object-cover rounded-lg"
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Image
-                  src={figurinha.jogador.time.escudo}
-                  alt={figurinha.jogador.time.nome}
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                />
-                <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
-              </div>
-              <div className="mt-2 flex justify-between items-center">
-                <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
-                <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
-              </div>
-              <div className="mt-2">
-                {figurinhasEmTroca.includes(figurinha.id) ? (
+
+        {/* Minhas Trocas */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Minhas Trocas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {minhasTrocas.map((troca) => (
+              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
+                <div className="relative w-full aspect-[3/4] mb-2">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-2">
                   <button
-                    onClick={() => removerTroca(figurinha)}
+                    onClick={() => removerTroca(troca.figurinhaOferta)}
                     className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
                   >
                     Remover da Troca
                   </button>
-                ) : (
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trocas Disponíveis */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Trocas Disponíveis</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {trocasDisponiveis.map((troca) => (
+              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
+                <div className="relative w-full aspect-[3/4] mb-2">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-2">
                   <button
-                    onClick={() => handleProporTroca(figurinha)}
+                    onClick={() => {
+                      setTrocaSelecionada(troca);
+                      setShowProporTrocaModal(true);
+                    }}
                     className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
                   >
                     Propor Troca
                   </button>
-                )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Propostas Recebidas */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Propostas Recebidas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {propostasRecebidas.map((troca) => (
+              <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
+                <div className="relative w-full aspect-[3/4] mb-2">
+                  <Image
+                    src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)}
+                    alt={troca.figurinhaOferta.jogador.nome}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  {troca.figurinhaOferta.jogador.time.escudo && (
+                    <Image
+                      src={troca.figurinhaOferta.jogador.time.escudo}
+                      alt={troca.figurinhaOferta.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                </div>
+                <div className="mt-2 flex space-x-2">
+                  <button
+                    onClick={() => handleResponderTroca(troca.id, true)}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-sm"
+                  >
+                    Aceitar
+                  </button>
+                  <button
+                    onClick={() => handleResponderTroca(troca.id, false)}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
+                  >
+                    Recusar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Minhas Figurinhas Repetidas */}
+        <div>
+          <h2 className="text-xl font-bold mb-4 text-brasil-blue">Minhas Figurinhas Repetidas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {repetidas.map((figurinha) => (
+              <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
+                <div className="relative w-full aspect-[3/4] mb-2">
+                  <Image
+                    src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                    alt={figurinha.jogador.nome}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  {figurinha.jogador.time.escudo && (
+                    <Image
+                      src={figurinha.jogador.time.escudo}
+                      alt={figurinha.jogador.time.nome}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
+                  <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
+                </div>
+                <div className="mt-2">
+                  {figurinhasEmTroca.includes(figurinha.id) ? (
+                    <button
+                      onClick={() => removerTroca(figurinha)}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
+                    >
+                      Remover da Troca
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => adicionarTroca(figurinha)}
+                      className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
+                    >
+                      Disponibilizar para Troca
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modais */}
+        {showProporTrocaModal && trocaSelecionada && (
+          <ModalProporTroca
+            isOpen={showProporTrocaModal}
+            onClose={() => {
+              setShowProporTrocaModal(false);
+              setTrocaSelecionada(null);
+            }}
+            troca={trocaSelecionada}
+            onProporTroca={handleProporTroca}
+            figurinhasRepetidas={repetidas}
+          />
+        )}
+
+        {showErrorModal && (
+          <Modal
+            isOpen={showErrorModal}
+            onClose={() => setShowErrorModal(false)}
+            title="Erro"
+          >
+            <p className="text-red-500">{errorMessage}</p>
+          </Modal>
+        )}
       </div>
     </div>
   );
