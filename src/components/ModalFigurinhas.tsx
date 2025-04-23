@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 interface Jogador {
   id: string;
@@ -98,9 +99,11 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <img
-                              src={figurinha.jogador.time.escudo}
+                            <Image
+                              src={figurinha.jogador.time.escudo || '/default-shield.png'}
                               alt={figurinha.jogador.time.nome}
+                              width={24}
+                              height={24}
                               className="w-6 h-6"
                             />
                             <span className="text-sm text-gray-500">

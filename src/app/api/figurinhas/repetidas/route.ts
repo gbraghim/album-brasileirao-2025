@@ -10,12 +10,15 @@ interface FigurinhaRepetida {
   quantidade: number;
 }
 
-interface FigurinhaComJogador {
-  jogadorId: string | null;
-  jogador: {
-    nome: string;
-    posicao: string | null;
-  } | null;
+interface UserFigurinha {
+  figurinha: {
+    jogadorId: string | null;
+    jogador: {
+      nome: string;
+      posicao: string | null;
+    } | null;
+  };
+  quantidade: number;
 }
 
 export async function GET() {
@@ -29,43 +32,42 @@ export async function GET() {
       );
     }
 
-    // Busca todas as figurinhas do usuário
-    const figurinhas = await prisma.figurinha.findMany({
+    // Busca o usuário
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Busca todas as figurinhas do usuário com quantidade > 1
+    const userFigurinhas = await prisma.userFigurinha.findMany({
       where: {
-        pacote: {
-          user: {
-            email: session.user.email
-          }
+        userId: user.id,
+        quantidade: {
+          gt: 1
         }
       },
       include: {
-        jogador: true
+        figurinha: {
+          include: {
+            jogador: true
+          }
+        }
       }
     });
 
-    // Conta quantas vezes cada jogador aparece
-    const contagemJogadores = figurinhas.reduce((acc: Record<string, FigurinhaRepetida>, figurinha: FigurinhaComJogador) => {
-      if (!figurinha.jogadorId || !figurinha.jogador) {
-        return acc;
-      }
-
-      const jogadorId = figurinha.jogadorId;
-      if (!acc[jogadorId]) {
-        acc[jogadorId] = {
-          jogadorId,
-          nome: figurinha.jogador.nome,
-          posicao: figurinha.jogador.posicao,
-          quantidade: 0
-        };
-      }
-      acc[jogadorId].quantidade++;
-      return acc;
-    }, {});
-
-    // Filtra apenas as figurinhas que aparecem mais de uma vez
-    const figurinhasRepetidas = (Object.values(contagemJogadores) as FigurinhaRepetida[])
-      .filter(fig => fig.quantidade > 1)
-      .sort((a, b) => b.quantidade - a.quantidade);
+    // Formata as figurinhas repetidas
+    const figurinhasRepetidas = userFigurinhas.map((uf: UserFigurinha) => ({
+      jogadorId: uf.figurinha.jogadorId || '',
+      nome: uf.figurinha.jogador?.nome || '',
+      posicao: uf.figurinha.jogador?.posicao || null,
+      quantidade: uf.quantidade
+    }));
 
     return NextResponse.json(figurinhasRepetidas);
   } catch (error) {

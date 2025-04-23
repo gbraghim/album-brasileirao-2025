@@ -51,6 +51,7 @@ export default function Footer() {
         
         <div className="mt-8 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
           <p>&copy; {new Date().getFullYear()} Álbum Brasileirão 2025. Todos os direitos reservados.</p>
+          <p className="mt-2">Criado por Gustavo B.</p>
         </div>
       </div>
     </footer>

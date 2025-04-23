@@ -56,6 +56,7 @@ export default function PacoteAnimation({ isOpen, onAnimationComplete }: PacoteA
             src="/pacote-figurinhas.png"
             alt="Pacote de figurinhas"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className={`object-contain ${showPacote ? 'animate-bounce' : ''}`}
           />
         </div>
@@ -72,6 +73,7 @@ export default function PacoteAnimation({ isOpen, onAnimationComplete }: PacoteA
             src="/pacote-figurinhas-aberto.png"
             alt="Pacote de figurinhas aberto"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain animate-pulse"
           />
         </div>
