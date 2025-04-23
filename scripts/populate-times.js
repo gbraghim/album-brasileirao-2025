@@ -6,102 +6,122 @@ async function main() {
   const times = [
     {
       nome: 'América-MG',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/america-mineiro',
+      estado: 'MG',
+      escudo: '/escudos/america-mineiro.png',
       apiId: 1
     },
     {
       nome: 'Athletico-PR',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/atletico-paranaense',
+      estado: 'PR',
+      escudo: '/escudos/atletico-paranaense.png',
       apiId: 2
     },
     {
       nome: 'Atlético-MG',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/atletico-mineiro',
+      estado: 'MG',
+      escudo: '/escudos/atletico_mg.png',
       apiId: 3
     },
     {
       nome: 'Bahia',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/bahia',
+      estado: 'BA',
+      escudo: '/escudos/bahia.png',
       apiId: 4
     },
     {
       nome: 'Botafogo',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/botafogo',
+      estado: 'RJ',
+      escudo: '/escudos/botafogo.png',
       apiId: 5
     },
     {
       nome: 'Corinthians',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/corinthians',
+      estado: 'SP',
+      escudo: '/escudos/corinthians.png',
       apiId: 6
     },
     {
       nome: 'Coritiba',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/coritiba',
+      estado: 'PR',
+      escudo: '/escudos/coritiba.png',
       apiId: 7
     },
     {
       nome: 'Cruzeiro',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/cruzeiro',
+      estado: 'MG',
+      escudo: '/escudos/cruzeiro.png',
       apiId: 8
     },
     {
       nome: 'Cuiabá',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/cuiaba',
+      estado: 'MT',
+      escudo: '/escudos/cuiaba.png',
       apiId: 9
     },
     {
       nome: 'Flamengo',
-      escudo: 'C:\Users\Braghinho\album-brasileirao-2025\scripts',
+      estado: 'RJ',
+      escudo: '/escudos/flamengo.png',
       apiId: 10
     },
     {
       nome: 'Fluminense',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/fluminense',
+      estado: 'RJ',
+      escudo: '/escudos/fluminense.png',
       apiId: 11
     },
     {
       nome: 'Fortaleza',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/fortaleza',
+      estado: 'CE',
+      escudo: '/escudos/fortaleza.png',
       apiId: 12
     },
     {
       nome: 'Goiás',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/goias',
+      estado: 'GO',
+      escudo: '/escudos/goias.png',
       apiId: 13
     },
     {
       nome: 'Grêmio',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/gremio',
+      estado: 'RS',
+      escudo: '/escudos/gremio.png',
       apiId: 14
     },
     {
       nome: 'Internacional',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/internacional',
+      estado: 'RS',
+      escudo: '/escudos/internacional.png',
       apiId: 15
     },
     {
       nome: 'Palmeiras',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/palmeiras',
+      estado: 'SP',
+      escudo: '/escudos/palmeiras.png',
       apiId: 16
     },
     {
-      nome: 'Red Bull Bragantino',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/red-bull-bragantino',
+      nome: 'Bragantino',
+      estado: 'SP',
+      escudo: '/escudos/Bragantino.jpg',
       apiId: 17
     },
     {
       nome: 'Santos',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/santos',
+      estado: 'SP',
+      escudo: '/escudos/santos.png',
       apiId: 18
     },
     {
       nome: 'São Paulo',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/sao-paulo',
+      estado: 'SP',
+      escudo: '/escudos/sao_paulo.png',
       apiId: 19
     },
     {
       nome: 'Vasco',
-      escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/vasco',
+      estado: 'RJ',
+      escudo: '/escudos/vasco.png',
       apiId: 20
     }
   ];
