@@ -21,7 +21,11 @@ interface RankingData {
 }
 
 export default function Dashboard() {
+  console.log('1. Iniciando renderização do Dashboard');
+  
   const { data: session, status } = useSession();
+  console.log('2. Status da sessão:', status);
+  
   const router = useRouter();
   const [stats, setStats] = useState<UserStatsType | null>(null);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
@@ -29,34 +33,55 @@ export default function Dashboard() {
   const [loadingRanking, setLoadingRanking] = useState(true);
 
   useEffect(() => {
+    console.log('3. useEffect executado - status:', status);
     if (status === 'unauthenticated') {
+      console.log('4. Usuário não autenticado, redirecionando...');
       router.push('/login');
     } else if (status === 'authenticated') {
+      console.log('4. Usuário autenticado, buscando dados...');
       fetchStats();
       fetchRanking();
     }
   }, [status, router]);
 
   const fetchStats = async () => {
+    console.log('5. Iniciando fetchStats');
     try {
+      console.log('6. Fazendo requisição para /api/stats');
       const response = await fetch('/api/stats');
+      console.log('7. Resposta recebida - status:', response.status);
+      
       if (!response.ok) throw new Error('Erro ao carregar estatísticas');
+      
       const data = await response.json();
+      console.log('8. Dados recebidos da API:', {
+        totalPacotes: data.totalPacotes,
+        totalFigurinhas: data.totalFigurinhas,
+        figurinhasRepetidas: data.figurinhasRepetidas,
+        timesCompletos: data.timesCompletos,
+        totalTimes: data.totalTimes,
+        totalJogadoresBase: data.totalJogadoresBase
+      });
+      
       setStats(data);
+      console.log('9. Estado stats atualizado');
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error);
     } finally {
       setLoading(false);
+      console.log('10. Loading finalizado');
     }
   };
 
   const fetchRanking = async () => {
+    console.log('11. Iniciando fetchRanking');
     try {
       setLoadingRanking(true);
       const response = await fetch('/api/ranking');
       if (!response.ok) throw new Error('Erro ao carregar ranking');
       const data = await response.json();
       setRankingData(data);
+      console.log('12. Ranking atualizado');
     } catch (error) {
       console.error('Erro ao carregar ranking:', error);
     } finally {
@@ -65,6 +90,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
+    console.log('13. Renderizando loading...');
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -73,8 +99,11 @@ export default function Dashboard() {
   }
 
   if (!session) {
+    console.log('14. Sem sessão, retornando null');
     return null;
   }
+
+  console.log('15. Renderizando dashboard completo. Stats:', stats);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">

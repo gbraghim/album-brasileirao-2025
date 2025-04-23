@@ -17,25 +17,7 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: {
-        pacotes: {
-          include: {
-            figurinhas: {
-              include: {
-                jogador: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    numero: true,
-                    posicao: true,
-                    nacionalidade: true,
-                    foto: true,
-                    timeId: true
-                  }
-                }
-              }
-            }
-          }
-        }
+        pacotes: true
       }
     });
 
@@ -46,80 +28,84 @@ export async function GET() {
       );
     }
 
-    // Calcula as estatísticas
+    // Calcula as estatísticas básicas
     const totalPacotes = user.pacotes.length;
 
-    // Total bruto de figurinhas (todas as figurinhas, incluindo repetidas)
-    const totalBruto = user.pacotes.reduce((acc, pacote) => 
-      acc + pacote.figurinhas.length, 0
+    // Busca todas as figurinhas do usuário, incluindo repetidas
+    const userFigurinhas = await prisma.userFigurinha.findMany({
+      where: {
+        userId: user.id
+      }
+    });
+
+    // Total de figurinhas únicas
+    const figurinhasUnicas = userFigurinhas.length;
+
+    // Busca figurinhas repetidas (quantidade > 1)
+    const figurinhasRepetidasQuery = await prisma.userFigurinha.findMany({
+      where: {
+        userId: user.id,
+        quantidade: {
+          gt: 1
+        }
+      }
+    });
+
+    console.log('API Stats - Figurinhas repetidas encontradas:', 
+      figurinhasRepetidasQuery.map(f => ({
+        figurinhaId: f.figurinhaId,
+        quantidade: f.quantidade
+      }))
     );
-    console.log('Total bruto de figurinhas:', totalBruto);
 
-    // Conta figurinhas por jogador
-    const jogadoresMap = new Map();
-    user.pacotes.forEach(pacote => {
-      pacote.figurinhas.forEach(figurinha => {
-        if (!figurinha.jogador) {
-          console.warn('Figurinha sem jogador:', figurinha);
-          return;
-        }
-        const jogadorId = figurinha.jogador.id;
-        if (!jogadoresMap.has(jogadorId)) {
-          jogadoresMap.set(jogadorId, 1);
-        } else {
-          jogadoresMap.set(jogadorId, jogadoresMap.get(jogadorId) + 1);
-        }
-      });
-    });
+    // Calcula o total de repetidas (número de figurinhas com quantidade > 1)
+    const figurinhasRepetidas = figurinhasRepetidasQuery.length;
 
-    // Log das quantidades por jogador
-    console.log('Quantidades por jogador:');
-    jogadoresMap.forEach((quantidade, jogadorId) => {
-      console.log(`Jogador ${jogadorId}: ${quantidade} figurinhas`);
-    });
-
-    // Figurinhas únicas (número de jogadores diferentes)
-    const figurinhasUnicas = jogadoresMap.size;
-    console.log('Figurinhas únicas:', figurinhasUnicas);
-
-    // Figurinhas repetidas (total bruto - únicas)
-    const figurinhasRepetidas = totalBruto - figurinhasUnicas;
-    console.log('Figurinhas repetidas:', figurinhasRepetidas);
-
-    // Total de figurinhas é o total bruto
-    const totalFigurinhas = totalBruto;
-    console.log('Total de figurinhas:', totalFigurinhas);
+    // Total bruto de figurinhas (únicas + repetidas)
+    const totalFigurinhas = userFigurinhas.reduce(
+      (acc, fig) => acc + fig.quantidade,
+      0
+    );
 
     // Calcula times completos
-    const timesFigurinhas = new Map();
-    user.pacotes.forEach(pacote => {
-      pacote.figurinhas.forEach(figurinha => {
-        if (!figurinha.jogador) {
-          console.warn('Figurinha sem jogador:', figurinha);
-          return;
+    const timesFigurinhas = await prisma.userFigurinha.findMany({
+      where: {
+        userId: user.id,
+        quantidade: {
+          gt: 0
         }
-        const timeId = figurinha.jogador.timeId;
-        if (!timeId) {
-          console.warn('Jogador sem timeId:', figurinha.jogador);
-          return;
+      },
+      include: {
+        figurinha: {
+          include: {
+            jogador: {
+              select: {
+                timeId: true
+              }
+            }
+          }
         }
-        if (!timesFigurinhas.has(timeId)) {
-          timesFigurinhas.set(timeId, new Set());
-        }
-        timesFigurinhas.get(timeId).add(figurinha.jogador.id);
-      });
+      }
+    });
+
+    const jogadoresPorTime = new Map();
+    timesFigurinhas.forEach(uf => {
+      const timeId = uf.figurinha.jogador?.timeId;
+      if (!timeId) return;
+      
+      if (!jogadoresPorTime.has(timeId)) {
+        jogadoresPorTime.set(timeId, new Set());
+      }
+      jogadoresPorTime.get(timeId).add(uf.figurinha.jogadorId);
     });
 
     // Para cada time, verifica se o usuário possui todos os jogadores
     const timesCompletos = await Promise.all(
-      Array.from(timesFigurinhas.keys()).map(async (timeId) => {
-        // Busca o total de jogadores do time
+      Array.from(jogadoresPorTime.keys()).map(async (timeId) => {
         const totalJogadoresTime = await prisma.jogador.count({
           where: { timeId }
         });
-
-        // Verifica se o usuário possui todos os jogadores do time
-        const jogadoresPossuidos = timesFigurinhas.get(timeId).size;
+        const jogadoresPossuidos = jogadoresPorTime.get(timeId).size;
         return jogadoresPossuidos === totalJogadoresTime;
       })
     ).then(results => results.filter(Boolean).length);
@@ -139,7 +125,14 @@ export async function GET() {
       totalJogadoresBase
     };
 
-    console.log('Estatísticas finais:', stats);
+    console.log('API - Estatísticas finais:', {
+      ...stats,
+      figurinhasRepetidasDetalhes: figurinhasRepetidasQuery.map(f => ({
+        id: f.figurinhaId,
+        quantidade: f.quantidade
+      }))
+    });
+
     return NextResponse.json(stats);
   } catch (error) {
     console.error('Erro ao buscar estatísticas:', error);

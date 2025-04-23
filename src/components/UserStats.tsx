@@ -8,6 +8,15 @@ interface UserStatsProps {
 }
 
 export default function UserStats({ stats }: UserStatsProps) {
+  console.log('UserStats - Recebendo props:', {
+    totalPacotes: stats.totalPacotes,
+    totalFigurinhas: stats.totalFigurinhas,
+    figurinhasRepetidas: stats.figurinhasRepetidas,
+    timesCompletos: stats.timesCompletos,
+    totalTimes: stats.totalTimes,
+    totalJogadoresBase: stats.totalJogadoresBase
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <Link href="/pacotes" className="block">

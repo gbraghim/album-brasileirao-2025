@@ -8,7 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const TIMES_SERIE_A: Time[] = [
-  { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico-mg.png' },
+  { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
   { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },
   { id: '3', nome: 'Botafogo', escudo: '/escudos/botafogo.png' },
   { id: '4', nome: 'Bragantino', escudo: '/escudos/bragantino.png' },
@@ -24,7 +24,7 @@ const TIMES_SERIE_A: Time[] = [
   { id: '14', nome: 'Mirassol', escudo: '/escudos/mirassol.png' },
   { id: '15', nome: 'Palmeiras', escudo: '/escudos/palmeiras.png' },
   { id: '16', nome: 'Santos', escudo: '/escudos/santos.png' },
-  { id: '17', nome: 'São Paulo', escudo: '/escudos/sao-paulo.png' },
+  { id: '17', nome: 'São Paulo', escudo: '/escudos/sao_paulo.png' },
   { id: '18', nome: 'Sport', escudo: '/escudos/sport.png' },
   { id: '19', nome: 'Vasco', escudo: '/escudos/vasco.png' },
   { id: '20', nome: 'Vitória', escudo: '/escudos/vitoria.png' }
