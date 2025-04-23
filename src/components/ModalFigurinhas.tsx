@@ -20,19 +20,7 @@ interface Jogador {
 
 interface Figurinha {
   id: number;
-  jogador: {
-    id: number;
-    nome: string;
-    numero: number;
-    posicao: string;
-    nacionalidade: string;
-    foto: string;
-    time: {
-      id: number;
-      nome: string;
-      escudo: string;
-    };
-  };
+  jogador: Jogador;
   quantidadeAtual: number;
 }
 
@@ -52,12 +40,13 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
     if (currentIndex < caminhos.length - 1) {
+      console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
       setCurrentImageIndex(prev => ({
         ...prev,
         [jogadorId]: currentIndex + 1
       }));
     } else {
-      console.error(`Erro ao carregar imagem do jogador ${nome} do time ${time}`);
+      console.error(`Todos os formatos falharam para ${nome} do ${time}`);
       setImageErrors(prev => ({
         ...prev,
         [jogadorId]: true
