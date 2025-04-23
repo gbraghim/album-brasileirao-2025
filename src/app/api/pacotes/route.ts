@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { verificarPacotesIniciais } from '@/lib/pacotes';
+import { verificarPacotesIniciais, verificarPacotesDiarios } from '@/lib/pacotes';
 
 export async function GET() {
   try {
@@ -23,6 +23,9 @@ export async function GET() {
 
     // Verificar e criar pacotes iniciais se necessário
     await verificarPacotesIniciais(usuario.id);
+
+    // Verificar e criar pacotes diários se necessário
+    await verificarPacotesDiarios(usuario.id);
 
     // Buscar os pacotes do usuário
     const pacotes = await prisma.pacote.findMany({

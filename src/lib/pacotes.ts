@@ -49,8 +49,8 @@ export async function verificarPacotesIniciais(userId: string) {
       return;
     }
 
-    // Criar 6 pacotes iniciais
-    for (let i = 0; i < 6; i++) {
+    // Criar 10 pacotes iniciais
+    for (let i = 0; i < 10; i++) {
       await prisma.pacote.create({
         data: {
           userId,

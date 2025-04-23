@@ -79,7 +79,7 @@ export default function MeuAlbum() {
   };
 
   const formatarCaminhoImagem = (time: string, jogador: string): string => {
-    const timeFormatado = time.replace(/\s+/g, '');
+    const timeFormatado = time; // Mantém o nome original do time
     const jogadorFormatado = formatarNomeArquivo(jogador);
     return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
   };
@@ -315,17 +315,13 @@ export default function MeuAlbum() {
                                     x{figurinha.figurinhas.length}
                                   </span>
                                 )
-                              ) : (
-                                <span className="text-brasil-yellow text-xs font-medium bg-brasil-blue/80 px-2 py-1 rounded-full">
-                                  Coletar
-                                </span>
-                              )}
+                              ) : null}
                             </div>
                           </div>
                           {!jogadorColetado && (
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
-                              <span className="bg-brasil-yellow text-brasil-blue text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                Abrir Pacotes
+                              <span className="bg-brasil-blue text-brasil-white text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                                Colecionar!
                               </span>
                             </div>
                           )}
