@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const jogadores = await prisma.jogador.findMany({
+      include: {
+        time: true
+      },
       orderBy: {
         nome: 'asc'
       }

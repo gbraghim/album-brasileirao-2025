@@ -66,6 +66,7 @@ export default function MeuAlbum() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
+  const [todosJogadores, setTodosJogadores] = useState<Jogador[]>([]);
   const [timeSelecionado, setTimeSelecionado] = useState<Time | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +89,7 @@ export default function MeuAlbum() {
       router.push('/login');
     } else if (status === 'authenticated') {
       fetchJogadores();
+      fetchTodosJogadores();
       fetchTotalJogadoresTime();
     }
   }, [status, router]);
@@ -143,6 +145,19 @@ export default function MeuAlbum() {
     }
   };
 
+  const fetchTodosJogadores = async () => {
+    try {
+      const response = await fetch('/api/jogadores');
+      if (!response.ok) {
+        throw new Error('Erro ao carregar todos os jogadores');
+      }
+      const data = await response.json();
+      setTodosJogadores(data);
+    } catch (err) {
+      console.error('Erro ao carregar todos os jogadores:', err);
+    }
+  };
+
   const fetchTotalJogadoresTime = async () => {
     try {
       const response = await fetch('/api/total-jogadores-time');
@@ -156,9 +171,20 @@ export default function MeuAlbum() {
     }
   };
 
-  const jogadoresDoTime = timeSelecionado ? jogadores.filter(
-    (jogador) => jogador.time.id === timeSelecionado.id
-  ) : [];
+  const jogadoresDoTime = timeSelecionado ? todosJogadores
+    .filter((jogador) => jogador.time.id === timeSelecionado.id)
+    .sort((a, b) => {
+      // Primeiro, verifica se o jogador está na coleção
+      const aColetado = jogadores.some(j => j.id === a.id);
+      const bColetado = jogadores.some(j => j.id === b.id);
+      
+      // Se um está coletado e outro não, o coletado vem primeiro
+      if (aColetado && !bColetado) return -1;
+      if (!aColetado && bColetado) return 1;
+      
+      // Se ambos estão coletados ou ambos não estão, ordena por nome
+      return a.nome.localeCompare(b.nome);
+    }) : [];
 
   const totalJogadores = timeSelecionado ? (totalJogadoresTime[timeSelecionado.id] || 0) : 0;
 
@@ -198,104 +224,104 @@ export default function MeuAlbum() {
           <div className="w-full md:w-1/4 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
             <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-brasil-blue">Times</h2>
             <div className="space-y-2 md:space-y-3">
-              {timesOrdenados.map((time) => (
-                <button
-                  key={time.id}
-                  onClick={() => setTimeSelecionado(time)}
-                  className={`flex flex-col items-center p-3 rounded-lg transition-all w-full ${
-                    timeSelecionado?.id === time.id
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  <div className="w-24 h-24 flex items-center justify-center">
-                    <Image
-                      src={time.escudo}
-                      alt={time.nome}
-                      width={2048}
-                      height={2048}
-                      className="object-contain p-2 w-full h-full"
-                    />
-                  </div>
-                  <span className="text-sm mt-2 text-brasil-blue font-medium">{time.nome}</span>
-                  <span className="text-xs text-brasil-blue">
-                    {jogadores.filter((j) => j.time.id === time.id).length} /{' '}
-                    {totalJogadoresTime[time.id] || 0}
-                  </span>
-                </button>
-              ))}
+              {timesOrdenados.map((time) => {
+                const jogadoresColetados = jogadores.filter(
+                  (jogador) => jogador.time.id === time.id
+                ).length;
+                const totalJogadores = totalJogadoresTime[time.id] || 0;
+
+                return (
+                  <button
+                    key={time.id}
+                    onClick={() => setTimeSelecionado(time)}
+                    className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-300 ${
+                      timeSelecionado?.id === time.id
+                        ? 'bg-brasil-green text-white'
+                        : 'hover:bg-brasil-green/10'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2 md:space-x-3">
+                      <div className="relative w-8 h-8 md:w-10 md:h-10">
+                        <Image
+                          src={time.escudo}
+                          alt={time.nome}
+                          fill
+                          sizes="(max-width: 640px) 2rem, 2.5rem"
+                          className="object-contain"
+                        />
+                      </div>
+                      <span className={`font-medium ${
+                        timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
+                      }`}>
+                        {time.nome}
+                      </span>
+                    </div>
+                    <span className={`text-sm ${
+                      timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
+                    }`}>
+                      {jogadoresColetados}/{totalJogadores}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Lista de Jogadores */}
+          {/* Grid de Jogadores */}
           <div className="w-full md:w-3/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-              {timeSelecionado && (
-                <div className="mb-4 md:mb-6">
-                  <h2 className="text-xl md:text-2xl font-bold text-brasil-blue">{timeSelecionado.nome}</h2>
-                  <p className="text-sm md:text-base text-brasil-green">
-                    {jogadoresDoTime.length} / {totalJogadores} jogadores no álbum
-                  </p>
+            {timeSelecionado && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg md:text-xl font-bold text-brasil-blue">
+                    {timeSelecionado.nome}
+                  </h2>
+                  <span className="text-sm text-brasil-blue">
+                    {jogadores.filter((j) => j.time.id === timeSelecionado.id).length} de {totalJogadores} figurinhas
+                  </span>
                 </div>
-              )}
 
-              {jogadoresDoTime.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                  {jogadoresDoTime.map((jogador) => (
-                    <div 
-                      key={jogador.id}
-                      className="bg-white/50 p-3 md:p-4 rounded-lg border border-brasil-yellow/20 relative transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-                    >
-                      <div className="flex flex-col">
-                        <div className="mb-3 w-full h-48 relative">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {jogadoresDoTime.map((jogador) => {
+                    const jogadorColetado = jogadores.some(j => j.id === jogador.id);
+                    const figurinha = jogadorColetado ? jogadores.find(j => j.id === jogador.id) : null;
+                    
+                    return (
+                      <div
+                        key={jogador.id}
+                        className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 ${
+                          !jogadorColetado ? 'opacity-70 grayscale' : ''
+                        }`}
+                      >
+                        <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                           <Image
                             src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)}
                             alt={jogador.nome}
                             fill
-                            className="object-cover rounded-lg"
+                            sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                            className="object-cover"
                           />
-                        </div>
-                        <div className="flex flex-col space-y-1 md:space-y-2">
-                          <h3 className="text-sm md:text-base font-bold text-brasil-blue truncate">{jogador.nome}</h3>
-                          <div className="flex justify-between items-center text-xs md:text-sm">
-                            <span className="bg-brasil-green/10 px-2 py-1 rounded-full text-brasil-green">#{jogador.numero}</span>
-                            <span className="bg-brasil-yellow/10 px-2 py-1 rounded-full text-brasil-yellow">{jogador.posicao}</span>
-                          </div>
-                          <div className="flex flex-col space-y-1 text-xs md:text-sm">
-                            <span className="text-gray-600">{jogador.nacionalidade}</span>
-                            {jogador.dataNascimento && (
-                              <span className="text-gray-600">
-                                {new Date(jogador.dataNascimento).toLocaleDateString('pt-BR')}
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                            <p className="text-white text-sm font-medium truncate">
+                              {jogador.nome}
+                            </p>
+                            <div className="flex justify-between items-center">
+                              <span className="text-white/80 text-xs">
+                                {jogador.posicao}
                               </span>
-                            )}
-                            {jogador.altura && (
-                              <span className="text-gray-600">{jogador.altura}cm</span>
-                            )}
-                          </div>
-                          {jogador.figurinhas?.some(f => f.quantidade > 1) && (
-                            <div className="mt-2 text-xs bg-brasil-blue/10 px-2 py-1 rounded text-brasil-blue">
-                              <Link href="/repetidas" className="hover:underline">
-                                {jogador.figurinhas?.reduce((total, f) => total + (f.quantidade - 1), 0)} repetida(s)
-                              </Link>
+                              {jogadorColetado && figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
+                                <span className="text-brasil-yellow text-xs font-medium">
+                                  x{figurinha.figurinhas.length}
+                                </span>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-brasil-blue text-lg mb-4">Você ainda não tem nenhuma figurinha do {timeSelecionado?.nome}!</p>
-                  <Link 
-                    href="/pacotes"
-                    className="inline-block bg-brasil-yellow text-brasil-blue font-bold py-2 px-6 rounded-lg hover:bg-brasil-yellow/80 transition-colors"
-                  >
-                    Abrir Pacotes
-                  </Link>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
