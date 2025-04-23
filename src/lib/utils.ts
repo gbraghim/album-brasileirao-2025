@@ -5,8 +5,20 @@ export const formatarNomeArquivo = (nome: string): string => {
     .replace(/\s+/g, ''); // Remove espaços
 };
 
-export const formatarCaminhoImagem = (time: string, jogador: string): string => {
+export const formatarCaminhoImagem = (time: string, jogador: string): string[] => {
   const timeFormatado = time; // Mantém o nome original do time
-  const jogadorFormatado = formatarNomeArquivo(jogador);
-  return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
+  
+  // Trata o nome do jogador de várias formas para aumentar a chance de encontrar o arquivo
+  const variantes = [
+    jogador.replace(/\s+/g, ''), // Remove apenas espaços
+    jogador.replace(/['\s]/g, ''), // Remove espaços e apóstrofos
+    formatarNomeArquivo(jogador), // Remove acentos e espaços
+    formatarNomeArquivo(jogador).replace(/'/g, '') // Remove acentos, espaços e apóstrofos
+  ];
+  
+  // Remove duplicatas usando Array.from
+  const variantesUnicas = Array.from(new Set(variantes));
+  
+  // Retorna todos os possíveis caminhos de arquivo
+  return variantesUnicas.map(variante => `/players/${timeFormatado}/${variante}.jpg`);
 }; 
