@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: ['s.glbimg.com', 'res.cloudinary.com', 'localhost', 'logodetimes.com', 'api.dicebear.com', 'img.a.transfermarkt.technology'],
-    formats: ['image/webp', 'image/avif'],
+    formats: ['image/webp', 'image/avif', 'image/png'],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
