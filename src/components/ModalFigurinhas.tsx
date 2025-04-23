@@ -69,7 +69,7 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
                     type="button"
@@ -86,10 +86,10 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                 </Dialog.Title>
                 
                 <div className="mt-2">
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-3">
                     {figurinhas.map((figurinha) => (
                       <div key={figurinha.id} className="relative">
-                        <div className="bg-white rounded-lg shadow-md p-4">
+                        <div className="bg-white rounded-lg shadow-md p-3">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-gray-900">
                               {figurinha.jogador.nome}
@@ -98,23 +98,31 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                               {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
                             </span>
                           </div>
-                          <div className="relative w-full aspect-[3/4] mb-2">
+                          <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
                             <Image
                               src={`/players/${figurinha.jogador.time.nome}/${figurinha.jogador.nome.replace(/\s+/g, '')}.jpg`}
                               alt={figurinha.jogador.nome}
                               fill
                               className="object-cover rounded-lg"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
+                              priority
+                              onError={(e) => {
+                                console.error('Erro ao carregar imagem:', e);
+                                e.currentTarget.src = '/placeholder.jpg';
+                              }}
                             />
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Image
-                              src={`/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
-                              alt={figurinha.jogador.time.nome}
-                              width={24}
-                              height={24}
-                              className="w-6 h-6"
-                            />
+                            {figurinha.jogador.time.escudo && (
+                              <Image
+                                src={figurinha.jogador.time.escudo}
+                                alt={figurinha.jogador.time.nome}
+                                width={24}
+                                height={24}
+                                className="w-6 h-6"
+                                priority
+                              />
+                            )}
                             <span className="text-sm text-gray-500">
                               {figurinha.jogador.time.nome}
                             </span>
