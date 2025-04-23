@@ -20,44 +20,6 @@ Um aplicativo web para coleção e troca de figurinhas do Brasileirão 2025, des
 - Tailwind CSS
 - SQLite (Banco de dados)
 
-## Como Executar
-
-1. Clone o repositório
-```bash
-git clone [URL_DO_REPOSITORIO]
-cd album
-```
-
-2. Instale as dependências
-```bash
-npm install
-```
-
-3. Configure as variáveis de ambiente
-```bash
-cp .env.example .env
-```
-Edite o arquivo `.env` com suas configurações
-
-4. Execute as migrações do banco de dados
-```bash
-npx prisma migrate dev
-```
-
-5. Inicie o servidor de desenvolvimento
-```bash
-npm run dev
-```
-
-O aplicativo estará disponível em `http://localhost:3000`
-
-## Estrutura do Projeto
-
-- `/src/app` - Rotas e páginas da aplicação
-- `/src/components` - Componentes React reutilizáveis
-- `/src/lib` - Utilitários e configurações
-- `/prisma` - Schema e migrações do banco de dados
-- `/public` - Arquivos estáticos
 
 ## Contribuindo
 
