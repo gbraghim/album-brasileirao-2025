@@ -72,6 +72,17 @@ export default function MeuAlbum() {
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
   const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
 
+  const formatarNomeArquivo = (nome: string): string => {
+    // Remove espaços e mantém as letras maiúsculas e minúsculas como estão
+    return nome.replace(/\s+/g, '');
+  };
+
+  const formatarCaminhoImagem = (time: string, jogador: string): string => {
+    const timeFormatado = time.replace(/\s+/g, '');
+    const jogadorFormatado = formatarNomeArquivo(jogador);
+    return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
+  };
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
@@ -236,6 +247,14 @@ export default function MeuAlbum() {
                       className="bg-white/50 p-3 md:p-4 rounded-lg border border-brasil-yellow/20 relative transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                     >
                       <div className="flex flex-col">
+                        <div className="mb-3 w-full h-48 relative">
+                          <Image
+                            src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)}
+                            alt={jogador.nome}
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        </div>
                         <div className="flex flex-col space-y-1 md:space-y-2">
                           <h3 className="text-sm md:text-base font-bold text-brasil-blue truncate">{jogador.nome}</h3>
                           <div className="flex justify-between items-center text-xs md:text-sm">
@@ -253,13 +272,13 @@ export default function MeuAlbum() {
                               <span className="text-gray-600">{jogador.altura}cm</span>
                             )}
                           </div>
-                          <div className="mt-2 text-xs bg-brasil-blue/10 px-2 py-1 rounded text-brasil-blue">
-                            {jogador.figurinhas?.some(f => f.quantidade > 1) && (
+                          {jogador.figurinhas?.some(f => f.quantidade > 1) && (
+                            <div className="mt-2 text-xs bg-brasil-blue/10 px-2 py-1 rounded text-brasil-blue">
                               <Link href="/repetidas" className="hover:underline">
                                 {jogador.figurinhas?.reduce((total, f) => total + (f.quantidade - 1), 0)} repetida(s)
                               </Link>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

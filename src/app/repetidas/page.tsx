@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Modal from '@/components/Modal';
+import Image from 'next/image';
 
 interface Figurinha {
   id: string;
@@ -31,6 +32,16 @@ export default function Repetidas() {
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const formatarNomeArquivo = (nome: string): string => {
+    return nome.replace(/\s+/g, '');
+  };
+
+  const formatarCaminhoImagem = (time: string, jogador: string): string => {
+    const timeFormatado = time.replace(/\s+/g, '');
+    const jogadorFormatado = formatarNomeArquivo(jogador);
+    return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
+  };
 
   useEffect(() => {
     if (session) {
@@ -195,6 +206,14 @@ export default function Repetidas() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {figurinhas.map((figurinha) => (
             <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4">
+              <div className="w-full h-48 relative mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                  alt={figurinha.jogador.nome}
+                  fill
+                  className="object-cover"
+                />
+              </div>
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                   <span className="text-xl font-bold text-brasil-blue">{figurinha.jogador.numero}</span>
@@ -204,9 +223,23 @@ export default function Repetidas() {
                   <p className="text-sm text-gray-600">{figurinha.jogador.posicao}</p>
                 </div>
               </div>
-              <div className="mb-4">
-                <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade - 1}</p>
-                <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade - 1}</p>
+                  <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
+                </div>
+                <div className="w-16 h-16 relative">
+                  <Image
+                    src={`/escudos/${figurinha.jogador.time.nome.toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/\s+/g, '_')}.png`}
+                    alt={figurinha.jogador.time.nome}
+                    fill
+                    sizes="64px"
+                    className="object-contain"
+                  />
+                </div>
               </div>
               {figurinhasEmTroca.includes(figurinha.id) ? (
                 <div className="flex flex-col gap-2">
