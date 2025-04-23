@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { formatarCaminhoImagem } from '@/lib/utils';
 
 interface Jogador {
   id: string;
@@ -100,7 +101,7 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                           </div>
                           <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
                             <Image
-                              src={`/players/${figurinha.jogador.time.nome}/${figurinha.jogador.nome.replace(/\s+/g, '')}.jpg`}
+                              src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
                               alt={figurinha.jogador.nome}
                               fill
                               className="object-cover rounded-lg"

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatarCaminhoImagem } from '@/lib/utils';
 
 const TIMES_SERIE_A: Time[] = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
@@ -72,17 +73,6 @@ export default function MeuAlbum() {
   const [error, setError] = useState<string | null>(null);
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
   const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
-
-  const formatarNomeArquivo = (nome: string): string => {
-    // Remove espaços e mantém as letras maiúsculas e minúsculas como estão
-    return nome.replace(/\s+/g, '');
-  };
-
-  const formatarCaminhoImagem = (time: string, jogador: string): string => {
-    const timeFormatado = time; // Mantém o nome original do time
-    const jogadorFormatado = formatarNomeArquivo(jogador);
-    return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
-  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {

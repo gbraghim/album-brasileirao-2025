@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Modal from '@/components/Modal';
 import Image from 'next/image';
+import { formatarCaminhoImagem } from '@/lib/utils';
 
 interface Figurinha {
   id: string;
@@ -32,16 +33,6 @@ export default function Repetidas() {
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const formatarNomeArquivo = (nome: string): string => {
-    return nome.replace(/\s+/g, '');
-  };
-
-  const formatarCaminhoImagem = (time: string, jogador: string): string => {
-    const timeFormatado = time.replace(/\s+/g, '');
-    const jogadorFormatado = formatarNomeArquivo(jogador);
-    return `/players/${timeFormatado}/${jogadorFormatado}.jpg`;
-  };
 
   useEffect(() => {
     if (session) {
@@ -202,71 +193,51 @@ export default function Repetidas() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {figurinhas.map((figurinha) => (
-            <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-4">
-              <div className="w-full h-48 relative mb-4 rounded-lg overflow-hidden">
+            <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
+              <div className="relative w-full aspect-[3/4] mb-2">
                 <Image
                   src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)}
                   alt={figurinha.jogador.nome}
                   fill
-                  className="object-cover"
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                 />
               </div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-xl font-bold text-brasil-blue">{figurinha.jogador.numero}</span>
-                </div>
-                <div className="ml-4">
-                  <h3 className="font-semibold text-brasil-blue">{figurinha.jogador.nome}</h3>
-                  <p className="text-sm text-gray-600">{figurinha.jogador.posicao}</p>
-                </div>
-              </div>
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Quantidade: {figurinha.quantidade - 1}</p>
-                  <p className="text-sm text-gray-600">Time: {figurinha.jogador.time.nome}</p>
-                </div>
-                <div className="w-16 h-16 relative">
+              <div className="flex items-center space-x-2">
+                {figurinha.jogador.time.escudo && (
                   <Image
-                    src={`/escudos/${figurinha.jogador.time.nome.toLowerCase()
-                      .normalize('NFD')
-                      .replace(/[\u0300-\u036f]/g, '')
-                      .replace(/\s+/g, '_')}.png`}
+                    src={figurinha.jogador.time.escudo}
                     alt={figurinha.jogador.time.nome}
-                    fill
-                    sizes="64px"
-                    className="object-contain"
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
                   />
-                </div>
+                )}
+                <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
               </div>
-              {figurinhasEmTroca.includes(figurinha.id) ? (
-                <div className="flex flex-col gap-2">
-                  <button
-                    className="w-full px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed"
-                    disabled
-                  >
-                    Figurinha já disponibilizada para troca
-                  </button>
+              <div className="mt-2 flex justify-between items-center">
+                <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
+                <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
+              </div>
+              <div className="mt-2">
+                {figurinhasEmTroca.includes(figurinha.id) ? (
                   <button
                     onClick={() => removerTroca(figurinha)}
-                    className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
                   >
-                    Remover da troca
+                    Remover da Troca
                   </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => enviarParaTroca(figurinha)}
-                  className="bg-brasil-yellow hover:bg-brasil-yellow-dark text-brasil-blue font-bold py-2 px-4 rounded"
-                  disabled={loading || figurinhasEmTroca.includes(figurinha.id)}
-                >
-                  {figurinhasEmTroca.includes(figurinha.id)
-                    ? 'Em Troca'
-                    : 'Disponibilizar para Troca'}
-                </button>
-              )}
+                ) : (
+                  <button
+                    onClick={() => enviarParaTroca(figurinha)}
+                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
+                  >
+                    Disponibilizar para Troca
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
