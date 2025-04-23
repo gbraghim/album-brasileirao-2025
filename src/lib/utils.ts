@@ -7,6 +7,7 @@ export const formatarNomeArquivo = (nome: string): string => {
 
 export const formatarCaminhoImagem = (time: string, jogador: string): string[] => {
   const timeFormatado = time; // Mantém o nome original do time
+  const extensoes = ['.jpg', '.jpeg', '.png', '.webp'];
   
   // Trata o nome do jogador de várias formas para aumentar a chance de encontrar o arquivo
   const variantes = [
@@ -19,6 +20,8 @@ export const formatarCaminhoImagem = (time: string, jogador: string): string[] =
   // Remove duplicatas usando Array.from
   const variantesUnicas = Array.from(new Set(variantes));
   
-  // Retorna todos os possíveis caminhos de arquivo
-  return variantesUnicas.map(variante => `/players/${timeFormatado}/${variante}.jpg`);
+  // Gera todas as combinações possíveis de variantes de nome com extensões
+  return variantesUnicas.flatMap(variante => 
+    extensoes.map(ext => `/players/${timeFormatado}/${variante}${ext}`)
+  );
 }; 
