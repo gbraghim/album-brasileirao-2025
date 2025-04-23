@@ -219,6 +219,23 @@ export default function Pacotes() {
         ))}
       </div>
 
+      {/* Seção de Compra de Pacotes */}
+      <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+        <div className="text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">
+            Pacotes Premium
+          </h2>
+          <div className="bg-gradient-to-r from-brasil-yellow/10 via-brasil-green/10 to-brasil-yellow/10 p-6 rounded-lg">
+            <p className="text-brasil-blue text-lg md:text-xl font-medium mb-2">
+              Em breve você poderá adquirir pacotinhos de figurinhas extras para completar seu álbum mais rápido e ficar no top colecionadores de figurinhas!!
+            </p>
+            <p className="text-brasil-blue/80 text-sm md:text-base">
+              Fique ligado para novidades!
+            </p>
+          </div>
+        </div>
+      </div>
+
       <PacoteAnimation
         isOpen={showAnimation}
         onAnimationComplete={handleAnimationComplete}
