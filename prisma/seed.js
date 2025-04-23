@@ -12,7 +12,7 @@ const times = [
   { nome: 'Vasco', escudo: '/escudos/vasco.png', apiId: 6 },
   { nome: 'Grêmio', escudo: '/escudos/gremio.png', apiId: 7 },
   { nome: 'Internacional', escudo: '/escudos/internacional.png', apiId: 8 },
-  { nome: 'Atlético-MG', escudo: '/escudos/atletico-mineiro.png', apiId: 9 },
+  { nome: 'Atlético Mineiro', escudo: '/escudos/atletico-mineiro.png', apiId: 9 },
   { nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png', apiId: 10 }
 ];
 
@@ -121,7 +121,7 @@ const jogadoresPorTime = {
     { nome: 'Enner Valencia', numero: 13, posicao: 'Atacante', idade: 34, nacionalidade: 'Equatoriano' },
     { nome: 'Wesley', numero: 7, posicao: 'Atacante', idade: 24, nacionalidade: 'Brasileiro' },
   ],
-  'Atlético-MG': [
+  'Atlético Mineiro': [
     { nome: 'Everson', numero: 1, posicao: 'Goleiro', idade: 33, nacionalidade: 'Brasileiro' },
     { nome: 'Saravia', numero: 2, posicao: 'Lateral-direito', idade: 30, nacionalidade: 'Argentino' },
     { nome: 'Jemerson', numero: 4, posicao: 'Zagueiro', idade: 31, nacionalidade: 'Brasileiro' },
