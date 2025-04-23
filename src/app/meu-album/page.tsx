@@ -289,8 +289,9 @@ export default function MeuAlbum() {
                       <div
                         key={jogador.id}
                         className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 ${
-                          !jogadorColetado ? 'opacity-70 grayscale' : ''
+                          !jogadorColetado ? 'opacity-70 grayscale hover:opacity-90 hover:grayscale-[0.5]' : ''
                         }`}
+                        onClick={() => !jogadorColetado && router.push('/pacotes')}
                       >
                         <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                           <Image
@@ -308,13 +309,26 @@ export default function MeuAlbum() {
                               <span className="text-white/80 text-xs">
                                 {jogador.posicao}
                               </span>
-                              {jogadorColetado && figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
-                                <span className="text-brasil-yellow text-xs font-medium">
-                                  x{figurinha.figurinhas.length}
+                              {jogadorColetado ? (
+                                figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
+                                  <span className="text-brasil-yellow text-xs font-medium">
+                                    x{figurinha.figurinhas.length}
+                                  </span>
+                                )
+                              ) : (
+                                <span className="text-brasil-yellow text-xs font-medium bg-brasil-blue/80 px-2 py-1 rounded-full">
+                                  Coletar
                                 </span>
                               )}
                             </div>
                           </div>
+                          {!jogadorColetado && (
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                              <span className="bg-brasil-yellow text-brasil-blue text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                                Abrir Pacotes
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
