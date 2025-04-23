@@ -10,6 +10,7 @@ interface Time {
 export default function EscudosCarousel() {
   const [times, setTimes] = useState<Time[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchTimes = async () => {
@@ -27,6 +28,33 @@ export default function EscudosCarousel() {
     fetchTimes();
   }, []);
 
+  const handleImageError = (timeNome: string, currentSrc: string) => {
+    // Tenta diferentes formatos de arquivo
+    const formats = ['.png', '.jpg', '.jpeg'];
+    const currentFormat = currentSrc.split('.').pop();
+    const nextFormat = formats.find(f => f !== `.${currentFormat}`);
+    
+    if (nextFormat) {
+      const newSrc = currentSrc.replace(`.${currentFormat}`, nextFormat);
+      const img = new window.Image();
+      img.src = newSrc;
+      
+      img.onload = () => {
+        const timeElement = document.querySelector(`[data-time="${timeNome}"]`) as HTMLImageElement;
+        if (timeElement) {
+          timeElement.src = newSrc;
+        }
+      };
+      
+      img.onerror = () => {
+        setImageErrors(prev => ({ ...prev, [timeNome]: true }));
+        console.error(`Erro ao carregar escudo do time ${timeNome}`);
+      };
+    } else {
+      setImageErrors(prev => ({ ...prev, [timeNome]: true }));
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-48">
@@ -43,9 +71,11 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={time.id} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={time.escudo}
-                alt={time.nome}
+                src={imageErrors[time.nome] ? '/placeholder-escudo.png' : time.escudo}
+                alt={`Escudo do ${time.nome}`}
                 fill
+                data-time={time.nome}
+                onError={() => handleImageError(time.nome, time.escudo)}
                 className="object-contain"
               />
             </div>
@@ -56,9 +86,11 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={`${time.id}-duplicate`} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={time.escudo}
-                alt={time.nome}
+                src={imageErrors[time.nome] ? '/placeholder-escudo.png' : time.escudo}
+                alt={`Escudo do ${time.nome}`}
                 fill
+                data-time={time.nome}
+                onError={() => handleImageError(time.nome, time.escudo)}
                 className="object-contain"
               />
             </div>
