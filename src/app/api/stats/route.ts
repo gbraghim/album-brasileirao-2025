@@ -38,8 +38,8 @@ export async function GET() {
       }
     });
 
-    // Total de figurinhas únicas
-    const figurinhasUnicas = userFigurinhas.length;
+    // Total de figurinhas únicas (desconsiderando repetidas)
+    const totalFigurinhas = userFigurinhas.length;
 
     // Busca figurinhas repetidas (quantidade > 1)
     const figurinhasRepetidasQuery = await prisma.userFigurinha.findMany({
@@ -61,11 +61,14 @@ export async function GET() {
     // Calcula o total de repetidas (número de figurinhas com quantidade > 1)
     const figurinhasRepetidas = figurinhasRepetidasQuery.length;
 
-    // Total bruto de figurinhas (únicas + repetidas)
-    const totalFigurinhas = userFigurinhas.reduce(
-      (acc, fig) => acc + fig.quantidade,
-      0
-    );
+    console.log('API Stats - Resumo:', {
+      totalFigurinhasUnicas: totalFigurinhas,
+      figurinhasRepetidas,
+      userFigurinhas: userFigurinhas.map(f => ({
+        figurinhaId: f.figurinhaId,
+        quantidade: f.quantidade
+      }))
+    });
 
     // Calcula times completos
     const timesFigurinhas = await prisma.userFigurinha.findMany({
