@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -66,6 +66,7 @@ interface TotalJogadoresTime {
 export default function MeuAlbum() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [todosJogadores, setTodosJogadores] = useState<Jogador[]>([]);
   const [timeSelecionado, setTimeSelecionado] = useState<Time | null>(null);
@@ -73,6 +74,13 @@ export default function MeuAlbum() {
   const [error, setError] = useState<string | null>(null);
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
   const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
+
+  // Função para atualizar a URL quando um time é selecionado
+  const atualizarTimeURL = (time: Time) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('time', time.id);
+    window.history.pushState({}, '', url.toString());
+  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -83,6 +91,17 @@ export default function MeuAlbum() {
       fetchTotalJogadoresTime();
     }
   }, [status, router]);
+
+  // Efeito para carregar o time da URL quando a página carrega
+  useEffect(() => {
+    const timeId = searchParams.get('time');
+    if (timeId) {
+      const time = TIMES_SERIE_A.find(t => t.id === timeId);
+      if (time) {
+        setTimeSelecionado(time);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Reordena os times quando um time é selecionado
@@ -123,9 +142,11 @@ export default function MeuAlbum() {
 
       setJogadores(data.jogadores);
       
-      // Seleciona o primeiro time da lista por padrão
-      if (TIMES_SERIE_A.length > 0) {
-        setTimeSelecionado(TIMES_SERIE_A[0]);
+      // Seleciona o primeiro time da lista por padrão apenas se não houver time na URL
+      if (TIMES_SERIE_A.length > 0 && !searchParams.get('time')) {
+        const primeiroTime = TIMES_SERIE_A[0];
+        setTimeSelecionado(primeiroTime);
+        atualizarTimeURL(primeiroTime);
       }
     } catch (err) {
       console.error('Erro ao carregar álbum:', err);
@@ -223,7 +244,10 @@ export default function MeuAlbum() {
                 return (
                   <button
                     key={time.id}
-                    onClick={() => setTimeSelecionado(time)}
+                    onClick={() => {
+                      setTimeSelecionado(time);
+                      atualizarTimeURL(time);
+                    }}
                     className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-300 ${
                       timeSelecionado?.id === time.id
                         ? 'bg-brasil-green text-white'
@@ -285,11 +309,20 @@ export default function MeuAlbum() {
                       >
                         <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                           <Image
-                            src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)}
+                            src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[0]}
                             alt={jogador.nome}
                             fill
                             sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                             className="object-cover"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
+                              if (img.src.includes(caminhos[0])) {
+                                img.src = caminhos[1];
+                              } else {
+                                img.src = '/placeholder.jpg';
+                              }
+                            }}
                           />
                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                             <p className="text-white text-sm font-medium truncate">
