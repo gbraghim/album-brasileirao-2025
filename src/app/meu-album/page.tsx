@@ -9,26 +9,26 @@ import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
 
 const TIMES_SERIE_A: Time[] = [
-  { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
-  { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },
-  { id: '3', nome: 'Botafogo', escudo: '/escudos/botafogo.png' },
-  { id: '4', nome: 'Bragantino', escudo: '/escudos/Bragantino.jpg' },
-  { id: '5', nome: 'Ceará', escudo: '/escudos/ceara.png' },
-  { id: '6', nome: 'Corinthians', escudo: '/escudos/corinthians.png' },
-  { id: '7', nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png' },
-  { id: '8', nome: 'Flamengo', escudo: '/escudos/flamengo.png' },
-  { id: '9', nome: 'Fluminense', escudo: '/escudos/fluminense.png' },
-  { id: '10', nome: 'Fortaleza', escudo: '/escudos/fortaleza.png' },
-  { id: '11', nome: 'Grêmio', escudo: '/escudos/gremio.png' },
-  { id: '12', nome: 'Internacional', escudo: '/escudos/internacional.png' },
-  { id: '13', nome: 'Juventude', escudo: '/escudos/juventude.png' },
-  { id: '14', nome: 'Mirassol', escudo: '/escudos/mirassol.png' },
-  { id: '15', nome: 'Palmeiras', escudo: '/escudos/palmeiras.png' },
-  { id: '16', nome: 'Santos', escudo: '/escudos/santos.png' },
-  { id: '17', nome: 'São Paulo', escudo: '/escudos/sao_paulo.png' },
-  { id: '18', nome: 'Sport', escudo: '/escudos/sport.png' },
-  { id: '19', nome: 'Vasco', escudo: '/escudos/vasco.png' },
-  { id: '20', nome: 'Vitória', escudo: '/escudos/vitoria.png' }
+  { id: '1', nome: 'Atlético Mineiro', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/atletico-mg' },
+  { id: '2', nome: 'Bahia', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/bahia' },
+  { id: '3', nome: 'Botafogo', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/botafogo' },
+  { id: '4', nome: 'Bragantino', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/bragantino' },
+  { id: '5', nome: 'Ceará', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/ceara' },
+  { id: '6', nome: 'Corinthians', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/corinthians' },
+  { id: '7', nome: 'Cruzeiro', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/cruzeiro' },
+  { id: '8', nome: 'Flamengo', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/flamengo' },
+  { id: '9', nome: 'Fluminense', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/fluminense' },
+  { id: '10', nome: 'Fortaleza', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/fortaleza' },
+  { id: '11', nome: 'Grêmio', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/gremio' },
+  { id: '12', nome: 'Internacional', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/internacional' },
+  { id: '13', nome: 'Juventude', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/juventude' },
+  { id: '14', nome: 'Mirassol', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/mirassol' },
+  { id: '15', nome: 'Palmeiras', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/palmeiras' },
+  { id: '16', nome: 'Santos', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/santos' },
+  { id: '17', nome: 'São Paulo', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/sao-paulo' },
+  { id: '18', nome: 'Sport', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/sport' },
+  { id: '19', nome: 'Vasco', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/vasco' },
+  { id: '20', nome: 'Vitória', escudo: 'https://res.cloudinary.com/drncqru7f/image/upload/v1/album-brasileirao/escudos/vitoria' }
 ].sort((a, b) => a.nome.localeCompare(b.nome));
 
 interface Figurinha {
