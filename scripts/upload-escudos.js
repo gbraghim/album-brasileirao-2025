@@ -1,13 +1,9 @@
-const cloudinary = require('cloudinary').v2;
+
 const path = require('path');
 const fs = require('fs');
 
-// Configure o Cloudinary
-cloudinary.config({
-  cloud_name: 'drncqru7f',
-  api_key: '267789528514714',
-  api_secret: '842aCgoFTA4gUla6HDIdWwbsIz4'
-});
+
+
 
 // Lista de times do Brasileirão
 const times = [
@@ -41,12 +37,6 @@ async function uploadEscudos() {
         continue;
       }
 
-      // Fazer upload da imagem para o Cloudinary
-      const result = await cloudinary.uploader.upload(filePath, {
-        folder: 'album-brasileirao/escudos',
-        public_id: time.slug,
-        overwrite: true
-      });
 
       console.log(`Escudo do ${time.nome} enviado com sucesso: ${result.secure_url}`);
     } catch (error) {

@@ -7,7 +7,6 @@ import Header from '@/components/Header';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
-import Figurinha from '@/components/Figurinha';
 
 const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
@@ -340,38 +339,51 @@ function MeuAlbumContent() {
                     const figurinha = jogadorColetado ? jogadores.find(j => j.id === jogador.id) : null;
                     
                     return (
-                      <div key={jogador.id} onClick={() => !jogadorColetado && router.push('/pacotes')}>
-                        <Figurinha
-                          figurinha={{
-                            id: jogador.id,
-                            nome: null,
-                            posicao: null,
-                            numero: null,
-                            nacionalidade: null,
-                            foto: null,
-                            timeId: null,
-                            pacoteId: null,
-                            jogadorId: jogador.id,
-                            jogador: {
-                              id: jogador.id,
-                              nome: jogador.nome,
-                              time: jogador.time.nome
-                            }
-                          }}
-                          coletada={jogadorColetado}
-                          className={`transform transition-all duration-300 hover:scale-105`}
-                        />
-                        {jogadorColetado && figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
-                          <div className="mt-1 text-center">
-                            <span className="text-brasil-yellow text-xs font-medium">
-                              x{figurinha.figurinhas.length}
+                      <div
+                        key={jogador.id}
+                        className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 ${
+                          !jogadorColetado ? 'opacity-70 grayscale hover:opacity-90 hover:grayscale-[0.5]' : ''
+                        }`}
+                        onClick={() => !jogadorColetado && router.push('/pacotes')}
+                      >
+                        <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
+                          {imageErrors[jogador.id] ? (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
+                              <span className="text-gray-500">Imagem não disponível</span>
+                            </div>
+                          ) : (
+                            <Image
+                              src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[currentImageIndex[jogador.id] || 0]}
+                              alt={`${jogador.nome} - ${jogador.time.nome}`}
+                              fill
+                              className="object-cover rounded-lg"
+                              sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
+                              priority
+                              onError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                            />
+                          )}
+                        </div>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                          <p className="text-white text-sm font-medium truncate">
+                            {jogador.nome}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/80 text-xs">
+                              {jogador.posicao}
                             </span>
+                            {jogadorColetado ? (
+                              figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
+                                <span className="text-brasil-yellow text-xs font-medium">
+                                  x{figurinha.figurinhas.length}
+                                </span>
+                              )
+                            ) : null}
                           </div>
-                        )}
+                        </div>
                         {!jogadorColetado && (
-                          <div className="mt-1 text-center">
-                            <span className="text-brasil-blue text-xs font-medium">
-                              Clique para colecionar!
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                            <span className="bg-brasil-blue text-brasil-white text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                              Colecionar!
                             </span>
                           </div>
                         )}
