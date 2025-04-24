@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Figurinha as FigurinhaType } from '@prisma/client';
-import { CloudinaryImage } from '@/lib/cloudinary';
+import Image from 'next/image';
 
 interface FigurinhaProps {
   figurinha: FigurinhaType & {
@@ -35,8 +35,8 @@ export default function Figurinha({ figurinha, onClick, className = '' }: Figuri
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
-        <CloudinaryImage
-          src={`album-brasileirao/players/${figurinha.jogador.id}`}
+        <Image
+          src={`/players/${figurinha.jogador.id}.jpg`}
           alt={figurinha.jogador.nome}
           width={128}
           height={192}

@@ -4,11 +4,11 @@ const nextConfig = {
   images: {
     domains: [
       's.glbimg.com',
-      'res.cloudinary.com',
       'localhost',
       'logodetimes.com',
       'api.dicebear.com',
-      'img.a.transfermarkt.technology'
+      'img.a.transfermarkt.technology',
+      'localhost:3000'
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
