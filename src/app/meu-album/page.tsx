@@ -63,6 +63,11 @@ interface TotalJogadoresTime {
   [timeId: string]: number;
 }
 
+const TIME_PATH_MAP: Record<string, string> = {
+  'São Paulo': 'SaoPaulo',
+  'Atlético Mineiro': 'AtleticoMineiro'
+};
+
 export default function MeuAlbum() {
   return (
     <Suspense fallback={<div>Carregando...</div>}>
@@ -85,8 +90,13 @@ function MeuAlbumContent() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
+  const getTimePathName = (timeName: string) => {
+    return TIME_PATH_MAP[timeName] || timeName;
+  };
+
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
-    const caminhos = formatarCaminhoImagem(time, nome);
+    const timePathName = getTimePathName(time);
+    const caminhos = formatarCaminhoImagem(timePathName, nome);
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
     if (currentIndex < caminhos.length - 1) {
@@ -343,7 +353,7 @@ function MeuAlbumContent() {
                             </div>
                           ) : (
                             <Image
-                              src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[currentImageIndex[jogador.id] || 0]}
+                              src={formatarCaminhoImagem(getTimePathName(jogador.time.nome), jogador.nome)[currentImageIndex[jogador.id] || 0]}
                               alt={`${jogador.nome} - ${jogador.time.nome}`}
                               fill
                               className="object-cover rounded-lg"
