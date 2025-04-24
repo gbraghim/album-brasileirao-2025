@@ -8,17 +8,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
 
-const TIMES_SERIE_A: Time[] = [
+const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
   { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },
-  { id: '3', nome: 'Botafogo', escudo: '/escudos/Botafogo.png' },
-  { id: '4', nome: 'Bragantino', escudo: '/escudos/Bragantino.png' },
+  { id: '3', nome: 'Botafogo', escudo: '/escudos/botafogo.png' },
+  { id: '4', nome: 'Red Bull Bragantino', escudo: '/escudos/bragantino.png' },
   { id: '5', nome: 'Ceará', escudo: '/escudos/ceara.png' },
   { id: '6', nome: 'Corinthians', escudo: '/escudos/corinthians.png' },
   { id: '7', nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png' },
   { id: '8', nome: 'Flamengo', escudo: '/escudos/flamengo.png' },
   { id: '9', nome: 'Fluminense', escudo: '/escudos/fluminense.png' },
-  { id: '10', nome: 'Fortaleza', escudo: '/escudos/Fortaleza.png' },
+  { id: '10', nome: 'Fortaleza', escudo: '/escudos/fortaleza.png' },
   { id: '11', nome: 'Grêmio', escudo: '/escudos/gremio.png' },
   { id: '12', nome: 'Internacional', escudo: '/escudos/internacional.png' },
   { id: '13', nome: 'Juventude', escudo: '/escudos/juventude.png' },
@@ -29,7 +29,7 @@ const TIMES_SERIE_A: Time[] = [
   { id: '18', nome: 'Sport', escudo: '/escudos/sport.png' },
   { id: '19', nome: 'Vasco', escudo: '/escudos/vasco.png' },
   { id: '20', nome: 'Vitória', escudo: '/escudos/vitoria.png' }
-].sort((a, b) => a.nome.localeCompare(b.nome));
+];
 
 interface Figurinha {
   id: string;
@@ -63,11 +63,6 @@ interface TotalJogadoresTime {
   [timeId: string]: number;
 }
 
-const TIME_PATH_MAP: Record<string, string> = {
-  'São Paulo': 'Sao Paulo',
-  'Atlético Mineiro': 'Atletico Mineiro'
-};
-
 export default function MeuAlbum() {
   return (
     <Suspense fallback={<div>Carregando...</div>}>
@@ -89,14 +84,10 @@ function MeuAlbumContent() {
   const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-
-  const getTimePathName = (timeName: string) => {
-    return TIME_PATH_MAP[timeName] || timeName;
-  };
+  const [escudoErrors, setEscudoErrors] = useState<Record<string, boolean>>({});
 
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
-    const timePathName = getTimePathName(time);
-    const caminhos = formatarCaminhoImagem(timePathName, nome);
+    const caminhos = formatarCaminhoImagem(time, nome);
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
     if (currentIndex < caminhos.length - 1) {
@@ -112,6 +103,14 @@ function MeuAlbumContent() {
         [jogadorId]: true
       }));
     }
+  };
+
+  const handleEscudoError = (timeId: string) => {
+    console.error(`Erro ao carregar escudo do time ${timeId}`);
+    setEscudoErrors(prev => ({
+      ...prev,
+      [timeId]: true
+    }));
   };
 
   // Função para atualizar a URL quando um time é selecionado
@@ -296,11 +295,12 @@ function MeuAlbumContent() {
                     <div className="flex items-center space-x-2 md:space-x-3">
                       <div className="relative w-8 h-8 md:w-10 md:h-10">
                         <Image
-                          src={time.escudo}
+                          src={escudoErrors[time.id] ? '/placeholder-escudo.svg' : time.escudo}
                           alt={time.nome}
                           fill
                           sizes="(max-width: 640px) 2rem, 2.5rem"
                           className="object-contain"
+                          onError={() => handleEscudoError(time.id)}
                         />
                       </div>
                       <span className={`font-medium ${
@@ -353,7 +353,7 @@ function MeuAlbumContent() {
                             </div>
                           ) : (
                             <Image
-                              src={formatarCaminhoImagem(getTimePathName(jogador.time.nome), jogador.nome)[currentImageIndex[jogador.id] || 0]}
+                              src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[currentImageIndex[jogador.id] || 0]}
                               alt={`${jogador.nome} - ${jogador.time.nome}`}
                               fill
                               className="object-cover rounded-lg"

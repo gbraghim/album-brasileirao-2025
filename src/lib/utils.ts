@@ -27,53 +27,40 @@ export function formatarNomeArquivo(nome: string): string[] {
 }
 
 export function formatarCaminhoImagem(time: string, nome: string): string[] {
-  const nomesFormatados = formatarNomeArquivo(nome);
-  const caminhos: string[] = [];
+  // Remove espaços e acentos do nome
+  const nomeSemEspacos = nome.replace(/\s+/g, '');
+  const nomeSemAcentos = removerAcentos(nomeSemEspacos);
+  const nomeMinusculo = nomeSemAcentos.toLowerCase();
   
-  // Variações do nome do time (com e sem acentos, maiúsculas e minúsculas)
-  const timesFormatados = formatarNomeArquivo(time);
-  
-  for (const timeFormatado of timesFormatados) {
-    for (const nomeFormatado of nomesFormatados) {
-      const caminhoJpg = `/players/${timeFormatado}/${nomeFormatado}.jpg`;
-      const caminhoJpeg = `/players/${timeFormatado}/${nomeFormatado}.jpeg`;
-      
-      // Verifica se a imagem existe
-      try {
-        const img = new Image();
-        img.src = caminhoJpg;
-        if (img.complete) {
-          console.log(`Imagem encontrada para ${nome} do ${time}: ${caminhoJpg}`);
-          return [caminhoJpg];
-        }
-      } catch (e) {
-        // Continua para o próximo formato
-      }
-
-      try {
-        const img = new Image();
-        img.src = caminhoJpeg;
-        if (img.complete) {
-          console.log(`Imagem encontrada para ${nome} do ${time}: ${caminhoJpeg}`);
-          return [caminhoJpeg];
-        }
-      } catch (e) {
-        // Continua para o próximo formato
-      }
-    }
+  // Trata nomes especiais dos times
+  let pastaTime = time;
+  if (time === 'São Paulo') {
+    pastaTime = 'SãoPaulo';
+  } else if (time === 'Atlético Mineiro') {
+    pastaTime = 'AtléticoMineiro';
   }
   
-  // Se nenhuma imagem for encontrada, retorna todos os caminhos possíveis
-  const todosCaminhos: string[] = [];
-  for (const timeFormatado of timesFormatados) {
-    for (const nomeFormatado of nomesFormatados) {
-      todosCaminhos.push(
-        `/players/${timeFormatado}/${nomeFormatado}.jpg`,
-        `/players/${timeFormatado}/${nomeFormatado}.jpeg`
-      );
-    }
-  }
+  // Gera os caminhos na ordem de prioridade
+  const caminhos = [
+    // Primeiro tenta o nome exato como está no arquivo
+    `/players/${pastaTime}/${nomeSemEspacos}.jpg`,
+    `/players/${pastaTime}/${nomeSemAcentos}.jpg`,
+    `/players/${pastaTime}/${nomeMinusculo}.jpg`,
+    
+    // Depois tenta com .jpeg
+    `/players/${pastaTime}/${nomeSemEspacos}.jpeg`,
+    `/players/${pastaTime}/${nomeSemAcentos}.jpeg`,
+    `/players/${pastaTime}/${nomeMinusculo}.jpeg`,
+    
+    // Tenta versões com acentos
+    `/players/${pastaTime}/${nome}.jpg`,
+    `/players/${pastaTime}/${nome}.jpeg`,
+    
+    // Tenta versões com primeira letra maiúscula
+    `/players/${pastaTime}/${nomeSemEspacos.charAt(0).toUpperCase() + nomeSemEspacos.slice(1)}.jpg`,
+    `/players/${pastaTime}/${nomeSemAcentos.charAt(0).toUpperCase() + nomeSemAcentos.slice(1)}.jpg`
+  ];
   
-  console.log(`Nenhuma imagem encontrada para ${nome} do ${time}, tentando todos os caminhos:`, todosCaminhos);
-  return todosCaminhos;
+  console.log(`Caminhos gerados para ${nome} do ${time}:`, caminhos);
+  return caminhos;
 } 

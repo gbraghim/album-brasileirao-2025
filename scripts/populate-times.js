@@ -7,13 +7,13 @@ async function main() {
     {
       nome: 'América-MG',
       estado: 'MG',
-      escudo: '/escudos/america-mineiro.png',
+      escudo: '/escudos/america_mg.png',
       apiId: 1
     },
     {
       nome: 'Athletico-PR',
       estado: 'PR',
-      escudo: '/escudos/atletico-paranaense.png',
+      escudo: '/escudos/athletico_pr.png',
       apiId: 2
     },
     {
@@ -103,7 +103,7 @@ async function main() {
     {
       nome: 'Bragantino',
       estado: 'SP',
-      escudo: '/escudos/Bragantino.jpg',
+      escudo: '/escudos/bragantino.png',
       apiId: 17
     },
     {

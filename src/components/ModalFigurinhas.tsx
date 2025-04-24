@@ -4,6 +4,29 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
 
+const TIMES_SERIE_A = [
+  { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
+  { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },
+  { id: '3', nome: 'Botafogo', escudo: '/escudos/botafogo.png' },
+  { id: '4', nome: 'Red Bull Bragantino', escudo: '/escudos/bragantino.png' },
+  { id: '5', nome: 'Ceará', escudo: '/escudos/ceara.png' },
+  { id: '6', nome: 'Corinthians', escudo: '/escudos/corinthians.png' },
+  { id: '7', nome: 'Cruzeiro', escudo: '/escudos/cruzeiro.png' },
+  { id: '8', nome: 'Flamengo', escudo: '/escudos/flamengo.png' },
+  { id: '9', nome: 'Fluminense', escudo: '/escudos/fluminense.png' },
+  { id: '10', nome: 'Fortaleza', escudo: '/escudos/fortaleza.png' },
+  { id: '11', nome: 'Grêmio', escudo: '/escudos/gremio.png' },
+  { id: '12', nome: 'Internacional', escudo: '/escudos/internacional.png' },
+  { id: '13', nome: 'Juventude', escudo: '/escudos/juventude.png' },
+  { id: '14', nome: 'Mirassol', escudo: '/escudos/mirassol.png' },
+  { id: '15', nome: 'Palmeiras', escudo: '/escudos/palmeiras.png' },
+  { id: '16', nome: 'Santos', escudo: '/escudos/santos.png' },
+  { id: '17', nome: 'São Paulo', escudo: '/escudos/sao_paulo.png' },
+  { id: '18', nome: 'Sport', escudo: '/escudos/sport.png' },
+  { id: '19', nome: 'Vasco', escudo: '/escudos/vasco.png' },
+  { id: '20', nome: 'Vitória', escudo: '/escudos/vitoria.png' }
+].sort((a, b) => a.nome.localeCompare(b.nome));
+
 interface Jogador {
   id: string;
   nome: string;
@@ -34,8 +57,14 @@ interface ModalFigurinhasProps {
 export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigurinhas }: ModalFigurinhasProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
+    if (loadedImages[jogadorId]) {
+      console.log(`Imagem já carregada para ${nome} do ${time}, parando busca`);
+      return;
+    }
+
     const caminhos = formatarCaminhoImagem(time, nome);
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
@@ -52,6 +81,14 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
         [jogadorId]: true
       }));
     }
+  };
+
+  const handleImageLoad = (jogadorId: string, caminho: string) => {
+    console.log(`Imagem carregada com sucesso para jogador ${jogadorId}: ${caminho}`);
+    setLoadedImages(prev => ({
+      ...prev,
+      [jogadorId]: true
+    }));
   };
 
   return (
@@ -108,6 +145,9 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                         ? '/placeholder.jpg'
                         : caminhos[currentIndex];
 
+                      const timeInfo = TIMES_SERIE_A.find(time => time.nome === figurinha.jogador.time.nome);
+                      const escudoPath = timeInfo?.escudo || figurinha.jogador.time.escudo;
+
                       return (
                         <div key={figurinha.jogador.id} className="relative">
                           <div className="bg-white rounded-lg shadow-md p-3">
@@ -127,17 +167,24 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                                 className="object-cover rounded-lg"
                                 sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
                                 priority
-                                onError={() => handleImageError(
-                                  figurinha.jogador.id.toString(),
-                                  figurinha.jogador.time.nome,
-                                  figurinha.jogador.nome
-                                )}
+                                onError={() => {
+                                  console.log(`Erro ao carregar imagem: ${imagemAtual}`);
+                                  handleImageError(
+                                    figurinha.jogador.id.toString(),
+                                    figurinha.jogador.time.nome,
+                                    figurinha.jogador.nome
+                                  );
+                                }}
+                                onLoad={() => {
+                                  console.log(`Sucesso ao carregar imagem: ${imagemAtual}`);
+                                  handleImageLoad(figurinha.jogador.id.toString(), imagemAtual);
+                                }}
                               />
                             </div>
                             <div className="flex items-center space-x-2">
-                              {figurinha.jogador.time.escudo && (
+                              {escudoPath && (
                                 <Image
-                                  src={figurinha.jogador.time.escudo}
+                                  src={escudoPath}
                                   alt={figurinha.jogador.time.nome}
                                   width={24}
                                   height={24}
