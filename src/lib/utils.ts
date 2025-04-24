@@ -37,9 +37,7 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     for (const nomeFormatado of nomesFormatados) {
       caminhos.push(
         `/players/${timeFormatado}/${nomeFormatado}.jpg`,
-        `/players/${timeFormatado}/${nomeFormatado}.jpeg`,
-        `/players/${timeFormatado}/${nomeFormatado}.png`,
-        `/players/${timeFormatado}/${nomeFormatado}.webp`
+        `/players/${timeFormatado}/${nomeFormatado}.jpeg`
       );
     }
   }
