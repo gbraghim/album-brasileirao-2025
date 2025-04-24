@@ -64,8 +64,8 @@ interface TotalJogadoresTime {
 }
 
 const TIME_PATH_MAP: Record<string, string> = {
-  'São Paulo': 'SaoPaulo',
-  'Atlético Mineiro': 'AtleticoMineiro'
+  'São Paulo': 'Sao Paulo',
+  'Atlético Mineiro': 'Atletico Mineiro'
 };
 
 export default function MeuAlbum() {
