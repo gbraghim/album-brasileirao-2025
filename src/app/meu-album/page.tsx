@@ -82,6 +82,27 @@ function MeuAlbumContent() {
   const [error, setError] = useState<string | null>(null);
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
   const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
+  const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (jogadorId: string, time: string, nome: string) => {
+    const caminhos = formatarCaminhoImagem(time, nome);
+    const currentIndex = currentImageIndex[jogadorId] || 0;
+    
+    if (currentIndex < caminhos.length - 1) {
+      console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
+      setCurrentImageIndex(prev => ({
+        ...prev,
+        [jogadorId]: currentIndex + 1
+      }));
+    } else {
+      console.error(`Todos os formatos falharam para ${nome} do ${time}`);
+      setImageErrors(prev => ({
+        ...prev,
+        [jogadorId]: true
+      }));
+    }
+  };
 
   // Função para atualizar a URL quando um time é selecionado
   const atualizarTimeURL = (time: Time) => {
@@ -315,55 +336,47 @@ function MeuAlbumContent() {
                         }`}
                         onClick={() => !jogadorColetado && router.push('/pacotes')}
                       >
-                        <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
-                          <Image
-                            src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[0]}
-                            alt={jogador.nome}
-                            fill
-                            sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
-                            className="object-cover"
-                            onError={(e) => {
-                              const img = e.currentTarget as HTMLImageElement;
-                              const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
-                              let index = 0;
-                              const tryNextPath = () => {
-                                index++;
-                                if (index < caminhos.length) {
-                                  img.src = caminhos[index];
-                                  img.onerror = tryNextPath;
-                                } else {
-                                  img.src = '/placeholder.jpg';
-                                  img.onerror = null;
-                                }
-                              };
-                              tryNextPath();
-                            }}
-                          />
-                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                            <p className="text-white text-sm font-medium truncate">
-                              {jogador.nome}
-                            </p>
-                            <div className="flex justify-between items-center">
-                              <span className="text-white/80 text-xs">
-                                {jogador.posicao}
-                              </span>
-                              {jogadorColetado ? (
-                                figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
-                                  <span className="text-brasil-yellow text-xs font-medium">
-                                    x{figurinha.figurinhas.length}
-                                  </span>
-                                )
-                              ) : null}
+                        <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
+                          {imageErrors[jogador.id] ? (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
+                              <span className="text-gray-500">Imagem não disponível</span>
                             </div>
-                          </div>
-                          {!jogadorColetado && (
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
-                              <span className="bg-brasil-blue text-brasil-white text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                Colecionar!
-                              </span>
-                            </div>
+                          ) : (
+                            <Image
+                              src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[currentImageIndex[jogador.id] || 0]}
+                              alt={`${jogador.nome} - ${jogador.time.nome}`}
+                              fill
+                              className="object-cover rounded-lg"
+                              sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
+                              priority
+                              onError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                            />
                           )}
                         </div>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                          <p className="text-white text-sm font-medium truncate">
+                            {jogador.nome}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/80 text-xs">
+                              {jogador.posicao}
+                            </span>
+                            {jogadorColetado ? (
+                              figurinha?.figurinhas && figurinha.figurinhas.length > 1 && (
+                                <span className="text-brasil-yellow text-xs font-medium">
+                                  x{figurinha.figurinhas.length}
+                                </span>
+                              )
+                            ) : null}
+                          </div>
+                        </div>
+                        {!jogadorColetado && (
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                            <span className="bg-brasil-blue text-brasil-white text-sm font-bold px-4 py-2 rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                              Colecionar!
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
