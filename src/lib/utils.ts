@@ -35,13 +35,45 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
   
   for (const timeFormatado of timesFormatados) {
     for (const nomeFormatado of nomesFormatados) {
-      caminhos.push(
+      const caminhoJpg = `/players/${timeFormatado}/${nomeFormatado}.jpg`;
+      const caminhoJpeg = `/players/${timeFormatado}/${nomeFormatado}.jpeg`;
+      
+      // Verifica se a imagem existe
+      try {
+        const img = new Image();
+        img.src = caminhoJpg;
+        if (img.complete) {
+          console.log(`Imagem encontrada para ${nome} do ${time}: ${caminhoJpg}`);
+          return [caminhoJpg];
+        }
+      } catch (e) {
+        // Continua para o próximo formato
+      }
+
+      try {
+        const img = new Image();
+        img.src = caminhoJpeg;
+        if (img.complete) {
+          console.log(`Imagem encontrada para ${nome} do ${time}: ${caminhoJpeg}`);
+          return [caminhoJpeg];
+        }
+      } catch (e) {
+        // Continua para o próximo formato
+      }
+    }
+  }
+  
+  // Se nenhuma imagem for encontrada, retorna todos os caminhos possíveis
+  const todosCaminhos: string[] = [];
+  for (const timeFormatado of timesFormatados) {
+    for (const nomeFormatado of nomesFormatados) {
+      todosCaminhos.push(
         `/players/${timeFormatado}/${nomeFormatado}.jpg`,
         `/players/${timeFormatado}/${nomeFormatado}.jpeg`
       );
     }
   }
   
-  console.log(`Caminhos gerados para ${nome} do ${time}:`, caminhos);
-  return caminhos;
+  console.log(`Nenhuma imagem encontrada para ${nome} do ${time}, tentando todos os caminhos:`, todosCaminhos);
+  return todosCaminhos;
 } 
