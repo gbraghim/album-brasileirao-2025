@@ -167,7 +167,7 @@ export default function ModalFigurinhas({
                       );
                       const currentIndex = currentImageIndex[figurinha.jogador.id] || 0;
                       const imagemAtual = imageErrors[figurinha.jogador.id]
-                        ? '/placeholder.jpg'
+                        ? '/public/placeholder.jpg'
                         : caminhos[currentIndex];
 
                       const timeInfo = TIMES_SERIE_A.find(time => time.nome === figurinha.jogador.time.nome);
@@ -192,7 +192,7 @@ export default function ModalFigurinhas({
                             <div className="p-2 bg-white/90 backdrop-blur-sm h-20 flex flex-col justify-center">
                               <div className="flex items-center justify-center gap-1 mb-1">
                                 <Image
-                                  src={escudoPath || '/placeholder.jpg'}
+                                  src={escudoPath || '/public/placeholder.jpg'}
                                   alt={`Escudo do ${figurinha.jogador.time.nome}`}
                                   width={20}
                                   height={20}

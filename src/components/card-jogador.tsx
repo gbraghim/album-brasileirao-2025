@@ -11,7 +11,7 @@ export function CardJogador({ jogador, quantidade }: CardJogadorProps) {
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <img
-            src={jogador.time.escudo || '/placeholder.png'}
+            src={jogador.time.escudo || '/public/placeholder.jpg'}
             alt={jogador.time.nome}
             className="w-8 h-8 object-contain"
           />
@@ -20,7 +20,7 @@ export function CardJogador({ jogador, quantidade }: CardJogadorProps) {
 
         <div className="flex justify-center mb-4">
           <img
-            src={jogador.foto || '/placeholder.png'}
+            src={jogador.foto || '/public/placeholder.jpg'}
             alt={jogador.nome}
             className="w-32 h-32 object-cover rounded-full"
           />

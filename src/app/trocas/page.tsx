@@ -474,7 +474,7 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/placeholder.jpg';
+                        img.src = '/public/placeholder.jpg';
                       }
                     }}
                   />
@@ -547,7 +547,7 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/placeholder.jpg';
+                        img.src = '/public/placeholder.jpg';
                       }
                     }}
                   />
@@ -608,7 +608,7 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/placeholder.jpg';
+                        img.src = '/public/placeholder.jpg';
                       }
                     }}
                   />
@@ -672,7 +672,7 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/placeholder.jpg';
+                        img.src = '/public/placeholder.jpg';
                       }
                     }}
                   />

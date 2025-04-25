@@ -71,7 +71,7 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={time.id} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={imageErrors[time.nome] ? '/placeholder-escudo.png' : time.escudo}
+                src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
                 alt={`Escudo do ${time.nome}`}
                 fill
                 data-time={time.nome}
@@ -86,7 +86,7 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={`${time.id}-duplicate`} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={imageErrors[time.nome] ? '/placeholder-escudo.png' : time.escudo}
+                src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
                 alt={`Escudo do ${time.nome}`}
                 fill
                 data-time={time.nome}
