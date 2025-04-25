@@ -58,9 +58,20 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     
     // Tenta versões com primeira letra maiúscula
     `/players/${pastaTime}/${nomeSemEspacos.charAt(0).toUpperCase() + nomeSemEspacos.slice(1)}.jpg`,
-    `/players/${pastaTime}/${nomeSemAcentos.charAt(0).toUpperCase() + nomeSemAcentos.slice(1)}.jpg`
+    `/players/${pastaTime}/${nomeSemAcentos.charAt(0).toUpperCase() + nomeSemAcentos.slice(1)}.jpg`,
+    
+    // Tenta versões com todas as letras maiúsculas
+    `/players/${pastaTime}/${nomeSemEspacos.toUpperCase()}.jpg`,
+    `/players/${pastaTime}/${nomeSemAcentos.toUpperCase()}.jpg`,
+    
+    // Tenta versões com todas as letras minúsculas
+    `/players/${pastaTime}/${nomeSemEspacos.toLowerCase()}.jpg`,
+    `/players/${pastaTime}/${nomeSemAcentos.toLowerCase()}.jpg`
   ];
   
-  console.log(`Caminhos gerados para ${nome} do ${time}:`, caminhos);
-  return caminhos;
+  // Remove duplicatas mantendo a ordem
+  const caminhosUnicos = Array.from(new Set(caminhos));
+  
+  console.log(`Caminhos gerados para ${nome} do ${time}:`, caminhosUnicos);
+  return caminhosUnicos;
 } 
