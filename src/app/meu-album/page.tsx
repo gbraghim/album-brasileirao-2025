@@ -356,7 +356,7 @@ function MeuAlbumContent() {
                               src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[currentImageIndex[jogador.id] || 0]}
                               alt={`${jogador.nome} - ${jogador.time.nome}`}
                               fill
-                              className="object-cover rounded-lg"
+                              className={`object-cover rounded-lg ${!jogadorColetado ? 'blur-md' : ''}`}
                               sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
                               priority
                               onError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
