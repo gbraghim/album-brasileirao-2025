@@ -55,6 +55,7 @@ interface ModalFigurinhasProps {
   userFigurinhas: Set<string>;
   onAbrirOutroPacote?: () => void;
   temMaisPacotes?: boolean;
+  animacaoRapida?: boolean;
 }
 
 const getRaridadeStyle = (raridade: string) => {
@@ -76,7 +77,8 @@ export default function ModalFigurinhas({
   figurinhas, 
   userFigurinhas,
   onAbrirOutroPacote,
-  temMaisPacotes = false 
+  temMaisPacotes = false,
+  animacaoRapida = false
 }: ModalFigurinhasProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -140,24 +142,24 @@ export default function ModalFigurinhas({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
                     type="button"
-                    className="rounded-md bg-white text-brasil-blue hover:text-brasil-green focus:outline-none focus:ring-2 focus:ring-brasil-green focus:ring-offset-2"
+                    className="rounded-md bg-white/50 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                     onClick={onClose}
                   >
                     <span className="sr-only">Fechar</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
                 
-                <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-brasil-blue mb-4">
+                <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-brasil-blue mb-4 text-center">
                   Figurinhas do Pacote
                 </Dialog.Title>
                 
                 <div className="mt-2">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4 justify-items-center">
                     {figurinhas.map((figurinha) => {
                       const caminhos = formatarCaminhoImagem(
                         figurinha.jogador.time.nome,
@@ -173,9 +175,9 @@ export default function ModalFigurinhas({
 
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105`}>
+                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
                             {/* Imagem do jogador */}
-                            <div className="relative w-full h-40">
+                            <div className="relative w-full h-52">
                               <Image
                                 src={imagemAtual}
                                 alt={figurinha.jogador.nome}
@@ -187,9 +189,18 @@ export default function ModalFigurinhas({
                             </div>
 
                             {/* Informações do jogador */}
-                            <div className="p-1 bg-white/90 backdrop-blur-sm">
-                              <p className="text-sm font-bold text-center text-black truncate">{figurinha.jogador.nome}</p>
-                              <p className="text-xs text-center text-black truncate">{figurinha.jogador.posicao}</p>
+                            <div className="p-2 bg-white/90 backdrop-blur-sm h-20 flex flex-col justify-center">
+                              <div className="flex items-center justify-center gap-1 mb-1">
+                                <Image
+                                  src={escudoPath || '/placeholder.jpg'}
+                                  alt={`Escudo do ${figurinha.jogador.time.nome}`}
+                                  width={20}
+                                  height={20}
+                                  className="object-contain"
+                                />
+                                <p className="text-sm font-bold text-center text-black line-clamp-2">{figurinha.jogador.nome}</p>
+                              </div>
+                              <p className="text-xs text-center text-gray-600">{figurinha.jogador.posicao}</p>
                             </div>
 
                             {/* Indicador de raridade */}
@@ -206,10 +217,16 @@ export default function ModalFigurinhas({
                             )}
 
                             {/* Indicador de repetida */}
-                            {figurinha.quantidadeAtual > 1 && (
+                            {figurinha.quantidadeAtual > 1 ? (
                               <div className="absolute top-1 left-1">
                                 <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/80 text-white">
                                   Repetida
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="absolute top-1 left-1">
+                                <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/80 text-white">
+                                  Nova
                                 </div>
                               </div>
                             )}
@@ -220,23 +237,39 @@ export default function ModalFigurinhas({
                   </div>
                 </div>
                 
-                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                  {temMaisPacotes && onAbrirOutroPacote && (
-                    <button
-                      type="button"
-                      className="w-full justify-center rounded-lg bg-brasil-green px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brasil-green/80 transition-colors sm:w-auto mr-2"
-                      onClick={onAbrirOutroPacote}
-                    >
-                      Abrir Outro Pacote
-                    </button>
+                <div className="mt-5 sm:mt-4">
+                  {temMaisPacotes && onAbrirOutroPacote ? (
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        className="w-full justify-center rounded-lg bg-brasil-green px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brasil-green/80 transition-colors"
+                        onClick={() => {
+                          if (onAbrirOutroPacote) {
+                            onAbrirOutroPacote();
+                          }
+                        }}
+                      >
+                        Abrir Outro Pacote
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 transition-colors"
+                        onClick={onClose}
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex justify-center">
+                      <button
+                        type="button"
+                        className="w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 transition-colors sm:w-auto"
+                        onClick={onClose}
+                      >
+                        Fechar
+                      </button>
+                    </div>
                   )}
-                  <button
-                    type="button"
-                    className="w-full justify-center rounded-lg bg-brasil-blue px-4 py-2 text-sm font-semibold text-brasil-yellow shadow-sm hover:bg-brasil-blue/80 transition-colors sm:w-auto"
-                    onClick={onClose}
-                  >
-                    Fechar
-                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

@@ -32,6 +32,7 @@ export default function Pacotes() {
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
   const [pacoteAbrindo, setPacoteAbrindo] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [animacaoRapida, setAnimacaoRapida] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -145,11 +146,21 @@ export default function Pacotes() {
   const handleAnimationComplete = () => {
     setShowAnimation(false);
     setModalAberto(true);
+    setAnimacaoRapida(false);
   };
 
   const handleFecharModal = () => {
     setModalAberto(false);
     carregarFigurinhasUsuario();
+  };
+
+  const handleAbrirOutroPacote = async () => {
+    if (pacotes.length > 0) {
+      setModalAberto(false);
+      setAnimacaoRapida(true);
+      setShowAnimation(true);
+      await handleAbrirPacote(pacotes[0].id);
+    }
   };
 
   if (loading) {
@@ -246,8 +257,9 @@ export default function Pacotes() {
         onClose={handleFecharModal}
         figurinhas={figurinhasAbertas}
         userFigurinhas={userFigurinhas}
-        onAbrirOutroPacote={pacotes.length > 0 ? () => handleAbrirPacote(pacotes[0].id) : undefined}
+        onAbrirOutroPacote={handleAbrirOutroPacote}
         temMaisPacotes={pacotes.length > 0}
+        animacaoRapida={animacaoRapida}
       />
     </div>
   );
