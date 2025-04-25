@@ -14,15 +14,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -39,37 +38,37 @@ model Session {
 }
 
 model User {
-  id                String        @id @default(cuid())
-  name              String?
-  email             String        @unique
-  emailVerified     DateTime?
-  image             String?
-  password          String
-  accounts          Account[]
-  sessions          Session[]
-  userFigurinhas    UserFigurinha[] @relation("UserFigurinhas")
-  trocasEnviadas    Troca[]       @relation("TrocasEnviadas")
-  trocasRecebidas   Troca[]       @relation("TrocasRecebidas")
-  notificacoes      Notificacao[]
-  numeroDeLogins    Int             @default(0)
-  primeiroAcesso    Boolean         @default(true)
-  pacotes           Pacote[]
-  trocas            TrocaFigurinha[]
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id              String           @id @default(cuid())
+  name            String?
+  email           String           @unique
+  emailVerified   DateTime?
+  image           String?
+  password        String
+  numeroDeLogins  Int              @default(0)
+  primeiroAcesso  Boolean          @default(true)
+  createdAt       DateTime?        @default(now())
+  updatedAt       DateTime?        @updatedAt
+  accounts        Account[]
+  notificacoes    Notificacao[]
+  pacotes         Pacote[]
+  sessions        Session[]
+  trocasEnviadas  Troca[]          @relation("TrocasEnviadas")
+  trocasRecebidas Troca[]          @relation("TrocasRecebidas")
+  trocas          TrocaFigurinha[]
+  userFigurinhas  UserFigurinha[]  @relation("UserFigurinhas")
 
   @@index([email])
 }
 
 model Time {
-  id        String    @id @default(cuid())
-  nome      String
-  escudo    String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  apiId     Int       @unique
-  jogadores Jogador[]
+  id         String      @id @default(cuid())
+  nome       String
+  escudo     String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  apiId      Int         @unique
   figurinhas Figurinha[]
+  jogadores  Jogador[]
 
   @@index([apiId])
 }
@@ -80,12 +79,13 @@ model Jogador {
   numero        Int?
   posicao       String?
   nacionalidade String?
-  idade         Int?
   apiId         Int         @unique
   timeId        String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   foto          String?
+  idade         Int?
+  raridade      String?     @default("Bronze")
   figurinhas    Figurinha[]
   time          Time        @relation(fields: [timeId], references: [id])
 
@@ -94,22 +94,23 @@ model Jogador {
 }
 
 model Figurinha {
-  id                String        @id @default(cuid())
+  id                String           @id @default(cuid())
   nome              String?
   posicao           String?
   numero            Int?
   nacionalidade     String?
   foto              String?
-  time              Time?         @relation(fields: [timeId], references: [id])
   timeId            String?
-  userFigurinhas    UserFigurinha[]
-  trocasOfertadas   Troca[]      @relation("FigurinhaOferta")
-  trocasSolicitadas Troca[]      @relation("FigurinhaSolicitada")
-  pacote            Pacote?      @relation(fields: [pacoteId], references: [id])
   pacoteId          String?
-  trocaFigurinhas   TrocaFigurinha[]
-  jogador           Jogador?      @relation(fields: [jogadorId], references: [id])
   jogadorId         String?
+  raridade          String?          @default("Bronze")
+  jogador           Jogador?         @relation(fields: [jogadorId], references: [id])
+  pacote            Pacote?          @relation(fields: [pacoteId], references: [id])
+  time              Time?            @relation(fields: [timeId], references: [id])
+  trocasOfertadas   Troca[]          @relation("FigurinhaOferta")
+  trocasSolicitadas Troca[]          @relation("FigurinhaSolicitada")
+  trocaFigurinhas   TrocaFigurinha[]
+  userFigurinhas    UserFigurinha[]
 
   @@index([timeId])
   @@index([pacoteId])
@@ -130,16 +131,16 @@ model Pacote {
 }
 
 model UserFigurinha {
-  id            String   @id @default(cuid())
-  userId        String
-  figurinhaId  String
-  quantidade    Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  nomeJogador   String   @default("")
-  nomeTime      String   @default("")
-  user          User     @relation("UserFigurinhas", fields: [userId], references: [id], onDelete: Cascade)
-  figurinha     Figurinha @relation(fields: [figurinhaId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  userId      String
+  figurinhaId String
+  quantidade  Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  nomeJogador String    @default("")
+  nomeTime    String    @default("")
+  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserFigurinhas", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, figurinhaId])
   @@index([userId])
@@ -147,19 +148,19 @@ model UserFigurinha {
 }
 
 model Troca {
-  id                String   @id @default(cuid())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  status            String   @default("PENDENTE")
-  figurinhaOferta   Figurinha @relation("FigurinhaOferta", fields: [figurinhaOfertaId], references: [id])
-  figurinhaOfertaId String
-  figurinhaSolicitada Figurinha? @relation("FigurinhaSolicitada", fields: [figurinhaSolicitadaId], references: [id])
+  id                    String        @id @default(cuid())
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  status                String        @default("PENDENTE")
+  figurinhaOfertaId     String
   figurinhaSolicitadaId String?
-  usuarioEnvia      User     @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
-  usuarioEnviaId    String
-  usuarioRecebe     User?    @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
-  usuarioRecebeId   String?
-  notificacoes      Notificacao[]
+  usuarioEnviaId        String
+  usuarioRecebeId       String?
+  notificacoes          Notificacao[]
+  figurinhaOferta       Figurinha     @relation("FigurinhaOferta", fields: [figurinhaOfertaId], references: [id])
+  figurinhaSolicitada   Figurinha?    @relation("FigurinhaSolicitada", fields: [figurinhaSolicitadaId], references: [id])
+  usuarioEnvia          User          @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
+  usuarioRecebe         User?         @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
 
   @@index([figurinhaOfertaId])
   @@index([figurinhaSolicitadaId])
@@ -188,12 +189,10 @@ model Notificacao {
   lida      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  usuario   User     @relation(fields: [usuarioId], references: [id])
   usuarioId String
-
-  troca     Troca?   @relation(fields: [trocaId], references: [id])
   trocaId   String?
+  troca     Troca?   @relation(fields: [trocaId], references: [id])
+  usuario   User     @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([trocaId])

@@ -45,6 +45,7 @@ interface Figurinha {
   id: number;
   jogador: Jogador;
   quantidadeAtual: number;
+  raridade: string;
 }
 
 interface ModalFigurinhasProps {
@@ -55,6 +56,19 @@ interface ModalFigurinhasProps {
   onAbrirOutroPacote?: () => void;
   temMaisPacotes?: boolean;
 }
+
+const getRaridadeStyle = (raridade: string) => {
+  switch (raridade) {
+    case 'Lendário':
+      return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
+    case 'Ouro':
+      return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
+    case 'Prata':
+      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+    default: // Bronze
+      return 'border-amber-800 shadow-amber-800 bg-gradient-to-br from-amber-800/20 to-amber-900/20';
+  }
+};
 
 export default function ModalFigurinhas({ 
   isOpen, 
@@ -159,55 +173,46 @@ export default function ModalFigurinhas({
 
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className="bg-white rounded-lg shadow-md p-2">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-medium text-gray-900 truncate max-w-[100px]">
-                                {figurinha.jogador.nome}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
-                              </span>
-                            </div>
-                            <div className="relative w-full aspect-[3/4] mb-1 max-w-[120px] mx-auto">
+                          <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105`}>
+                            {/* Imagem do jogador */}
+                            <div className="relative w-full h-40">
                               <Image
                                 src={imagemAtual}
-                                alt={`${figurinha.jogador.nome} - ${figurinha.jogador.time.nome}`}
+                                alt={figurinha.jogador.nome}
                                 fill
-                                className="object-cover rounded-lg"
-                                sizes="(max-width: 640px) 120px, (max-width: 1024px) 120px, 120px"
-                                priority
-                                onError={() => {
-                                  console.log(`Erro ao carregar imagem: ${imagemAtual}`);
-                                  handleImageError(
-                                    figurinha.jogador.id.toString(),
-                                    figurinha.jogador.time.nome,
-                                    figurinha.jogador.nome
-                                  );
-                                }}
-                                onLoad={() => {
-                                  console.log(`Sucesso ao carregar imagem: ${imagemAtual}`);
-                                  handleImageLoad(figurinha.jogador.id.toString(), imagemAtual);
-                                }}
+                                className="object-cover"
+                                onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                                onLoad={() => handleImageLoad(figurinha.jogador.id.toString(), imagemAtual)}
                               />
                             </div>
-                            <div className="flex items-center space-x-1">
-                              {escudoPath && (
-                                <Image
-                                  src={escudoPath}
-                                  alt={figurinha.jogador.time.nome}
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                  priority
-                                />
-                              )}
-                              <span className="text-xs text-gray-500 truncate max-w-[80px]">
-                                {figurinha.jogador.time.nome}
-                              </span>
+
+                            {/* Informações do jogador */}
+                            <div className="p-1 bg-white/90 backdrop-blur-sm">
+                              <p className="text-sm font-bold text-center text-black truncate">{figurinha.jogador.nome}</p>
+                              <p className="text-xs text-center text-black truncate">{figurinha.jogador.posicao}</p>
                             </div>
-                            <div className="mt-1 text-xs text-gray-500">
-                              Quantidade: {figurinha.quantidadeAtual}
-                            </div>
+
+                            {/* Indicador de raridade */}
+                            {figurinha.raridade !== 'Bronze' && (
+                              <div className="absolute top-1 right-1">
+                                <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                  figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                                  figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                                  'bg-gray-400/80 text-black'
+                                }`}>
+                                  {figurinha.raridade}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Indicador de repetida */}
+                            {figurinha.quantidadeAtual > 1 && (
+                              <div className="absolute top-1 left-1">
+                                <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/80 text-white">
+                                  Repetida
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
