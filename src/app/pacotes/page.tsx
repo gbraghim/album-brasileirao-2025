@@ -246,6 +246,8 @@ export default function Pacotes() {
         onClose={handleFecharModal}
         figurinhas={figurinhasAbertas}
         userFigurinhas={userFigurinhas}
+        onAbrirOutroPacote={pacotes.length > 0 ? () => handleAbrirPacote(pacotes[0].id) : undefined}
+        temMaisPacotes={pacotes.length > 0}
       />
     </div>
   );

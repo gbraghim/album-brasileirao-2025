@@ -52,9 +52,18 @@ interface ModalFigurinhasProps {
   onClose: () => void;
   figurinhas: Figurinha[];
   userFigurinhas: Set<string>;
+  onAbrirOutroPacote?: () => void;
+  temMaisPacotes?: boolean;
 }
 
-export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigurinhas }: ModalFigurinhasProps) {
+export default function ModalFigurinhas({ 
+  isOpen, 
+  onClose, 
+  figurinhas, 
+  userFigurinhas,
+  onAbrirOutroPacote,
+  temMaisPacotes = false 
+}: ModalFigurinhasProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
@@ -134,7 +143,7 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                 </Dialog.Title>
                 
                 <div className="mt-2">
-                  <div className="grid grid-cols-1 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {figurinhas.map((figurinha) => {
                       const caminhos = formatarCaminhoImagem(
                         figurinha.jogador.time.nome,
@@ -150,22 +159,22 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
 
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className="bg-white rounded-lg shadow-md p-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-900">
+                          <div className="bg-white rounded-lg shadow-md p-2">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-medium text-gray-900 truncate max-w-[100px]">
                                 {figurinha.jogador.nome}
                               </span>
-                              <span className="text-sm text-gray-500">
+                              <span className="text-xs text-gray-500">
                                 {figurinha.quantidadeAtual > 1 ? 'Repetida' : 'Nova'}
                               </span>
                             </div>
-                            <div className="relative w-full aspect-[3/4] mb-2 max-w-[200px] mx-auto">
+                            <div className="relative w-full aspect-[3/4] mb-1 max-w-[120px] mx-auto">
                               <Image
                                 src={imagemAtual}
                                 alt={`${figurinha.jogador.nome} - ${figurinha.jogador.time.nome}`}
                                 fill
                                 className="object-cover rounded-lg"
-                                sizes="(max-width: 640px) 200px, (max-width: 1024px) 200px, 200px"
+                                sizes="(max-width: 640px) 120px, (max-width: 1024px) 120px, 120px"
                                 priority
                                 onError={() => {
                                   console.log(`Erro ao carregar imagem: ${imagemAtual}`);
@@ -181,22 +190,22 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                                 }}
                               />
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-1">
                               {escudoPath && (
                                 <Image
                                   src={escudoPath}
                                   alt={figurinha.jogador.time.nome}
-                                  width={24}
-                                  height={24}
-                                  className="w-6 h-6"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
                                   priority
                                 />
                               )}
-                              <span className="text-sm text-gray-500">
+                              <span className="text-xs text-gray-500 truncate max-w-[80px]">
                                 {figurinha.jogador.time.nome}
                               </span>
                             </div>
-                            <div className="mt-2 text-sm text-gray-500">
+                            <div className="mt-1 text-xs text-gray-500">
                               Quantidade: {figurinha.quantidadeAtual}
                             </div>
                           </div>
@@ -207,6 +216,15 @@ export default function ModalFigurinhas({ isOpen, onClose, figurinhas, userFigur
                 </div>
                 
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  {temMaisPacotes && onAbrirOutroPacote && (
+                    <button
+                      type="button"
+                      className="w-full justify-center rounded-lg bg-brasil-green px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brasil-green/80 transition-colors sm:w-auto mr-2"
+                      onClick={onAbrirOutroPacote}
+                    >
+                      Abrir Outro Pacote
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="w-full justify-center rounded-lg bg-brasil-blue px-4 py-2 text-sm font-semibold text-brasil-yellow shadow-sm hover:bg-brasil-blue/80 transition-colors sm:w-auto"
