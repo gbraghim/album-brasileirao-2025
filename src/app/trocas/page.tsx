@@ -480,19 +480,11 @@ export default function Trocas() {
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {figurinha.jogador.time.escudo && (
-                    <Image
-                      src={figurinha.jogador.time.escudo}
-                      alt={figurinha.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
+
+                  <span className="text-sm text-gray-600 font-bold">{figurinha.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
+                  <span className="text-sm text-gray-600 font-bold">{figurinha.jogador.nome}</span>
                   <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                 </div>
                 <div className="mt-3">
@@ -553,23 +545,13 @@ export default function Trocas() {
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                
+                  <span className="text-sm text-gray-600 font-bold">{troca.figurinhaOferta.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
+                  <span className="text-sm text-gray-600 font-bold">{troca.figurinhaOferta.jogador.nome}</span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.nome}</span></span>
                 </div>
                 <div className="mt-3">
                   <button
@@ -617,19 +599,11 @@ export default function Trocas() {
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                  
+                  <span className="text-sm text-gray-600 font-bold">{troca.figurinhaOferta.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <span className="text-sm text-gray-600 font-bold">{troca.figurinhaOferta.jogador.nome}</span>
                 </div>
                 <div className="mt-1">
                   <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.nome}</span></span>
