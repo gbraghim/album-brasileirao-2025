@@ -52,29 +52,17 @@ export async function GET() {
 
     console.log('2. Usuário autenticado:', session.user.id);
 
-    const trocas = await prisma.troca.findMany({
-      where: {
-        OR: [
-          { usuarioEnviaId: session.user.id },
-          { usuarioRecebeId: session.user.id }
-        ],
-        status: 'PENDENTE'
-      },
+    // Buscar todas as trocas pendentes
+    const todasTrocas = await prisma.troca.findMany({
+      where: { status: 'PENDENTE' },
       include: trocaInclude,
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     });
 
-    console.log('3. Trocas encontradas no banco:', trocas);
-
     // Separar as trocas em diferentes categorias
-    const minhasTrocas = trocas.filter(troca => troca.usuarioEnviaId === session.user.id);
-    const trocasRecebidas = trocas.filter(troca => troca.usuarioRecebeId === session.user.id);
-    const trocasDisponiveis = trocas.filter(troca => 
-      troca.usuarioEnviaId !== session.user.id && 
-      (!troca.usuarioRecebeId || troca.usuarioRecebeId === session.user.id)
-    );
+    const minhasTrocas = todasTrocas.filter(troca => troca.usuarioEnviaId === session.user.id);
+    const trocasRecebidas = todasTrocas.filter(troca => troca.usuarioRecebeId === session.user.id);
+    const trocasDisponiveis = todasTrocas.filter(troca => troca.usuarioEnviaId !== session.user.id);
 
     console.log('4. Trocas separadas:', {
       minhasTrocas,
