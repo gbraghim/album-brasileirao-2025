@@ -5,26 +5,26 @@ async function atualizarEscudos() {
   try {
     // Mapa de apiIds para caminhos locais dos escudos
     const escudosMap = {
-      1: '/escudos/america_mg.png',
-      2: '/escudos/athletico_pr.png',
-      3: '/escudos/atletico_mg.png',
-      4: '/escudos/bahia.png',
-      5: '/escudos/botafogo.png',
+      1: '/escudos/atletico_mg.png',
+      2: '/escudos/bahia.png',
+      3: '/escudos/botafogo.png',
+      4: '/escudos/bragantino.png',
+      5: '/escudos/ceara.png',
       6: '/escudos/corinthians.png',
-      7: '/escudos/coritiba.png',
-      8: '/escudos/cruzeiro.png',
-      9: '/escudos/cuiaba.png',
-      10: '/escudos/flamengo.png',
-      11: '/escudos/fluminense.png',
-      12: '/escudos/fortaleza.png',
-      13: '/escudos/goias.png',
-      14: '/escudos/gremio.png',
-      15: '/escudos/internacional.png',
-      16: '/escudos/palmeiras.png',
-      17: '/escudos/bragantino.png',
-      18: '/escudos/santos.png',
-      19: '/escudos/sao_paulo.png',
-      20: '/escudos/vasco.png'
+      7: '/escudos/cruzeiro.png',
+      8: '/escudos/flamengo.png',
+      9: '/escudos/fluminense.png',
+      10: '/escudos/fortaleza.png',
+      11: '/escudos/gremio.png',
+      12: '/escudos/internacional.png',
+      13: '/escudos/juventude.png',
+      14: '/escudos/mirassol.png',
+      15: '/escudos/palmeiras.png',
+      16: '/escudos/santos.png',
+      17: '/escudos/sao_paulo.png',
+      18: '/escudos/sport.png',
+      19: '/escudos/vasco.png',
+      20: '/escudos/vitoria.png'
     };
 
     // Atualiza cada time com seu escudo

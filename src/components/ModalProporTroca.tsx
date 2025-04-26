@@ -1,6 +1,9 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import { formatarCaminhoImagem } from '@/lib/utils';
+import React from 'react';
 
 interface Jogador {
   id: string;
@@ -42,6 +45,19 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
   if (!troca) {
     return null;
   }
+
+  const [currentImageIndex, setCurrentImageIndex] = React.useState<Record<string, number>>({});
+  const [imageErrors, setImageErrors] = React.useState<Record<string, boolean>>({});
+
+  const handleImageError = (figurinhaId: string, time: string, nome: string) => {
+    const caminhos = formatarCaminhoImagem(time, nome);
+    const currentIndex = currentImageIndex[figurinhaId] || 0;
+    if (currentIndex < caminhos.length - 1) {
+      setCurrentImageIndex(prev => ({ ...prev, [figurinhaId]: currentIndex + 1 }));
+    } else {
+      setImageErrors(prev => ({ ...prev, [figurinhaId]: true }));
+    }
+  };
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -90,14 +106,50 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
                         Você está propondo uma troca para a figurinha de {troca.figurinhaOferta.jogador.nome}
                       </p>
                     </div>
+                    
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-900">Selecione uma figurinha para troca:</h4>
+                      <div className="mt-2 grid grid-cols-2 gap-4">
+                        {figurinhasRepetidas.map((figurinha) => {
+                          const caminhos = formatarCaminhoImagem(
+                            figurinha.jogador.time.nome,
+                            figurinha.jogador.nome
+                          );
+                          const currentIndex = currentImageIndex[figurinha.id] || 0;
+                          const imagemAtual = imageErrors[figurinha.id]
+                            ? '/placeholder-player.png'
+                            : caminhos[currentIndex];
+                          return (
+                            <div 
+                              key={figurinha.id}
+                              className="relative flex flex-col items-center p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
+                              onClick={() => onProporTroca(figurinha)}
+                            >
+                              <div className="relative w-24 h-32 mb-2">
+                                <Image
+                                  src={imagemAtual}
+                                  alt={figurinha.jogador.nome}
+                                  fill
+                                  className="object-cover rounded"
+                                  onError={() => handleImageError(figurinha.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
+                                />
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">{figurinha.jogador.nome}</span>
+                              <span className="text-xs text-gray-500">{figurinha.jogador.time.nome}</span>
+                              <span className="text-xs text-gray-500">Quantidade: {figurinha.quantidade}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                    onClick={() => onProporTroca(troca.figurinhaOferta)}
-                    disabled={loading}
+                    onClick={() => onProporTroca(figurinhasRepetidas[0])}
+                    disabled={loading || figurinhasRepetidas.length === 0}
                   >
                     {loading ? 'Carregando...' : 'Confirmar Troca'}
                   </button>
