@@ -215,15 +215,13 @@ export default function Repetidas() {
                 />
               </div>
               <div className="flex items-center space-x-2">
-                {figurinha.jogador.time.escudo && (
-                  <Image
-                    src={figurinha.jogador.time.escudo}
-                    alt={figurinha.jogador.time.nome}
-                    width={24}
-                    height={24}
-                    className="w-6 h-6"
-                  />
-                )}
+                <Image
+                  src={`/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                  alt={figurinha.jogador.time.nome}
+                  width={24}
+                  height={24}
+                  className="w-6 h-6"
+                />
                 <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
               </div>
               <div className="mt-2 flex justify-between items-center">

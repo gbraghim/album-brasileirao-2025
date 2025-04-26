@@ -474,21 +474,19 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/public/placeholder.jpg';
+                        img.src = '/placeholder.jpg';
                       }
                     }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {figurinha.jogador.time.escudo && (
-                    <Image
-                      src={figurinha.jogador.time.escudo}
-                      alt={figurinha.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
+                  <Image
+                    src={`/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                    alt={figurinha.jogador.time.nome}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
                   <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
@@ -547,26 +545,23 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/public/placeholder.jpg';
+                        img.src = '/placeholder.jpg';
                       }
                     }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
+                  <Image
+                    src={`/escudos/${troca.figurinhaOferta.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                    alt={troca.figurinhaOferta.jogador.time.nome}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                 </div>
                 <div className="mt-3">
                   <button
@@ -608,21 +603,19 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/public/placeholder.jpg';
+                        img.src = '/placeholder.jpg';
                       }
                     }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
+                  <Image
+                    src={`/escudos/${troca.figurinhaOferta.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                    alt={troca.figurinhaOferta.jogador.time.nome}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
@@ -672,21 +665,19 @@ export default function Trocas() {
                       if (img.src.includes(caminhos[0])) {
                         img.src = caminhos[1];
                       } else {
-                        img.src = '/public/placeholder.jpg';
+                        img.src = '/placeholder.jpg';
                       }
                     }}
                   />
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
-                  {troca.figurinhaOferta.jogador.time.escudo && (
-                    <Image
-                      src={troca.figurinhaOferta.jogador.time.escudo}
-                      alt={troca.figurinhaOferta.jogador.time.nome}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  )}
+                  <Image
+                    src={`/escudos/${troca.figurinhaOferta.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                    alt={troca.figurinhaOferta.jogador.time.nome}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">

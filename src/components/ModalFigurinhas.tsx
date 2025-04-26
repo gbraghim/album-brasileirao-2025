@@ -66,7 +66,9 @@ const getRaridadeStyle = (raridade: string) => {
       return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
     case 'Prata':
       return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-    default: // Bronze
+    case 'Bronze':
+      return 'border-amber-800 shadow-amber-800 bg-gradient-to-br from-amber-800/20 to-amber-900/20';
+    default:
       return 'border-amber-800 shadow-amber-800 bg-gradient-to-br from-amber-800/20 to-amber-900/20';
   }
 };
@@ -170,14 +172,11 @@ export default function ModalFigurinhas({
                         ? '/public/placeholder.jpg'
                         : caminhos[currentIndex];
 
-                      const timeInfo = TIMES_SERIE_A.find(time => time.nome === figurinha.jogador.time.nome);
-                      const escudoPath = timeInfo?.escudo || figurinha.jogador.time.escudo;
-
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
+                          <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
                             {/* Imagem do jogador */}
-                            <div className="relative w-full h-52">
+                            <div className="relative w-full h-40">
                               <Image
                                 src={imagemAtual}
                                 alt={figurinha.jogador.nome}
@@ -189,18 +188,9 @@ export default function ModalFigurinhas({
                             </div>
 
                             {/* Informações do jogador */}
-                            <div className="p-2 bg-white/90 backdrop-blur-sm h-20 flex flex-col justify-center">
-                              <div className="flex items-center justify-center gap-1 mb-1">
-                                <Image
-                                  src={escudoPath || '/public/placeholder.jpg'}
-                                  alt={`Escudo do ${figurinha.jogador.time.nome}`}
-                                  width={20}
-                                  height={20}
-                                  className="object-contain"
-                                />
-                                <p className="text-sm font-bold text-center text-black line-clamp-2">{figurinha.jogador.nome}</p>
-                              </div>
-                              <p className="text-xs text-center text-gray-600">{figurinha.jogador.posicao}</p>
+                            <div className="p-1 bg-white/90 backdrop-blur-sm">
+                              <p className="text-sm font-bold text-center text-black truncate">{figurinha.jogador.nome}</p>
+                              <p className="text-xs text-center text-black truncate">{figurinha.jogador.posicao || 'N/A'}</p>
                             </div>
 
                             {/* Indicador de raridade */}
@@ -212,21 +202,6 @@ export default function ModalFigurinhas({
                                   'bg-gray-400/80 text-black'
                                 }`}>
                                   {figurinha.raridade}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Indicador de repetida */}
-                            {figurinha.quantidadeAtual > 1 ? (
-                              <div className="absolute top-1 left-1">
-                                <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/80 text-white">
-                                  Repetida
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="absolute top-1 left-1">
-                                <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/80 text-white">
-                                  Nova
                                 </div>
                               </div>
                             )}
