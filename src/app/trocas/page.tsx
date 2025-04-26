@@ -318,7 +318,7 @@ export default function Trocas() {
         },
         body: JSON.stringify({
           trocaId: trocaSelecionada.id,
-          figurinhaId: figurinha.id,
+          figurinhaSolicitadaId: figurinha.id,
         }),
       });
 
