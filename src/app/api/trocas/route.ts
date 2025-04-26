@@ -43,31 +43,38 @@ const trocaInclude = {
 
 export async function GET() {
   try {
+    console.log('1. Iniciando rota GET /api/trocas');
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      console.log('1. Usuário não autenticado');
+      console.log('2. Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    console.log('2. Usuário autenticado:', session.user.id);
+    console.log('3. Usuário autenticado:', session.user.id);
 
     // Buscar todas as trocas pendentes
+    console.log('4. Iniciando busca de trocas no banco de dados');
     const todasTrocas = await prisma.troca.findMany({
       where: { status: 'PENDENTE' },
       include: trocaInclude,
       orderBy: { createdAt: 'desc' }
     });
+    console.log('5. Trocas encontradas:', todasTrocas.length);
 
     // Separar as trocas em diferentes categorias
+    console.log('6. Iniciando filtragem de trocas');
     const minhasTrocas = todasTrocas.filter(troca => troca.usuarioEnviaId === session.user.id);
     const trocasRecebidas = todasTrocas.filter(troca => troca.usuarioRecebeId === session.user.id);
-    const trocasDisponiveis = todasTrocas.filter(troca => troca.usuarioEnviaId !== session.user.id);
+    const trocasDisponiveis = todasTrocas.filter(troca => 
+      troca.usuarioEnviaId !== session.user.id && 
+      troca.usuarioRecebeId === null
+    );
 
-    console.log('4. Trocas separadas:', {
-      minhasTrocas,
-      trocasRecebidas,
-      trocasDisponiveis
+    console.log('7. Trocas separadas:', {
+      minhasTrocas: minhasTrocas.length,
+      trocasRecebidas: trocasRecebidas.length,
+      trocasDisponiveis: trocasDisponiveis.length
     });
 
     return NextResponse.json({
@@ -76,7 +83,7 @@ export async function GET() {
       trocasDisponiveis
     });
   } catch (error) {
-    console.error('5. Erro ao buscar trocas:', error);
+    console.error('8. Erro detalhado ao buscar trocas:', error);
     return NextResponse.json(
       { error: 'Erro ao buscar trocas' },
       { status: 500 }
