@@ -68,9 +68,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Troca não encontrada ou não está mais pendente' }, { status: 404 });
     }
 
-    // Verificar se o usuário é o destinatário da troca
-    if (troca.usuarioRecebeId !== session.user.id) {
-      return NextResponse.json({ error: 'Você não tem permissão para responder a esta troca' }, { status: 403 });
+    // Verificar se o usuário é o dono da oferta
+    if (troca.usuarioEnviaId === session.user.id) {
+      return NextResponse.json({ error: 'Você não pode propor troca para sua própria figurinha.' }, { status: 403 });
     }
 
     // Verifica se a figurinha solicitada pertence ao usuário
@@ -91,13 +91,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // Atualiza a troca com a figurinha solicitada
+    // Atualiza a troca com a figurinha solicitada e o usuário que está propondo
     const trocaAtualizada = await prisma.troca.update({
       where: { id: trocaId },
       data: {
         figurinhaSolicitada: {
           connect: {
             id: figurinhaSolicitadaId
+          }
+        },
+        usuarioRecebe: {
+          connect: {
+            id: session.user.id
           }
         }
       },
