@@ -237,13 +237,12 @@ function MeuAlbumContent() {
       const ordemRaridade: Record<string, number> = {
         'Lendário': 0,
         'Ouro': 1,
-        'Prata': 2,
-        'Bronze': 3
+        'Prata': 2
       };
       
       // Garante que a raridade seja tratada como string e normalize o valor
-      const raridadeA = ordemRaridade[String(a.raridade).trim()] ?? 3;
-      const raridadeB = ordemRaridade[String(b.raridade).trim()] ?? 3;
+      const raridadeA = ordemRaridade[String(a.raridade).trim()] ?? 2;
+      const raridadeB = ordemRaridade[String(b.raridade).trim()] ?? 2;
       
       if (raridadeA !== raridadeB) {
         return raridadeA - raridadeB;
@@ -284,8 +283,7 @@ function MeuAlbumContent() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Meu Álbum</h1>
-
+        <h1 className="text-2xl md:text-3xl font-bold text-brasil-blue mb-6">Meu Álbum</h1>
         <div className="flex flex-col md:flex-row gap-4 md:gap-6">
           {/* Lista de Times */}
           <div className="w-full md:w-1/4 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
@@ -343,12 +341,25 @@ function MeuAlbumContent() {
             {timeSelecionado && (
               <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
                 <div className="flex flex-col items-center justify-center mb-4">
-                  <h2 className="text-lg md:text-xl font-bold text-brasil-blue text-center">
-                    {timeSelecionado.nome}
-                  </h2>
-                  <span className="text-sm text-brasil-blue mt-1">
-                    {jogadores.filter((j) => j.time.id === timeSelecionado.id).length} de {totalJogadores} figurinhas
-                  </span>
+                  <div className="flex justify-between w-full items-center">
+                    <h2 className="text-lg md:text-xl font-bold text-brasil-blue text-center">
+                      {timeSelecionado.nome}
+                    </h2>
+                    <div className="flex gap-2">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-6 rounded-sm border-2 border-purple-600"></div>
+                        <span className="text-xs text-brasil-blue">Lendário</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-6 rounded-sm border-2 border-yellow-500"></div>
+                        <span className="text-xs text-brasil-blue">Ouro</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-6 rounded-sm border-2 border-gray-400"></div>
+                        <span className="text-xs text-brasil-blue">Prata</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="text-center mb-4">

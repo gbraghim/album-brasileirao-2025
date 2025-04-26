@@ -66,10 +66,8 @@ const getRaridadeStyle = (raridade: string) => {
       return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
     case 'Prata':
       return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-    case 'Bronze':
-      return 'border-amber-800 shadow-amber-800 bg-gradient-to-br from-amber-800/20 to-amber-900/20';
     default:
-      return 'border-amber-800 shadow-amber-800 bg-gradient-to-br from-amber-800/20 to-amber-900/20';
+      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
   }
 };
 
