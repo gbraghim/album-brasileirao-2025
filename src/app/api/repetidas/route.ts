@@ -82,7 +82,7 @@ export async function GET() {
         }
       },
       quantidade: uf.quantidade,
-      raridade: 'COMUM'
+      raridade: uf.figurinha.raridade === 'COMUM' ? 'Prata' : (uf.figurinha.raridade || 'Prata')
     }));
 
     console.log('Figurinhas formatadas:', figurinhasFormatadas);

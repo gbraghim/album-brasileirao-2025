@@ -78,9 +78,9 @@ export default function FiltrosRepetidas({ filtros, onFiltrosChange }: FiltrosRe
           className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Todas as raridades</option>
-          <option value="COMUM">Comum</option>
-          <option value="RARO">Raro</option>
-          <option value="SUPER_RARO">Super Raro</option>
+          <option value="Lendário">Lendário</option>
+          <option value="Ouro">Ouro</option>
+          <option value="Prata">Prata</option>
         </select>
       </div>
 
