@@ -85,7 +85,7 @@ model Jogador {
   updatedAt     DateTime    @updatedAt
   foto          String?
   idade         Int?
-  raridade      String?     @default("Bronze")
+  raridade      String?     @default("Prata")
   figurinhas    Figurinha[]
   time          Time        @relation(fields: [timeId], references: [id])
 
@@ -103,7 +103,7 @@ model Figurinha {
   timeId            String?
   pacoteId          String?
   jogadorId         String?
-  raridade          String?          @default("Bronze")
+  raridade          String?          @default("Prata")
   jogador           Jogador?         @relation(fields: [jogadorId], references: [id])
   pacote            Pacote?          @relation(fields: [pacoteId], references: [id])
   time              Time?            @relation(fields: [timeId], references: [id])

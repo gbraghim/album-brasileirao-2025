@@ -158,6 +158,17 @@ export default function ModalFigurinhas({
                   Figurinhas do Pacote
                 </Dialog.Title>
                 
+                {!temMaisPacotes && (
+                  <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+                    <p className="text-yellow-800 font-medium">
+                      Você não tem mais pacotes disponíveis! 
+                    </p>
+                    <p className="text-yellow-700 text-sm mt-1">
+                      Compre mais pacotes para completar seu álbum mais rápido e aumentar suas chances de encontrar figurinhas lendárias!
+                    </p>
+                  </div>
+                )}
+                
                 <div className="mt-2">
                   <div className="grid grid-cols-2 gap-4 justify-items-center">
                     {figurinhas.map((figurinha) => {
