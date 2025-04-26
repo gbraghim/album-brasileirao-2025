@@ -5,6 +5,12 @@ export interface UserStats {
   timesCompletos: number;
   totalTimes: number;
   totalJogadoresBase: number;
+  figurinhasLendarias: number;
+  totalFigurinhasLendarias: number;
+  figurinhasOuro: number;
+  totalFigurinhasOuro: number;
+  figurinhasPrata: number;
+  totalFigurinhasPrata: number;
 }
 
 export interface TimeStats {

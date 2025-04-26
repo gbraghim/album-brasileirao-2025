@@ -16,7 +16,11 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: {
+      select: {
+        id: true,
+        qtdFigurinhasLendarias: true,
+        qtdFigurinhasOuro: true,
+        qtdFigurinhasPrata: true,
         pacotes: true
       }
     });
@@ -120,12 +124,18 @@ export async function GET() {
     const totalJogadoresBase = await prisma.jogador.count();
 
     const stats: UserStats = {
-      totalPacotes,
+      totalPacotes: user?.pacotes?.length ?? 0,
       totalFigurinhas,
       figurinhasRepetidas,
       timesCompletos,
       totalTimes,
-      totalJogadoresBase
+      totalJogadoresBase,
+      figurinhasLendarias: user?.qtdFigurinhasLendarias ?? 0,
+      totalFigurinhasLendarias: user?.qtdFigurinhasLendarias ?? 0,
+      figurinhasOuro: user?.qtdFigurinhasOuro ?? 0,
+      totalFigurinhasOuro: user?.qtdFigurinhasOuro ?? 0,
+      figurinhasPrata: user?.qtdFigurinhasPrata ?? 0,
+      totalFigurinhasPrata: user?.qtdFigurinhasPrata ?? 0
     };
 
     console.log('API - Estatísticas finais:', {

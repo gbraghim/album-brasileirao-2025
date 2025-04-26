@@ -137,6 +137,21 @@ export default function Dashboard() {
               </div>
             </Link>
           </div>
+          {/* Quantidade de figurinhas por raridade - agora com destaque */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="rounded-lg shadow-md bg-purple-100 border-l-4 border-purple-600 flex flex-col items-center py-4">
+              <span className="text-xs text-purple-700 font-semibold uppercase tracking-wider mb-1">Lendárias</span>
+              <span className="text-3xl font-extrabold text-purple-700">{stats?.figurinhasLendarias ?? 0}</span>
+            </div>
+            <div className="rounded-lg shadow-md bg-yellow-100 border-l-4 border-yellow-500 flex flex-col items-center py-4">
+              <span className="text-xs text-yellow-700 font-semibold uppercase tracking-wider mb-1">Ouro</span>
+              <span className="text-3xl font-extrabold text-yellow-600">{stats?.figurinhasOuro ?? 0}</span>
+            </div>
+            <div className="rounded-lg shadow-md bg-gray-100 border-l-4 border-gray-400 flex flex-col items-center py-4">
+              <span className="text-xs text-gray-700 font-semibold uppercase tracking-wider mb-1">Prata</span>
+              <span className="text-3xl font-extrabold text-gray-600">{stats?.figurinhasPrata ?? 0}</span>
+            </div>
+          </div>
         </div>
 
         {/* Ranking de Colecionadores */}

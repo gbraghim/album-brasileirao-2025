@@ -56,6 +56,9 @@ model User {
   trocasRecebidas Troca[]          @relation("TrocasRecebidas")
   trocas          TrocaFigurinha[]
   userFigurinhas  UserFigurinha[]  @relation("UserFigurinhas")
+  qtdFigurinhasLendarias Int       @default(0)
+  qtdFigurinhasOuro      Int       @default(0)
+  qtdFigurinhasPrata     Int       @default(0)
 
   @@index([email])
 }
