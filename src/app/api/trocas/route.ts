@@ -93,19 +93,26 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    console.log('1. Iniciando criação de troca');
     const session = await getServerSession(authOptions);
 
     if (!session) {
+      console.log('2. Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    console.log('3. Usuário autenticado:', session.user.id);
+
     const { figurinhaId } = await req.json();
+    console.log('4. Figurinha ID recebida:', figurinhaId);
 
     if (!figurinhaId) {
+      console.log('5. Figurinha ID inválida');
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
 
     // Verifica se a figurinha já está em uma troca pendente
+    console.log('6. Verificando se figurinha já está em troca pendente');
     const trocaExistente = await prisma.troca.findFirst({
       where: {
         figurinhaOfertaId: figurinhaId,
@@ -114,12 +121,14 @@ export async function POST(req: Request) {
     });
 
     if (trocaExistente) {
+      console.log('7. Figurinha já está em troca pendente');
       return NextResponse.json(
         { error: 'Figurinha já está disponível para troca' },
         { status: 400 }
       );
     }
 
+    console.log('8. Criando nova troca');
     const troca = await prisma.troca.create({
       data: {
         figurinhaOfertaId: figurinhaId,
@@ -129,9 +138,11 @@ export async function POST(req: Request) {
       include: trocaInclude
     });
 
+    console.log('9. Troca criada com sucesso:', troca.id);
+
     return NextResponse.json(troca);
   } catch (error) {
-    console.error('Erro ao criar troca:', error);
+    console.error('10. Erro detalhado ao criar troca:', error);
     return NextResponse.json(
       { error: 'Erro ao criar troca' },
       { status: 500 }
