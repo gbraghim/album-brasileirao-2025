@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, TrocaStatus } from '@prisma/client';
 
 const trocaInclude = {
   figurinhaOferta: {
@@ -56,7 +56,7 @@ export async function GET() {
     // Buscar todas as trocas pendentes
     console.log('4. Iniciando busca de trocas no banco de dados');
     const todasTrocas = await prisma.troca.findMany({
-      where: { status: 'PENDENTE' },
+      where: { status: TrocaStatus.PENDENTE },
       include: trocaInclude,
       orderBy: { createdAt: 'desc' }
     });
@@ -81,18 +81,48 @@ export async function GET() {
     const response = {
       minhasTrocas: minhasTrocas.map(troca => ({
         ...troca,
-        createdAt: troca.createdAt.toISOString(),
-        updatedAt: troca.updatedAt.toISOString()
+        createdAt: troca.createdAt?.toISOString() || null,
+        updatedAt: troca.updatedAt?.toISOString() || null,
+        usuarioEnvia: troca.usuarioEnvia ? {
+          id: troca.usuarioEnvia.id,
+          name: troca.usuarioEnvia.name,
+          email: troca.usuarioEnvia.email
+        } : null,
+        usuarioRecebe: troca.usuarioRecebe ? {
+          id: troca.usuarioRecebe.id,
+          name: troca.usuarioRecebe.name,
+          email: troca.usuarioRecebe.email
+        } : null
       })),
       trocasRecebidas: trocasRecebidas.map(troca => ({
         ...troca,
-        createdAt: troca.createdAt.toISOString(),
-        updatedAt: troca.updatedAt.toISOString()
+        createdAt: troca.createdAt?.toISOString() || null,
+        updatedAt: troca.updatedAt?.toISOString() || null,
+        usuarioEnvia: troca.usuarioEnvia ? {
+          id: troca.usuarioEnvia.id,
+          name: troca.usuarioEnvia.name,
+          email: troca.usuarioEnvia.email
+        } : null,
+        usuarioRecebe: troca.usuarioRecebe ? {
+          id: troca.usuarioRecebe.id,
+          name: troca.usuarioRecebe.name,
+          email: troca.usuarioRecebe.email
+        } : null
       })),
       trocasDisponiveis: trocasDisponiveis.map(troca => ({
         ...troca,
-        createdAt: troca.createdAt.toISOString(),
-        updatedAt: troca.updatedAt.toISOString()
+        createdAt: troca.createdAt?.toISOString() || null,
+        updatedAt: troca.updatedAt?.toISOString() || null,
+        usuarioEnvia: troca.usuarioEnvia ? {
+          id: troca.usuarioEnvia.id,
+          name: troca.usuarioEnvia.name,
+          email: troca.usuarioEnvia.email
+        } : null,
+        usuarioRecebe: troca.usuarioRecebe ? {
+          id: troca.usuarioRecebe.id,
+          name: troca.usuarioRecebe.name,
+          email: troca.usuarioRecebe.email
+        } : null
       }))
     };
 
@@ -131,7 +161,7 @@ export async function POST(req: Request) {
     const trocaExistente = await prisma.troca.findFirst({
       where: {
         figurinhaOfertaId: figurinhaId,
-        status: 'PENDENTE'
+        status: TrocaStatus.PENDENTE
       }
     });
 
@@ -148,7 +178,7 @@ export async function POST(req: Request) {
       data: {
         figurinhaOfertaId: figurinhaId,
         usuarioEnviaId: session.user.id,
-        status: 'PENDENTE'
+        status: TrocaStatus.PENDENTE
       },
       include: trocaInclude
     });

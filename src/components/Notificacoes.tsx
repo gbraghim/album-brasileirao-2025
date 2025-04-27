@@ -161,14 +161,14 @@ export function Notificacoes() {
                   onClick={() => marcarComoLida(notificacao.id)}
                 >
                   <p className="text-sm text-gray-900">{notificacao.mensagem}</p>
-                  {notificacao.tipo === 'PROPOSTA_TROCA' && notificacao.troca?.status === 'PENDENTE' && (
+                  {notificacao.tipo === 'TROCA_ACEITA' && notificacao.troca?.status === 'PENDENTE' && (
                     <div className="mt-2 flex space-x-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           responderTroca(notificacao.troca!.id, true);
                         }}
-                        className=" hover: text-white px-3 py-1 rounded text-sm"
+                        className="hover: text-white px-3 py-1 rounded text-sm"
                       >
                         Aceitar
                       </button>

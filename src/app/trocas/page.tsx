@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Modal from '@/components/Modal';
 import ModalProporTroca from '@/components/ModalProporTroca';
 import { formatarCaminhoImagem } from '@/lib/utils';
+import { TrocaStatus } from '@prisma/client';
 
 interface Jogador {
   id: string;
@@ -77,13 +78,13 @@ interface Troca {
   };
   usuarioEnvia: {
     id: string;
-    nome: string;
+    name: string;
   };
   usuarioRecebe: {
     id: string;
-    nome: string;
+    name: string;
   };
-  status: 'PENDENTE' | 'ACEITA' | 'REJEITADA';
+  status: TrocaStatus;
   createdAt: string;
 }
 
@@ -166,9 +167,9 @@ export default function Trocas() {
           figurinhaSolicitada: troca.figurinhaSolicitada || null,
           usuarioEnvia: {
             id: troca.usuarioEnvia?.id || '',
-            nome: troca.usuarioEnvia?.name || troca.usuarioEnvia?.nome || '',
+            name: troca.usuarioEnvia?.name || '',
           },
-          usuarioRecebe: troca.usuarioRecebe || { id: '', nome: '' },
+          usuarioRecebe: troca.usuarioRecebe || { id: '', name: '' },
           createdAt: troca.createdAt || ''
         });
 
@@ -247,9 +248,9 @@ export default function Trocas() {
         figurinhaSolicitada: troca.figurinhaSolicitada || null,
         usuarioEnvia: {
           id: troca.usuarioEnvia?.id || '',
-          nome: troca.usuarioEnvia?.name || '',
+          name: troca.usuarioEnvia?.name || '',
         },
-        usuarioRecebe: troca.usuarioRecebe || { id: '', nome: '' },
+        usuarioRecebe: troca.usuarioRecebe || { id: '', name: '' },
         createdAt: troca.createdAt || ''
       });
 
@@ -570,7 +571,7 @@ export default function Trocas() {
                   <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.nome}</span></span>
+                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
                 </div>
                 <div className="mt-3">
                   <button
@@ -633,7 +634,7 @@ export default function Trocas() {
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.nome}</span></span>
+                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
                 </div>
                 <div className="mt-3">
                   <button
@@ -700,7 +701,7 @@ export default function Trocas() {
                   <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.nome}</span></span>
+                  <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
                 </div>
                 <div className="mt-3 flex space-x-2">
                   <button

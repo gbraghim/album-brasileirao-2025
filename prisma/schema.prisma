@@ -8,6 +8,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TrocaStatus {
+  PENDENTE
+  ACEITA
+  RECUSADA
+  FINALIZADA
+  CANCELADA
+}
+
+enum TipoNotificacao {
+  TROCA_ACEITA
+  TROCA_RECUSADA
+  TROCA_FINALIZADA
+  TROCA_CANCELADA
+  PACOTE_ABERTO
+  FIGURINHA_NOVA
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -154,7 +171,7 @@ model Troca {
   id                    String        @id @default(cuid())
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
-  status                String        @default("PENDENTE")
+  status                TrocaStatus   @default(PENDENTE)
   figurinhaOfertaId     String
   figurinhaSolicitadaId String?
   usuarioEnviaId        String
@@ -186,16 +203,16 @@ model TrocaFigurinha {
 }
 
 model Notificacao {
-  id        String   @id @default(cuid())
-  tipo      String
+  id        String         @id @default(cuid())
+  tipo      TipoNotificacao
   mensagem  String
-  lida      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  lida      Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   usuarioId String
   trocaId   String?
-  troca     Troca?   @relation(fields: [trocaId], references: [id])
-  usuario   User     @relation(fields: [usuarioId], references: [id])
+  troca     Troca?         @relation(fields: [trocaId], references: [id])
+  usuario   User           @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([trocaId])

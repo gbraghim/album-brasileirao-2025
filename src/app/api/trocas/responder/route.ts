@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { TrocaStatus } from '@prisma/client';
 
 type TrocaInclude = {
   figurinhaOferta: {
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
     const troca = await prisma.troca.findUnique({
       where: { 
         id: trocaId,
-        status: 'PENDENTE'
+        status: TrocaStatus.PENDENTE
       },
       include: trocaInclude
     });
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
       // Atualizar o status da troca para ACEITA
       const trocaAtualizada = await prisma.troca.update({
         where: { id: trocaId },
-        data: { status: 'ACEITA' },
+        data: { status: TrocaStatus.ACEITA },
         include: trocaInclude
       });
 
@@ -137,7 +138,7 @@ export async function POST(request: Request) {
       // Atualizar o status da troca para RECUSADA
       const trocaAtualizada = await prisma.troca.update({
         where: { id: trocaId },
-        data: { status: 'RECUSADA' },
+        data: { status: TrocaStatus.RECUSADA },
         include: trocaInclude
       });
 

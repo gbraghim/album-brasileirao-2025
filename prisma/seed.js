@@ -154,8 +154,6 @@ async function main() {
 
   // Limpar o banco de dados na ordem correta
   await prisma.notificacao.deleteMany();
-  await prisma.troca.deleteMany();
-  await prisma.trocaFigurinha.deleteMany();
   await prisma.userFigurinha.deleteMany();
   await prisma.figurinha.deleteMany();
   await prisma.pacote.deleteMany();
