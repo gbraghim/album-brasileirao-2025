@@ -345,20 +345,6 @@ function MeuAlbumContent() {
                     <h2 className="text-lg md:text-xl font-bold text-brasil-blue text-center">
                       {timeSelecionado.nome}
                     </h2>
-                    <div className="flex gap-2">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-6 rounded-sm border-2 border-purple-600"></div>
-                        <span className="text-xs text-brasil-blue">Lendário</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-6 rounded-sm border-2 border-yellow-500"></div>
-                        <span className="text-xs text-brasil-blue">Ouro</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-6 rounded-sm border-2 border-gray-400"></div>
-                        <span className="text-xs text-brasil-blue">Prata</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 

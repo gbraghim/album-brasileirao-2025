@@ -39,8 +39,8 @@ export async function POST(
       return NextResponse.json({ error: 'Troca não encontrada' }, { status: 404 });
     }
 
-    // Verificar se o usuário é o destinatário da troca
-    if (troca.usuarioRecebeId !== user.id) {
+    // Verificar se o usuário é o dono da oferta (quem pode aprovar/recusar)
+    if (troca.usuarioEnviaId !== user.id) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
     }
 
@@ -50,28 +50,10 @@ export async function POST(
     }
 
     if (aceitar) {
-      // Verificar se o usuário ainda tem a figurinha solicitada
-      const figurinhaSolicitada = await prisma.userFigurinha.findFirst({
-        where: {
-          userId: user.id,
-          figurinhaId: troca.figurinhaSolicitadaId!,
-          quantidade: {
-            gt: 1
-          }
-        }
-      });
-
-      if (!figurinhaSolicitada) {
-        return NextResponse.json(
-          { error: 'Você não tem mais a figurinha solicitada disponível para troca' },
-          { status: 400 }
-        );
-      }
-
-      // Verificar se o usuário que enviou a proposta ainda tem a figurinha oferecida
+      // Verificar se o usuário (dono da oferta) ainda tem a figurinha ofertada
       const figurinhaOferta = await prisma.userFigurinha.findFirst({
         where: {
-          userId: troca.usuarioEnviaId,
+          userId: user.id,
           figurinhaId: troca.figurinhaOfertaId,
           quantidade: {
             gt: 1
@@ -81,44 +63,32 @@ export async function POST(
 
       if (!figurinhaOferta) {
         return NextResponse.json(
-          { error: 'O usuário não tem mais a figurinha oferecida disponível para troca' },
+          { error: 'Você não tem mais a figurinha ofertada disponível para troca' },
+          { status: 400 }
+        );
+      }
+
+      // Verificar se o usuário que fez a proposta ainda tem a figurinha solicitada
+      const figurinhaSolicitada = await prisma.userFigurinha.findFirst({
+        where: {
+          userId: troca.usuarioRecebeId!,
+          figurinhaId: troca.figurinhaSolicitadaId!,
+          quantidade: {
+            gt: 1
+          }
+        }
+      });
+
+      if (!figurinhaSolicitada) {
+        return NextResponse.json(
+          { error: 'O usuário que fez a proposta não tem mais a figurinha solicitada disponível para troca' },
           { status: 400 }
         );
       }
 
       // Realizar a troca
       await prisma.$transaction([
-        // Atualizar a quantidade da figurinha solicitada do usuário atual
-        prisma.userFigurinha.update({
-          where: {
-            id: figurinhaSolicitada.id
-          },
-          data: {
-            quantidade: figurinhaSolicitada.quantidade - 1
-          }
-        }),
-
-        // Adicionar a figurinha oferecida ao usuário atual
-        prisma.userFigurinha.upsert({
-          where: {
-            userId_figurinhaId: {
-              userId: user.id,
-              figurinhaId: troca.figurinhaOfertaId
-            }
-          },
-          update: {
-            quantidade: {
-              increment: 1
-            }
-          },
-          create: {
-            userId: user.id,
-            figurinhaId: troca.figurinhaOfertaId,
-            quantidade: 1
-          }
-        }),
-
-        // Atualizar a quantidade da figurinha oferecida do usuário que enviou a proposta
+        // Atualizar a quantidade da figurinha ofertada do usuário atual
         prisma.userFigurinha.update({
           where: {
             id: figurinhaOferta.id
@@ -128,11 +98,11 @@ export async function POST(
           }
         }),
 
-        // Adicionar a figurinha solicitada ao usuário que enviou a proposta
+        // Adicionar a figurinha solicitada ao usuário atual
         prisma.userFigurinha.upsert({
           where: {
             userId_figurinhaId: {
-              userId: troca.usuarioEnviaId,
+              userId: user.id,
               figurinhaId: troca.figurinhaSolicitadaId!
             }
           },
@@ -142,8 +112,38 @@ export async function POST(
             }
           },
           create: {
-            userId: troca.usuarioEnviaId,
+            userId: user.id,
             figurinhaId: troca.figurinhaSolicitadaId!,
+            quantidade: 1
+          }
+        }),
+
+        // Atualizar a quantidade da figurinha solicitada do usuário que fez a proposta
+        prisma.userFigurinha.update({
+          where: {
+            id: figurinhaSolicitada.id
+          },
+          data: {
+            quantidade: figurinhaSolicitada.quantidade - 1
+          }
+        }),
+
+        // Adicionar a figurinha ofertada ao usuário que fez a proposta
+        prisma.userFigurinha.upsert({
+          where: {
+            userId_figurinhaId: {
+              userId: troca.usuarioRecebeId!,
+              figurinhaId: troca.figurinhaOfertaId
+            }
+          },
+          update: {
+            quantidade: {
+              increment: 1
+            }
+          },
+          create: {
+            userId: troca.usuarioRecebeId!,
+            figurinhaId: troca.figurinhaOfertaId,
             quantidade: 1
           }
         }),

@@ -93,6 +93,7 @@ export default function Trocas() {
   const [minhasTrocas, setMinhasTrocas] = useState<Troca[]>([]);
   const [trocasDisponiveis, setTrocasDisponiveis] = useState<Troca[]>([]);
   const [propostasRecebidas, setPropostasRecebidas] = useState<Troca[]>([]);
+  const [ofertasEnviadas, setOfertasEnviadas] = useState<Troca[]>([]);
   const [repetidas, setRepetidas] = useState<Figurinha[]>([]);
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +103,7 @@ export default function Trocas() {
   const [selectedFigurinha, setSelectedFigurinha] = useState<Figurinha | null>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,7 +139,8 @@ export default function Trocas() {
         const figurinhasEmTrocaIds = new Set([
           ...(trocasData.minhasTrocas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
           ...(trocasData.trocasRecebidas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
-          ...(trocasData.trocasDisponiveis || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean)
+          ...(trocasData.trocasDisponiveis || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
+          ...(trocasData.ofertasEnviadas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean)
         ]);
         console.log('5. IDs das figurinhas em troca:', Array.from(figurinhasEmTrocaIds));
         setFigurinhasEmTroca(Array.from(figurinhasEmTrocaIds));
@@ -164,34 +167,56 @@ export default function Trocas() {
             },
             quantidade: troca.figurinhaOferta?.quantidade || 0
           },
-          figurinhaSolicitada: troca.figurinhaSolicitada || null,
+          figurinhaSolicitada: troca.figurinhaSolicitada ? {
+            id: troca.figurinhaSolicitada.id || '',
+            jogador: {
+              id: troca.figurinhaSolicitada.jogador?.id || '',
+              nome: troca.figurinhaSolicitada.jogador?.nome || '',
+              posicao: troca.figurinhaSolicitada.jogador?.posicao || '',
+              numero: troca.figurinhaSolicitada.jogador?.numero || 0,
+              nacionalidade: troca.figurinhaSolicitada.jogador?.nacionalidade || '',
+              foto: troca.figurinhaSolicitada.jogador?.foto || '',
+              time: {
+                id: troca.figurinhaSolicitada.jogador?.time?.id || '',
+                nome: troca.figurinhaSolicitada.jogador?.time?.nome || '',
+                escudo: troca.figurinhaSolicitada.jogador?.time?.escudo || ''
+              }
+            }
+          } : null,
           usuarioEnvia: {
             id: troca.usuarioEnvia?.id || '',
             name: troca.usuarioEnvia?.name || '',
           },
-          usuarioRecebe: troca.usuarioRecebe || { id: '', name: '' },
+          usuarioRecebe: troca.usuarioRecebe ? {
+            id: troca.usuarioRecebe.id || '',
+            name: troca.usuarioRecebe.name || '',
+          } : null,
           createdAt: troca.createdAt || ''
         });
 
         const minhasTrocasFormatadas = (trocasData.minhasTrocas || []).map(formatarTroca);
         const trocasRecebidasFormatadas = (trocasData.trocasRecebidas || []).map(formatarTroca);
         const trocasDisponiveisFormatadas = (trocasData.trocasDisponiveis || []).map(formatarTroca);
+        const ofertasEnviadasFormatadas = (trocasData.ofertasEnviadas || []).map(formatarTroca);
 
         console.log('7. Trocas formatadas:', {
           minhasTrocas: minhasTrocasFormatadas.length,
           trocasRecebidas: trocasRecebidasFormatadas.length,
-          trocasDisponiveis: trocasDisponiveisFormatadas.length
+          trocasDisponiveis: trocasDisponiveisFormatadas.length,
+          ofertasEnviadas: ofertasEnviadasFormatadas.length
         });
 
         setMinhasTrocas(minhasTrocasFormatadas);
         setPropostasRecebidas(trocasRecebidasFormatadas);
         setTrocasDisponiveis(trocasDisponiveisFormatadas);
+        setOfertasEnviadas(ofertasEnviadasFormatadas);
         setRepetidas(repetidasData);
         setLoading(false);
         console.log('8. Estado atualizado:', {
           minhasTrocas: minhasTrocasFormatadas.length,
           trocasRecebidas: trocasRecebidasFormatadas.length,
           trocasDisponiveis: trocasDisponiveisFormatadas.length,
+          ofertasEnviadas: ofertasEnviadasFormatadas.length,
           repetidas: repetidasData.length
         });
       } catch (err) {
@@ -220,7 +245,8 @@ export default function Trocas() {
       const figurinhasEmTrocaIds = new Set([
         ...(data.minhasTrocas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
         ...(data.trocasRecebidas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
-        ...(data.trocasDisponiveis || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean)
+        ...(data.trocasDisponiveis || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
+        ...(data.ofertasEnviadas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean)
       ]);
       setFigurinhasEmTroca(Array.from(figurinhasEmTrocaIds));
 
@@ -257,10 +283,12 @@ export default function Trocas() {
       const minhasTrocasFormatadas = (data.minhasTrocas || []).map(formatarTroca);
       const trocasRecebidasFormatadas = (data.trocasRecebidas || []).map(formatarTroca);
       const trocasDisponiveisFormatadas = (data.trocasDisponiveis || []).map(formatarTroca);
+      const ofertasEnviadasFormatadas = (data.ofertasEnviadas || []).map(formatarTroca);
 
       setMinhasTrocas(minhasTrocasFormatadas);
       setPropostasRecebidas(trocasRecebidasFormatadas);
       setTrocasDisponiveis(trocasDisponiveisFormatadas);
+      setOfertasEnviadas(ofertasEnviadasFormatadas);
       setLoading(false);
     } catch (error) {
       console.error('Erro:', error);
@@ -320,7 +348,7 @@ export default function Trocas() {
         },
         body: JSON.stringify({
           trocaId: trocaSelecionada.id,
-          figurinhaId: figurinha.id,
+          figurinhaSolicitadaId: figurinha.id,
         }),
       });
 
@@ -373,6 +401,10 @@ export default function Trocas() {
       
       // Recarregar as trocas
       await fetchTrocas();
+      
+      if (aceitar) {
+        setShowSuccessModal(true);
+      }
       
       setError(null);
     } catch (error) {
@@ -448,7 +480,7 @@ export default function Trocas() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
+    <div className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-8 text-brasil-blue">Trocas</h1>
 
@@ -728,6 +760,45 @@ export default function Trocas() {
           </div>
         </div>
 
+        {/* Propostas Pendentes */}
+        <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+          <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Propostas Pendentes
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {ofertasEnviadas.map((troca) => (
+              <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-brasil-blue">Você oferece:</p>
+                    {troca.figurinhaSolicitada && (
+                      <>
+                        <p className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.nome}</p>
+                        <p className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.posicao}</p>
+                        <p className="text-sm text-gray-600">#{troca.figurinhaSolicitada.jogador.numero}</p>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-brasil-blue">Você recebe:</p>
+                    <p className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</p>
+                    <p className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.posicao}</p>
+                    <p className="text-sm text-gray-600">#{troca.figurinhaOferta.jogador.numero}</p>
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    Pendente
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Modais */}
         {showProporTrocaModal && trocaSelecionada && (
           <ModalProporTroca
@@ -748,7 +819,27 @@ export default function Trocas() {
             onClose={() => setShowErrorModal(false)}
             title="Erro"
           >
-            <p className="text-red-500">{errorMessage}</p>
+            <div className="text-center py-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <p className="text-red-600 font-semibold">{errorMessage}</p>
+            </div>
+          </Modal>
+        )}
+
+        {showSuccessModal && (
+          <Modal
+            isOpen={showSuccessModal}
+            onClose={() => setShowSuccessModal(false)}
+            title="Troca realizada"
+          >
+            <div className="text-center py-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-green-600 font-semibold">Troca realizada com sucesso!</p>
+            </div>
           </Modal>
         )}
       </div>

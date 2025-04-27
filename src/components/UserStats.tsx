@@ -35,32 +35,6 @@ export default function UserStats({ stats }: UserStatsProps) {
         </div>
       </Link>
 
-      <Link href="/meu-album" className="block">
-        <div className="bg-white rounded-lg shadow-lg p-6 h-32 hover:bg-gray-50 transition-colors cursor-pointer">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Figurinhas Lendárias</h3>
-          <p className="text-3xl font-bold text-purple-600">
-            {(stats.figurinhasLendarias ?? 0)}/{(stats.totalFigurinhasLendarias ?? 0)}
-          </p>
-        </div>
-      </Link>
-
-      <Link href="/meu-album" className="block">
-        <div className="bg-white rounded-lg shadow-lg p-6 h-32 hover:bg-gray-50 transition-colors cursor-pointer">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Figurinhas Ouro</h3>
-          <p className="text-3xl font-bold text-yellow-500">
-            {(stats.figurinhasOuro ?? 0)}/{(stats.totalFigurinhasOuro ?? 0)}
-          </p>
-        </div>
-      </Link>
-
-      <Link href="/meu-album" className="block">
-        <div className="bg-white rounded-lg shadow-lg p-6 h-32 hover:bg-gray-50 transition-colors cursor-pointer">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Figurinhas Prata</h3>
-          <p className="text-3xl font-bold text-gray-400">
-            {(stats.figurinhasPrata ?? 0)}/{(stats.totalFigurinhasPrata ?? 0)}
-          </p>
-        </div>
-      </Link>
-    </div>
+      </div>
   );
 } 

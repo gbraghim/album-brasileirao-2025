@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { EditarAvatar } from '@/components/EditarAvatar';
 
 type User = {
   id: string;
@@ -19,6 +20,7 @@ export default function PerfilPage() {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState(session?.user?.image || '/default-avatar.png');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -77,9 +79,8 @@ export default function PerfilPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Informações Pessoais</h2>
             <div className="space-y-3 md:space-y-4">
-              <div className="flex items-center space-x-3 md:space-x-4">
-
-                <div>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="text-center">
                   <h3 className="text-lg md:text-xl font-semibold text-brasil-blue">{session?.user?.name}</h3>
                   <p className="text-sm md:text-base text-gray-600">{session?.user?.email}</p>
                 </div>

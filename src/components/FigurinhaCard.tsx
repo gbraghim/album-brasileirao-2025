@@ -64,6 +64,19 @@ export default function FigurinhaCard({
           <p className="text-sm font-bold text-center text-black truncate">{jogador.nome}</p>
           <p className="text-xs text-center text-black truncate">{jogador.posicao}</p>
         </div>
+
+        {/* Indicador de raridade */}
+        {jogador.raridade !== 'Prata' && (
+          <div className="absolute top-1 right-1">
+            <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+              jogador.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+              jogador.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+              'bg-gray-400/80 text-black'
+            }`}>
+              {jogador.raridade}
+            </div>
+          </div>
+        )}
       </div>
       {jogador.quantidade && jogador.quantidade > 1 && onAdicionarRepetida && (
         <div className="flex items-center justify-between mt-2">

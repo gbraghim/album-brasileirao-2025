@@ -62,17 +62,30 @@ export async function GET() {
     });
     console.log('5. Trocas encontradas:', todasTrocas.length);
 
-    // Separar as trocas em diferentes categorias
-    console.log('7. Iniciando filtragem de trocas');
-    const minhasTrocas = todasTrocas.filter(troca => troca.usuarioEnviaId === session.user.id);
-    const trocasRecebidas = todasTrocas.filter(troca => troca.usuarioRecebeId === session.user.id);
+    // Filtrar as trocas
+    const minhasTrocas = todasTrocas.filter(troca => 
+      troca.usuarioEnviaId === session.user.id && 
+      !troca.figurinhaSolicitadaId
+    );
+
+    const ofertasEnviadas = todasTrocas.filter(troca => 
+      troca.usuarioRecebeId === session.user.id && 
+      troca.figurinhaSolicitadaId !== null
+    );
+
+    const trocasRecebidas = todasTrocas.filter(troca => 
+      troca.usuarioEnviaId === session.user.id && 
+      troca.figurinhaSolicitadaId !== null
+    );
+
     const trocasDisponiveis = todasTrocas.filter(troca => 
       troca.usuarioEnviaId !== session.user.id && 
-      troca.usuarioRecebeId === null
+      !troca.figurinhaSolicitadaId
     );
 
     console.log('8. Trocas separadas:', {
       minhasTrocas: minhasTrocas.length,
+      ofertasEnviadas: ofertasEnviadas.length,
       trocasRecebidas: trocasRecebidas.length,
       trocasDisponiveis: trocasDisponiveis.length
     });
@@ -80,6 +93,21 @@ export async function GET() {
     // Garantir que todos os objetos sejam serializáveis
     const response = {
       minhasTrocas: minhasTrocas.map(troca => ({
+        ...troca,
+        createdAt: troca.createdAt?.toISOString() || null,
+        updatedAt: troca.updatedAt?.toISOString() || null,
+        usuarioEnvia: troca.usuarioEnvia ? {
+          id: troca.usuarioEnvia.id,
+          name: troca.usuarioEnvia.name,
+          email: troca.usuarioEnvia.email
+        } : null,
+        usuarioRecebe: troca.usuarioRecebe ? {
+          id: troca.usuarioRecebe.id,
+          name: troca.usuarioRecebe.name,
+          email: troca.usuarioRecebe.email
+        } : null
+      })),
+      ofertasEnviadas: ofertasEnviadas.map(troca => ({
         ...troca,
         createdAt: troca.createdAt?.toISOString() || null,
         updatedAt: troca.updatedAt?.toISOString() || null,
