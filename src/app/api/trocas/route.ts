@@ -46,8 +46,8 @@ export async function GET() {
     console.log('1. Iniciando rota GET /api/trocas');
     const session = await getServerSession(authOptions);
 
-    if (!session) {
-      console.log('2. Usuário não autenticado');
+    if (!session || !session.user?.id) {
+      console.log('2. Usuário não autenticado ou ID inválido');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -62,8 +62,17 @@ export async function GET() {
     });
     console.log('5. Trocas encontradas:', todasTrocas.length);
 
+    if (!todasTrocas) {
+      console.log('6. Nenhuma troca encontrada');
+      return NextResponse.json({
+        minhasTrocas: [],
+        trocasRecebidas: [],
+        trocasDisponiveis: []
+      });
+    }
+
     // Separar as trocas em diferentes categorias
-    console.log('6. Iniciando filtragem de trocas');
+    console.log('7. Iniciando filtragem de trocas');
     const minhasTrocas = todasTrocas.filter(troca => troca.usuarioEnviaId === session.user.id);
     const trocasRecebidas = todasTrocas.filter(troca => troca.usuarioRecebeId === session.user.id);
     const trocasDisponiveis = todasTrocas.filter(troca => 
@@ -71,7 +80,7 @@ export async function GET() {
       troca.usuarioRecebeId === null
     );
 
-    console.log('7. Trocas separadas:', {
+    console.log('8. Trocas separadas:', {
       minhasTrocas: minhasTrocas.length,
       trocasRecebidas: trocasRecebidas.length,
       trocasDisponiveis: trocasDisponiveis.length
@@ -83,7 +92,7 @@ export async function GET() {
       trocasDisponiveis
     });
   } catch (error) {
-    console.error('8. Erro detalhado ao buscar trocas:', error);
+    console.error('9. Erro detalhado ao buscar trocas:', error);
     return NextResponse.json(
       { error: 'Erro ao buscar trocas' },
       { status: 500 }
