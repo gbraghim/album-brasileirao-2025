@@ -62,15 +62,6 @@ export async function GET() {
     });
     console.log('5. Trocas encontradas:', todasTrocas.length);
 
-    if (!todasTrocas) {
-      console.log('6. Nenhuma troca encontrada');
-      return NextResponse.json({
-        minhasTrocas: [],
-        trocasRecebidas: [],
-        trocasDisponiveis: []
-      });
-    }
-
     // Separar as trocas em diferentes categorias
     console.log('7. Iniciando filtragem de trocas');
     const minhasTrocas = todasTrocas.filter(troca => troca.usuarioEnviaId === session.user.id);
@@ -86,15 +77,30 @@ export async function GET() {
       trocasDisponiveis: trocasDisponiveis.length
     });
 
-    return NextResponse.json({
-      minhasTrocas,
-      trocasRecebidas,
-      trocasDisponiveis
-    });
+    // Garantir que todos os objetos sejam serializáveis
+    const response = {
+      minhasTrocas: minhasTrocas.map(troca => ({
+        ...troca,
+        createdAt: troca.createdAt.toISOString(),
+        updatedAt: troca.updatedAt.toISOString()
+      })),
+      trocasRecebidas: trocasRecebidas.map(troca => ({
+        ...troca,
+        createdAt: troca.createdAt.toISOString(),
+        updatedAt: troca.updatedAt.toISOString()
+      })),
+      trocasDisponiveis: trocasDisponiveis.map(troca => ({
+        ...troca,
+        createdAt: troca.createdAt.toISOString(),
+        updatedAt: troca.updatedAt.toISOString()
+      }))
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('9. Erro detalhado ao buscar trocas:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar trocas' },
+      { error: 'Erro ao buscar trocas', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     );
   }
