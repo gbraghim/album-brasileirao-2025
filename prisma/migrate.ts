@@ -1,69 +1,42 @@
-import { PrismaClient, TipoNotificacao } from '@prisma/client';
+import { PrismaClient, NotificacaoTipo } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando migração de tipos de notificação...');
+  console.log('Iniciando migração de notificações...');
 
-  // Atualizar notificações de troca aceita
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.TROCA_ACEITA
-    },
-    data: {
-      tipo: TipoNotificacao.TROCA_ACEITA
-    }
-  });
+  // Criar a tabela Notificacao se não existir
+  await prisma.$executeRaw`
+    CREATE TABLE IF NOT EXISTS "Notificacao" (
+      id TEXT PRIMARY KEY,
+      mensagem TEXT NOT NULL,
+      lida BOOLEAN DEFAULT false,
+      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      "usuarioId" TEXT NOT NULL,
+      "trocaId" TEXT,
+      tipo "NotificacaoTipo" NOT NULL,
+      "tipoNovo" "TipoNotificacao",
+      FOREIGN KEY ("usuarioId") REFERENCES "User"("id") ON DELETE CASCADE,
+      FOREIGN KEY ("trocaId") REFERENCES "Troca"("id") ON DELETE CASCADE
+    );
+  `;
 
-  // Atualizar notificações de troca recusada
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.TROCA_RECUSADA
-    },
-    data: {
-      tipo: TipoNotificacao.TROCA_RECUSADA
-    }
-  });
-
-  // Atualizar notificações de troca finalizada
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.TROCA_FINALIZADA
-    },
-    data: {
-      tipo: TipoNotificacao.TROCA_FINALIZADA
-    }
-  });
-
-  // Atualizar notificações de troca cancelada
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.TROCA_CANCELADA
-    },
-    data: {
-      tipo: TipoNotificacao.TROCA_CANCELADA
-    }
-  });
-
-  // Atualizar notificações de pacote aberto
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.PACOTE_ABERTO
-    },
-    data: {
-      tipo: TipoNotificacao.PACOTE_ABERTO
-    }
-  });
-
-  // Atualizar notificações de figurinha nova
-  await prisma.notificacao.updateMany({
-    where: {
-      tipo: TipoNotificacao.FIGURINHA_NOVA
-    },
-    data: {
-      tipo: TipoNotificacao.FIGURINHA_NOVA
-    }
-  });
+  // Criar o enum TipoNotificacao se não existir
+  await prisma.$executeRaw`
+    DO $$ BEGIN
+      CREATE TYPE "TipoNotificacao" AS ENUM (
+        'TROCA_ACEITA',
+        'TROCA_RECUSADA',
+        'TROCA_FINALIZADA',
+        'TROCA_CANCELADA',
+        'PACOTE_ABERTO',
+        'FIGURINHA_NOVA'
+      );
+    EXCEPTION
+      WHEN duplicate_object THEN null;
+    END $$;
+  `;
 
   console.log('Migração concluída!');
 }
