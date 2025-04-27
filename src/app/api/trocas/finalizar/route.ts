@@ -111,10 +111,10 @@ export async function POST(request: Request) {
           }
         }
       }),
-      // Atualizar o status da troca para FINALIZADA
+      // Atualizar o status da troca para CANCELADA (já que não temos FINALIZADA)
       prisma.troca.update({
         where: { id: trocaId },
-        data: { status: TrocaStatus.FINALIZADA }
+        data: { status: TrocaStatus.CANCELADA }
       })
     ]);
 
