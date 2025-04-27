@@ -25,8 +25,7 @@ export async function GET() {
         trocasEnviadas: false,
         trocasRecebidas: false,
         notificacoes: false,
-        pacotes: false,
-        trocas: false
+        pacotes: false
       }
     });
 
