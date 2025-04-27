@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Prisma, TipoNotificacao } from '@prisma/client';
+import { Prisma, NotificacaoTipo } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -56,14 +56,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Mensagem e tipo são obrigatórios' }, { status: 400 });
     }
 
-    if (!Object.values(TipoNotificacao).includes(tipo)) {
+    if (!Object.values(NotificacaoTipo).includes(tipo)) {
       return NextResponse.json({ error: 'Tipo de notificação inválido' }, { status: 400 });
     }
 
     const notificacao = await prisma.notificacao.create({
       data: {
         mensagem,
-        tipo: tipo as TipoNotificacao,
+        tipo: tipo as NotificacaoTipo,
         usuarioId: session.user.id,
         trocaId,
       },
