@@ -8,60 +8,60 @@ async function main() {
   // Atualizar notificações de troca aceita
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'TROCA_ACEITA'
+      tipo: TipoNotificacao.TROCA_ACEITA
     },
     data: {
-      tipoNovo: TipoNotificacao.TROCA_ACEITA
+      tipo: TipoNotificacao.TROCA_ACEITA
     }
   });
 
   // Atualizar notificações de troca recusada
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'TROCA_RECUSADA'
+      tipo: TipoNotificacao.TROCA_RECUSADA
     },
     data: {
-      tipoNovo: TipoNotificacao.TROCA_RECUSADA
+      tipo: TipoNotificacao.TROCA_RECUSADA
     }
   });
 
   // Atualizar notificações de troca finalizada
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'TROCA_FINALIZADA'
+      tipo: TipoNotificacao.TROCA_FINALIZADA
     },
     data: {
-      tipoNovo: TipoNotificacao.TROCA_FINALIZADA
+      tipo: TipoNotificacao.TROCA_FINALIZADA
     }
   });
 
   // Atualizar notificações de troca cancelada
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'TROCA_CANCELADA'
+      tipo: TipoNotificacao.TROCA_CANCELADA
     },
     data: {
-      tipoNovo: TipoNotificacao.TROCA_CANCELADA
+      tipo: TipoNotificacao.TROCA_CANCELADA
     }
   });
 
   // Atualizar notificações de pacote aberto
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'PACOTE_ABERTO'
+      tipo: TipoNotificacao.PACOTE_ABERTO
     },
     data: {
-      tipoNovo: TipoNotificacao.PACOTE_ABERTO
+      tipo: TipoNotificacao.PACOTE_ABERTO
     }
   });
 
   // Atualizar notificações de figurinha nova
   await prisma.notificacao.updateMany({
     where: {
-      tipo: 'FIGURINHA_NOVA'
+      tipo: TipoNotificacao.FIGURINHA_NOVA
     },
     data: {
-      tipoNovo: TipoNotificacao.FIGURINHA_NOVA
+      tipo: TipoNotificacao.FIGURINHA_NOVA
     }
   });
 
