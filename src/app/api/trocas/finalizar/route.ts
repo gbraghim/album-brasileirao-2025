@@ -43,6 +43,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Você não tem permissão para finalizar esta troca' }, { status: 403 });
     }
 
+    // Buscar a raridade correta dos jogadores (apenas para uso futuro, não para gravar em userFigurinha)
+    const jogadorOferta = await prisma.jogador.findUnique({
+      where: { id: troca.figurinhaOferta.jogadorId },
+      select: { raridade: true }
+    });
+    let jogadorSolicitada = null;
+    if (troca.figurinhaSolicitada) {
+      jogadorSolicitada = await prisma.jogador.findUnique({
+        where: { id: troca.figurinhaSolicitada.jogadorId },
+        select: { raridade: true }
+      });
+    }
+
     // Atualizar os donos das figurinhas em uma transação
     const result = await prisma.$transaction([
       // Atualizar o dono da figurinha ofertada

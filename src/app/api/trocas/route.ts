@@ -184,8 +184,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
 
+    // Verifica se a figurinha é lendária
+    console.log('6. Verificando raridade da figurinha');
+    const figurinha = await prisma.figurinha.findUnique({
+      where: { id: figurinhaId },
+      select: { raridade: true }
+    });
+
+    if (figurinha?.raridade === 'Lendário') {
+      console.log('7. Figurinha lendária não pode ser trocada');
+      return NextResponse.json(
+        { error: 'Figurinhas lendárias não podem ser trocadas' },
+        { status: 400 }
+      );
+    }
+
     // Verifica se a figurinha já está em uma troca pendente
-    console.log('6. Verificando se figurinha já está em troca pendente');
+    console.log('8. Verificando se figurinha já está em troca pendente');
     const trocaExistente = await prisma.troca.findFirst({
       where: {
         figurinhaOfertaId: figurinhaId,
@@ -194,14 +209,14 @@ export async function POST(req: Request) {
     });
 
     if (trocaExistente) {
-      console.log('7. Figurinha já está em troca pendente');
+      console.log('9. Figurinha já está em troca pendente');
       return NextResponse.json(
         { error: 'Figurinha já está disponível para troca' },
         { status: 400 }
       );
     }
 
-    console.log('8. Criando nova troca');
+    console.log('10. Criando nova troca');
     const troca = await prisma.troca.create({
       data: {
         figurinhaOfertaId: figurinhaId,
@@ -211,11 +226,11 @@ export async function POST(req: Request) {
       include: trocaInclude
     });
 
-    console.log('9. Troca criada com sucesso:', troca.id);
+    console.log('11. Troca criada com sucesso:', troca.id);
 
     return NextResponse.json(troca);
   } catch (error) {
-    console.error('10. Erro detalhado ao criar troca:', error);
+    console.error('12. Erro detalhado ao criar troca:', error);
     return NextResponse.json(
       { error: 'Erro ao criar troca' },
       { status: 500 }

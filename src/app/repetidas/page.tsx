@@ -23,6 +23,11 @@ interface Figurinha {
   raridade: string;
 }
 
+// Função utilitária para normalizar strings (remover acentos e deixar minúsculo)
+function normalize(str: string) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 export default function Repetidas() {
   const { data: session } = useSession();
   const [figurinhas, setFigurinhas] = useState<Figurinha[]>([]);
@@ -215,34 +220,36 @@ export default function Repetidas() {
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <Image
-                  src={`/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
-                  alt={figurinha.jogador.time.nome}
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                />
+                {figurinha.jogador.time.escudo && (
+                  <Image
+                    src={figurinha.jogador.time.escudo}
+                    alt={figurinha.jogador.time.nome}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
+                )}
                 <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
               </div>
               <div className="mt-2 flex justify-between items-center">
                 <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
                 <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
               </div>
-              <div className="mt-2">
-                {figurinhasEmTroca.includes(figurinha.id) ? (
-                  <button
-                    onClick={() => removerTroca(figurinha)}
-                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm"
-                  >
-                    Remover da Troca
-                  </button>
-                ) : (
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</span>
+                {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
                   <button
                     onClick={() => enviarParaTroca(figurinha)}
-                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-2 rounded text-sm"
+                    className="bg-brasil-yellow text-brasil-blue px-3 py-1 rounded-md text-sm hover:bg-yellow-500 transition-colors"
                   >
                     Disponibilizar para Troca
                   </button>
+                )}
+                {figurinhasEmTroca.includes(figurinha.id) && (
+                  <span className="text-sm text-brasil-yellow">Disponível para troca</span>
+                )}
+                {normalize(figurinha.raridade) === 'lendario' && (
+                  <span className="text-sm text-gray-500">Não pode ser trocada</span>
                 )}
               </div>
             </div>
