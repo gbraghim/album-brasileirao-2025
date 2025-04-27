@@ -2,44 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
-
-const trocaInclude = {
-  figurinhaOferta: {
-    include: {
-      jogador: {
-        select: {
-          id: true,
-          nome: true,
-          posicao: true,
-          numero: true,
-          foto: true,
-          time: {
-            select: {
-              id: true,
-              nome: true,
-              escudo: true
-            }
-          }
-        }
-      }
-    }
-  },
-  usuarioEnvia: {
-    select: {
-      id: true,
-      name: true,
-      email: true
-    }
-  },
-  usuarioRecebe: {
-    select: {
-      id: true,
-      name: true,
-      email: true
-    }
-  }
-} satisfies Prisma.TrocaInclude;
 
 export async function GET(request: Request) {
   try {
@@ -52,11 +14,6 @@ export async function GET(request: Request) {
     const notificacoes = await prisma.notificacao.findMany({
       where: {
         usuarioId: session.user.id,
-      },
-      include: {
-        troca: {
-          include: trocaInclude
-        }
       },
       orderBy: {
         createdAt: 'desc'
@@ -93,11 +50,6 @@ export async function POST(request: Request) {
         mensagem,
         trocaId,
         usuarioId
-      },
-      include: {
-        troca: {
-          include: trocaInclude
-        }
       }
     });
 
