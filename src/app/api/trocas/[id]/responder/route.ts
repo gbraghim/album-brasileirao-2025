@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { TrocaStatus } from '@prisma/client';
 
 export async function POST(
   request: NextRequest,
@@ -44,7 +45,7 @@ export async function POST(
     }
 
     // Verificar se a troca já foi respondida
-    if (troca.status !== 'PENDENTE') {
+    if (troca.status !== TrocaStatus.PENDENTE) {
       return NextResponse.json({ error: 'Troca já foi respondida' }, { status: 400 });
     }
 
@@ -150,14 +151,14 @@ export async function POST(
         // Atualizar o status da troca
         prisma.troca.update({
           where: { id: trocaId },
-          data: { status: 'ACEITO' }
+          data: { status: TrocaStatus.ACEITA }
         })
       ]);
     } else {
       // Atualizar o status da troca para recusado
       await prisma.troca.update({
         where: { id: trocaId },
-        data: { status: 'RECUSADO' }
+        data: { status: TrocaStatus.RECUSADA }
       });
     }
 
