@@ -8,23 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TrocaStatus {
-  PENDENTE
-  ACEITA
-  RECUSADA
-  FINALIZADA
-  CANCELADA
-}
-
-enum TipoNotificacao {
-  TROCA_ACEITA
-  TROCA_RECUSADA
-  TROCA_FINALIZADA
-  TROCA_CANCELADA
-  PACOTE_ABERTO
-  FIGURINHA_NOVA
-}
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -55,27 +38,26 @@ model Session {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  name            String?
-  email           String           @unique
-  emailVerified   DateTime?
-  image           String?
-  password        String
-  numeroDeLogins  Int              @default(0)
-  primeiroAcesso  Boolean          @default(true)
-  createdAt       DateTime?        @default(now())
-  updatedAt       DateTime?        @updatedAt
-  accounts        Account[]
-  notificacoes    Notificacao[]
-  pacotes         Pacote[]
-  sessions        Session[]
-  trocasEnviadas  Troca[]          @relation("TrocasEnviadas")
-  trocasRecebidas Troca[]          @relation("TrocasRecebidas")
-  trocas          TrocaFigurinha[]
-  userFigurinhas  UserFigurinha[]  @relation("UserFigurinhas")
-  qtdFigurinhasLendarias Int       @default(0)
-  qtdFigurinhasOuro      Int       @default(0)
-  qtdFigurinhasPrata     Int       @default(0)
+  id                     String          @id @default(cuid())
+  name                   String?
+  email                  String          @unique
+  emailVerified          DateTime?
+  image                  String?
+  password               String
+  numeroDeLogins         Int             @default(0)
+  primeiroAcesso         Boolean         @default(true)
+  createdAt              DateTime?       @default(now())
+  updatedAt              DateTime?       @updatedAt
+  qtdFigurinhasLendarias Int             @default(0)
+  qtdFigurinhasOuro      Int             @default(0)
+  qtdFigurinhasPrata     Int             @default(0)
+  accounts               Account[]
+  notificacoes           Notificacao[]
+  pacotes                Pacote[]
+  sessions               Session[]
+  trocasEnviadas         Troca[]         @relation("TrocasEnviadas")
+  trocasRecebidas        Troca[]         @relation("TrocasRecebidas")
+  userFigurinhas         UserFigurinha[] @relation("UserFigurinhas")
 
   @@index([email])
 }
@@ -114,7 +96,7 @@ model Jogador {
 }
 
 model Figurinha {
-  id                String           @id @default(cuid())
+  id                String          @id @default(cuid())
   nome              String?
   posicao           String?
   numero            Int?
@@ -123,13 +105,12 @@ model Figurinha {
   timeId            String?
   pacoteId          String?
   jogadorId         String?
-  raridade          String?          @default("Prata")
-  jogador           Jogador?         @relation(fields: [jogadorId], references: [id])
-  pacote            Pacote?          @relation(fields: [pacoteId], references: [id])
-  time              Time?            @relation(fields: [timeId], references: [id])
-  trocasOfertadas   Troca[]          @relation("FigurinhaOferta")
-  trocasSolicitadas Troca[]          @relation("FigurinhaSolicitada")
-  trocaFigurinhas   TrocaFigurinha[]
+  raridade          String?         @default("Prata")
+  jogador           Jogador?        @relation(fields: [jogadorId], references: [id])
+  pacote            Pacote?         @relation(fields: [pacoteId], references: [id])
+  time              Time?           @relation(fields: [timeId], references: [id])
+  trocasOfertadas   Troca[]         @relation("FigurinhaOferta")
+  trocasSolicitadas Troca[]         @relation("FigurinhaSolicitada")
   userFigurinhas    UserFigurinha[]
 
   @@index([timeId])
@@ -171,11 +152,11 @@ model Troca {
   id                    String        @id @default(cuid())
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
-  status                TrocaStatus   @default(PENDENTE)
   figurinhaOfertaId     String
   figurinhaSolicitadaId String?
   usuarioEnviaId        String
   usuarioRecebeId       String?
+  status                TrocaStatus   @default(PENDENTE)
   notificacoes          Notificacao[]
   figurinhaOferta       Figurinha     @relation("FigurinhaOferta", fields: [figurinhaOfertaId], references: [id])
   figurinhaSolicitada   Figurinha?    @relation("FigurinhaSolicitada", fields: [figurinhaSolicitadaId], references: [id])
@@ -188,32 +169,42 @@ model Troca {
   @@index([usuarioRecebeId])
 }
 
-model TrocaFigurinha {
-  id          String    @id @default(cuid())
-  usuarioId   String
-  figurinhaId String
-  status      String    @default("DISPONIVEL")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id])
-  usuario     User      @relation(fields: [usuarioId], references: [id])
-
-  @@index([usuarioId])
-  @@index([figurinhaId])
-}
-
 model Notificacao {
-  id        String         @id @default(cuid())
-  tipo      TipoNotificacao
+  id        String           @id @default(cuid())
   mensagem  String
-  lida      Boolean        @default(false)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  lida      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   usuarioId String
   trocaId   String?
-  troca     Troca?         @relation(fields: [trocaId], references: [id])
-  usuario   User           @relation(fields: [usuarioId], references: [id])
+  tipo      NotificacaoTipo
+  tipoNovo  TipoNotificacao?
+  troca     Troca?           @relation(fields: [trocaId], references: [id])
+  usuario   User             @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([trocaId])
+}
+
+enum TrocaStatus {
+  PENDENTE
+  ACEITA
+  RECUSADA
+  CANCELADA
+}
+
+enum TipoNotificacao {
+  TROCA_ACEITA
+  TROCA_RECUSADA
+  TROCA_FINALIZADA
+  TROCA_CANCELADA
+  PACOTE_ABERTO
+  FIGURINHA_NOVA
+}
+
+enum NotificacaoTipo {
+  TROCA_PROPOSTA
+  TROCA_ACEITA
+  TROCA_RECUSADA
+  TROCA_CANCELADA
 }

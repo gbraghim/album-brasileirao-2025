@@ -170,6 +170,11 @@ async function main() {
       password: hashedPassword,
       numeroDeLogins: 0,
       primeiroAcesso: true,
+      qtdFigurinhasLendarias: 0,
+      qtdFigurinhasOuro: 0,
+      qtdFigurinhasPrata: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   });
 
