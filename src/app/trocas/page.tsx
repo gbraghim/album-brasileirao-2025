@@ -32,6 +32,7 @@ interface Figurinha {
     posicao: string | null;
     nacionalidade: string | null;
     foto: string | null;
+    raridade: string;
     time: {
       id: string;
       nome: string;
@@ -53,6 +54,7 @@ interface Troca {
       numero: number;
       nacionalidade: string;
       foto: string;
+      raridade: string;
       time: {
         id: string;
         nome: string;
@@ -70,6 +72,7 @@ interface Troca {
       numero: number;
       nacionalidade: string;
       foto: string;
+      raridade: string;
       time: {
         id: string;
         nome: string;
@@ -160,41 +163,41 @@ export default function Trocas() {
               numero: troca.figurinhaOferta?.jogador?.numero || 0,
               nacionalidade: troca.figurinhaOferta?.jogador?.nacionalidade || '',
               foto: troca.figurinhaOferta?.jogador?.foto || '',
+              raridade: troca.figurinhaOferta?.jogador?.raridade || 'COMUM',
               time: {
                 id: troca.figurinhaOferta?.jogador?.time?.id || '',
                 nome: troca.figurinhaOferta?.jogador?.time?.nome || '',
                 escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
               },
-              raridade: troca.figurinhaOferta?.jogador?.raridade || 'Prata'
             },
             quantidade: troca.figurinhaOferta?.quantidade || 0
           },
-          figurinhaSolicitada: troca.figurinhaSolicitada ? {
-            id: troca.figurinhaSolicitada.id || '',
+          figurinhaSolicitada: {
+            id: troca.figurinhaSolicitada?.id || '',
             jogador: {
-              id: troca.figurinhaSolicitada.jogador?.id || '',
-              nome: troca.figurinhaSolicitada.jogador?.nome || '',
-              posicao: troca.figurinhaSolicitada.jogador?.posicao || '',
-              numero: troca.figurinhaSolicitada.jogador?.numero || 0,
-              nacionalidade: troca.figurinhaSolicitada.jogador?.nacionalidade || '',
-              foto: troca.figurinhaSolicitada.jogador?.foto || '',
+              id: troca.figurinhaSolicitada?.jogador?.id || '',
+              nome: troca.figurinhaSolicitada?.jogador?.nome || '',
+              posicao: troca.figurinhaSolicitada?.jogador?.posicao || '',
+              numero: troca.figurinhaSolicitada?.jogador?.numero || 0,
+              nacionalidade: troca.figurinhaSolicitada?.jogador?.nacionalidade || '',
+              foto: troca.figurinhaSolicitada?.jogador?.foto || '',
+              raridade: troca.figurinhaSolicitada?.jogador?.raridade || 'COMUM',
               time: {
-                id: troca.figurinhaSolicitada.jogador?.time?.id || '',
-                nome: troca.figurinhaSolicitada.jogador?.time?.nome || '',
-                escudo: troca.figurinhaSolicitada.jogador?.time?.escudo || ''
+                id: troca.figurinhaSolicitada?.jogador?.time?.id || '',
+                nome: troca.figurinhaSolicitada?.jogador?.time?.nome || '',
+                escudo: troca.figurinhaSolicitada?.jogador?.time?.escudo || ''
               },
-              raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
             }
-          } : null,
+          },
           usuarioEnvia: {
             id: troca.usuarioEnvia?.id || '',
-            name: troca.usuarioEnvia?.name || '',
+            name: troca.usuarioEnvia?.name || ''
           },
-          usuarioRecebe: troca.usuarioRecebe ? {
-            id: troca.usuarioRecebe.id || '',
-            name: troca.usuarioRecebe.name || '',
-          } : null,
-          createdAt: troca.createdAt || ''
+          usuarioRecebe: {
+            id: troca.usuarioRecebe?.id || '',
+            name: troca.usuarioRecebe?.name || ''
+          },
+          createdAt: troca.createdAt || new Date().toISOString()
         });
 
         const minhasTrocasFormatadas = (trocasData.minhasTrocas || []).map(formatarTroca);
@@ -269,12 +272,12 @@ export default function Trocas() {
             numero: troca.figurinhaOferta?.jogador?.numero || 0,
             nacionalidade: troca.figurinhaOferta?.jogador?.nacionalidade || '',
             foto: troca.figurinhaOferta?.jogador?.foto || '',
+            raridade: troca.figurinhaOferta?.jogador?.raridade || 'COMUM',
             time: {
               id: troca.figurinhaOferta?.jogador?.time?.id || '',
               nome: troca.figurinhaOferta?.jogador?.time?.nome || '',
               escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
             },
-            raridade: troca.figurinhaOferta?.jogador?.raridade || 'Prata'
           },
           quantidade: troca.figurinhaOferta?.quantidade || 0
         },
