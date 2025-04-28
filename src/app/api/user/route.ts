@@ -1,47 +1,25 @@
-import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-      include: {
-        accounts: false,
-        sessions: false,
-        userFigurinhas: false,
-        trocasEnviadas: false,
-        trocasRecebidas: false,
-        notificacoes: false,
-        pacotes: false
-      }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(user);
-  } catch (error) {
-    console.error('Erro ao buscar usuário:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+  if (!session?.user?.email) {
+    return new NextResponse('Não autorizado', { status: 401 });
   }
+
+  const usuario = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+
+  if (!usuario) {
+    return new NextResponse('Usuário não encontrado', { status: 404 });
+  }
+
+  // Removendo a senha do objeto antes de enviar
+  const { password, ...usuarioSemSenha } = usuario;
+
+  return NextResponse.json(usuarioSemSenha);
 } 
