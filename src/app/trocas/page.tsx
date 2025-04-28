@@ -62,6 +62,7 @@ interface Troca {
       };
     };
     quantidade: number;
+    raridade: string;
   };
   figurinhaSolicitada: {
     id: string;
@@ -99,6 +100,7 @@ export default function Trocas() {
   const [propostasRecebidas, setPropostasRecebidas] = useState<Troca[]>([]);
   const [ofertasEnviadas, setOfertasEnviadas] = useState<Troca[]>([]);
   const [repetidas, setRepetidas] = useState<Figurinha[]>([]);
+  const [trocas, setTrocas] = useState<Troca[]>([]);
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -170,7 +172,8 @@ export default function Trocas() {
                 escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
               },
             },
-            quantidade: troca.figurinhaOferta?.quantidade || 0
+            quantidade: troca.figurinhaOferta?.quantidade || 0,
+            raridade: troca.figurinhaOferta?.jogador?.raridade || 'COMUM'
           },
           figurinhaSolicitada: {
             id: troca.figurinhaSolicitada?.id || '',
@@ -220,6 +223,7 @@ export default function Trocas() {
           ...f,
           raridade: f.raridade || 'Prata'
         })));
+        setTrocas(trocasData.trocas);
         setLoading(false);
         console.log('8. Estado atualizado:', {
           minhasTrocas: minhasTrocasFormatadas.length,
@@ -279,7 +283,8 @@ export default function Trocas() {
               escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
             },
           },
-          quantidade: troca.figurinhaOferta?.quantidade || 0
+          quantidade: troca.figurinhaOferta?.quantidade || 0,
+          raridade: troca.figurinhaOferta?.jogador?.raridade || 'COMUM'
         },
         figurinhaSolicitada: troca.figurinhaSolicitada || null,
         usuarioEnvia: {
@@ -299,6 +304,7 @@ export default function Trocas() {
       setPropostasRecebidas(trocasRecebidasFormatadas);
       setTrocasDisponiveis(trocasDisponiveisFormatadas);
       setOfertasEnviadas(ofertasEnviadasFormatadas);
+      setTrocas(data.trocas);
       setLoading(false);
     } catch (error) {
       console.error('Erro:', error);
@@ -436,26 +442,12 @@ export default function Trocas() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao remover troca');
+        throw new Error('Erro ao remover troca');
       }
 
-      // Recarrega as trocas e as repetidas
-      const [repetidasResponse] = await Promise.all([
-        fetch('/api/repetidas'),
-        fetchTrocas()
-      ]);
-
-      if (!repetidasResponse.ok) {
-        throw new Error('Erro ao atualizar repetidas');
-      }
-
-      const repetidasData = await repetidasResponse.json();
-      setRepetidas(repetidasData);
-      setFigurinhasEmTroca(figurinhasEmTroca.filter(id => id !== figurinha.id));
+      setTrocas(trocas.filter(t => t.figurinhaOferta.id !== figurinha.id));
     } catch (error) {
       console.error('Erro ao remover troca:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao remover troca');
     }
   };
 
