@@ -2,7 +2,6 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { EditarAvatar } from '@/components/EditarAvatar';
 
 type User = {
   id: string;
@@ -20,7 +19,6 @@ export default function PerfilPage() {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<any>(null);
-  const [avatarUrl, setAvatarUrl] = useState(session?.user?.image || '/default-avatar.png');
 
   useEffect(() => {
     const fetchUser = async () => {
