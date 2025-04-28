@@ -458,20 +458,6 @@ export default function Trocas() {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
-  // Função para definir a cor da borda de acordo com a raridade
-  function getRaridadeStyle(raridade: string) {
-    switch (raridade) {
-      case 'Lendário':
-        return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
-      case 'Ouro':
-        return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
-      case 'Prata':
-        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-      default:
-        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-    }
-  }
-
   if (!session) {
     return (
       <div className="min-h-screen  text-white p-8">
@@ -518,7 +504,7 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {repetidas.map((figurinha) => (
               <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className={`relative w-full aspect-[3/4] rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden`}>
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
                   <Image
                     src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                     alt={figurinha.jogador.nome}
@@ -535,18 +521,6 @@ export default function Trocas() {
                       }
                     }}
                   />
-                  {/* Tag de raridade */}
-                  {figurinha.raridade && (
-                    <div className="absolute top-1 right-1">
-                      <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                        figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
-                        figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
-                        'bg-gray-400/80 text-black'
-                      }`}>
-                        {figurinha.raridade}
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
                   {figurinha.jogador.time.escudo && (
@@ -639,7 +613,6 @@ export default function Trocas() {
                 </div>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                 </div>
                 <div className="mt-1">
                   <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
@@ -769,29 +742,28 @@ export default function Trocas() {
                 </div>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                  <span className="text-sm font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                 </div>
                 <div className="mt-1">
                   <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
                 </div>
-                <div className="mt-3 flex space-x-2">
+                <div className="mt-3 flex space-x-2 min-w-0">
                   <button
                     onClick={() => handleResponderTroca(troca.id, true)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1 min-w-0"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Aceitar
+                    <span className="truncate">Aceitar</span>
                   </button>
                   <button
                     onClick={() => handleResponderTroca(troca.id, false)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1 min-w-0"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Recusar
+                    <span className="truncate">Recusar</span>
                   </button>
                 </div>
               </div>
