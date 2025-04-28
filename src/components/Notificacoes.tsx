@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -31,12 +31,32 @@ export function Notificacoes() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (session) {
       fetchNotificacoes();
     }
   }, [session]);
+
+  useEffect(() => {
+    if (isOpen && notificacoes.some(n => !n.lida)) {
+      marcarTodasComoLidas();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const fetchNotificacoes = async () => {
     try {
@@ -80,58 +100,44 @@ export function Notificacoes() {
 
   const marcarComoLida = async (id: string) => {
     try {
-      await fetch(`/api/notificacoes/${id}`, {
-        method: 'PATCH',
+      const response = await fetch(`/api/notificacoes/${id}/lida`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      setNotificacoes(notificacoes.map(n => 
-        n.id === id ? { ...n, lida: true } : n
-      ));
+
+      if (response.ok) {
+        setNotificacoes(notificacoes.map(n => 
+          n.id === id ? { ...n, lida: true } : n
+        ));
+      }
     } catch (error) {
       console.error('Erro ao marcar notificação como lida:', error);
     }
   };
 
-  const responderTroca = async (trocaId: string, aceitar: boolean) => {
+  const marcarTodasComoLidas = async () => {
     try {
-      const response = await fetch(`/api/trocas/${trocaId}`, {
-        method: 'PATCH',
+      const response = await fetch('/api/notificacoes/lidas', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          status: aceitar ? 'ACEITA' : 'RECUSADA',
-        }),
       });
 
       if (response.ok) {
-        await fetchNotificacoes();
+        setNotificacoes(notificacoes.map(n => ({ ...n, lida: true })));
       }
     } catch (error) {
-      console.error('Erro ao responder troca:', error);
-    }
-  };
-
-  const marcarTodasComoLidas = async () => {
-    try {
-      const response = await fetch('/api/notificacoes/ler-todas', {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao marcar notificações como lidas');
-      }
-
-      // Atualizar o estado local
-      setNotificacoes(notificacoes.map(n => ({ ...n, lida: true })));
-    } catch (error) {
-      console.error('Erro ao marcar notificações como lidas:', error);
+      console.error('Erro ao marcar todas as notificações como lidas:', error);
     }
   };
 
   const notificacoesNaoLidas = notificacoes.filter(n => !n.lida).length;
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full hover:bg-green-700"
@@ -166,28 +172,6 @@ export function Notificacoes() {
                   }}
                 >
                   <p className="text-sm text-gray-900">{notificacao.mensagem}</p>
-                  {notificacao.tipo === 'TROCA_ACEITA' && notificacao.troca?.status === 'PENDENTE' && (
-                    <div className="mt-2 flex space-x-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          responderTroca(notificacao.troca!.id, true);
-                        }}
-                        className="hover: text-white px-3 py-1 rounded text-sm"
-                      >
-                        Aceitar
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          responderTroca(notificacao.troca!.id, false);
-                        }}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Recusar
-                      </button>
-                    </div>
-                  )}
                   <p className="text-xs text-gray-500 mt-1">
                     {new Date(notificacao.createdAt).toLocaleString()}
                   </p>
