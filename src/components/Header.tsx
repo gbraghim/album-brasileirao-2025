@@ -26,7 +26,7 @@ export default function Header() {
               height={32}
               className="rounded-lg"
             />
-            <span className="text-white font-bold text-lg">Álbum Brasileirão 2025</span>
+            <span className="text-white font-bold text-lg">Álbum 2025</span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Bell } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Notificacao {
   id: string;
@@ -29,6 +30,7 @@ export function Notificacoes() {
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (session) {
@@ -157,8 +159,11 @@ export function Notificacoes() {
                   key={notificacao.id}
                   className={`p-4 rounded-lg ${
                     notificacao.lida ? 'bg-gray-50' : 'bg-blue-50'
-                  }`}
-                  onClick={() => marcarComoLida(notificacao.id)}
+                  } cursor-pointer`}
+                  onClick={() => {
+                    marcarComoLida(notificacao.id);
+                    router.push('/trocas');
+                  }}
                 >
                   <p className="text-sm text-gray-900">{notificacao.mensagem}</p>
                   {notificacao.tipo === 'TROCA_ACEITA' && notificacao.troca?.status === 'PENDENTE' && (

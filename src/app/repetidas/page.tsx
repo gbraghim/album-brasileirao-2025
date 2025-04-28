@@ -28,6 +28,20 @@ function normalize(str: string) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
+// Função para definir a cor da borda de acordo com a raridade
+function getRaridadeStyle(raridade: string) {
+  switch (raridade) {
+    case 'Lendário':
+      return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
+    case 'Ouro':
+      return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
+    case 'Prata':
+      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+    default:
+      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+  }
+}
+
 export default function Repetidas() {
   const { data: session } = useSession();
   const [figurinhas, setFigurinhas] = useState<Figurinha[]>([]);
@@ -201,7 +215,7 @@ export default function Repetidas() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {figurinhas.map((figurinha) => (
             <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-3">
-              <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
+              <div className={`relative w-full aspect-[3/4] rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden`}>
                 <Image
                   src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                   alt={figurinha.jogador.nome}
@@ -218,6 +232,18 @@ export default function Repetidas() {
                     }
                   }}
                 />
+                {/* Tag de raridade */}
+                {figurinha.raridade && (
+                  <div className="absolute top-1 right-1">
+                    <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                      figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                      figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                      'bg-gray-400/80 text-black'
+                    }`}>
+                      {figurinha.raridade}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 {figurinha.jogador.time.escudo && (
@@ -236,21 +262,23 @@ export default function Repetidas() {
                 <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
-                <span className="text-sm text-gray-600">Quantidade: {figurinha.quantidade}</span>
                 {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
                   <button
-                    onClick={() => enviarParaTroca(figurinha)}
-                    className="bg-brasil-yellow text-brasil-blue px-3 py-1 rounded-md text-sm hover:bg-yellow-500 transition-colors"
-                  >
-                    Disponibilizar para Troca
-                  </button>
+                      onClick={() => enviarParaTroca(figurinha)}
+                      className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Enviar para troca
+                    </button>
                 )}
                 {figurinhasEmTroca.includes(figurinha.id) && (
                   <span className="text-sm text-brasil-yellow">Disponível para troca</span>
                 )}
                 {normalize(figurinha.raridade) === 'lendario' && (
-                  <span className="text-sm text-gray-500">Não pode ser trocada</span>
-                )}
+                    <span className="text-sm text-gray-500 text-center">Figurinha lendária não pode ser trocada</span>
+                  )}
               </div>
             </div>
           ))}

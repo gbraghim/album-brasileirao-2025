@@ -109,6 +109,17 @@ export async function POST(req: Request) {
       include: trocaInclude
     });
 
+    // Criar notificação para o dono da figurinha ofertada
+    await prisma.notificacao.create({
+      data: {
+        usuarioId: troca.usuarioEnviaId,
+        tipo: 'TROCA_RECEBIDA',
+        mensagem: `${session.user.name} propôs uma troca para sua figurinha ${troca.figurinhaOferta.jogador?.nome || ''}`,
+        lida: false,
+        trocaId: trocaId
+      }
+    });
+
     return NextResponse.json(trocaAtualizada);
   } catch (error) {
     console.error('Erro ao propor troca:', error);

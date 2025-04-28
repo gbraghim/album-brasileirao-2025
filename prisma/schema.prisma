@@ -200,6 +200,7 @@ enum TipoNotificacao {
   TROCA_CANCELADA
   PACOTE_ABERTO
   FIGURINHA_NOVA
+  TROCA_RECEBIDA
 }
 
 enum NotificacaoTipo {
@@ -207,4 +208,5 @@ enum NotificacaoTipo {
   TROCA_ACEITA
   TROCA_RECUSADA
   TROCA_CANCELADA
+  TROCA_RECEBIDA
 }

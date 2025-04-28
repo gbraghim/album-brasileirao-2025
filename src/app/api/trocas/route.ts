@@ -14,6 +14,7 @@ const trocaInclude = {
           posicao: true,
           numero: true,
           foto: true,
+          raridade: true,
           time: {
             select: {
               id: true,
@@ -105,7 +106,11 @@ export async function GET() {
           id: troca.usuarioRecebe.id,
           name: troca.usuarioRecebe.name,
           email: troca.usuarioRecebe.email
-        } : null
+        } : null,
+        figurinhaOferta: {
+          ...troca.figurinhaOferta,
+          raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
+        }
       })),
       ofertasEnviadas: ofertasEnviadas.map(troca => ({
         ...troca,
@@ -120,7 +125,11 @@ export async function GET() {
           id: troca.usuarioRecebe.id,
           name: troca.usuarioRecebe.name,
           email: troca.usuarioRecebe.email
-        } : null
+        } : null,
+        figurinhaOferta: {
+          ...troca.figurinhaOferta,
+          raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
+        }
       })),
       trocasRecebidas: trocasRecebidas.map(troca => ({
         ...troca,
@@ -135,7 +144,11 @@ export async function GET() {
           id: troca.usuarioRecebe.id,
           name: troca.usuarioRecebe.name,
           email: troca.usuarioRecebe.email
-        } : null
+        } : null,
+        figurinhaOferta: {
+          ...troca.figurinhaOferta,
+          raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
+        }
       })),
       trocasDisponiveis: trocasDisponiveis.map(troca => ({
         ...troca,
@@ -150,7 +163,11 @@ export async function GET() {
           id: troca.usuarioRecebe.id,
           name: troca.usuarioRecebe.name,
           email: troca.usuarioRecebe.email
-        } : null
+        } : null,
+        figurinhaOferta: {
+          ...troca.figurinhaOferta,
+          raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
+        }
       }))
     };
 

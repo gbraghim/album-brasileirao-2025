@@ -44,6 +44,7 @@ export async function GET() {
                 posicao: true,
                 nacionalidade: true,
                 foto: true,
+                raridade: true,
                 time: {
                   select: {
                     id: true,
@@ -82,7 +83,7 @@ export async function GET() {
         }
       },
       quantidade: uf.quantidade,
-      raridade: uf.figurinha.raridade === 'COMUM' ? 'Prata' : (uf.figurinha.raridade || 'Prata')
+      raridade: uf.figurinha.jogador?.raridade || 'Prata'
     }));
 
     console.log('Figurinhas formatadas:', figurinhasFormatadas);
