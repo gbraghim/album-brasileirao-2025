@@ -42,6 +42,7 @@ model User {
   name                   String?
   email                  String          @unique
   emailVerified          DateTime?
+  image                  String?
   password               String
   numeroDeLogins         Int             @default(0)
   primeiroAcesso         Boolean         @default(true)

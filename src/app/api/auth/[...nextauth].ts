@@ -41,6 +41,7 @@ export const authOptions: AuthOptions = {
             name: true,
             email: true,
             emailVerified: true,
+            image: true,
             numeroDeLogins: true,
             primeiroAcesso: true,
             password: true,
