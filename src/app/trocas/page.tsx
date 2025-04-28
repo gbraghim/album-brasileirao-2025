@@ -51,6 +51,7 @@ export default function Trocas() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -321,6 +322,8 @@ export default function Trocas() {
       
       // Recarregar as trocas
       await fetchTrocas();
+      setSuccessMessage('Proposta de troca enviada com sucesso!');
+      setShowSuccessModal(true);
     } catch (error) {
       console.error('Erro ao propor troca:', error);
       setError(error instanceof Error ? error.message : 'Erro ao propor troca');
@@ -360,6 +363,10 @@ export default function Trocas() {
       await fetchTrocas();
       
       if (aceitar) {
+        setSuccessMessage('Proposta de troca aceita com sucesso!');
+        setShowSuccessModal(true);
+      } else {
+        setSuccessMessage('Proposta de troca recusada com sucesso!');
         setShowSuccessModal(true);
       }
       
@@ -945,13 +952,13 @@ export default function Trocas() {
           <Modal
             isOpen={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
-            title="Troca realizada"
+            title="Sucesso!"
           >
             <div className="text-center py-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <p className="text-green-600 font-semibold">Troca realizada com sucesso!</p>
+              <p className="text-green-600 font-semibold">{successMessage}</p>
             </div>
           </Modal>
         )}

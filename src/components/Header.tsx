@@ -14,6 +14,15 @@ export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
+  const menuItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/pacotes', label: 'Pacotes' },
+    { href: '/meu-album', label: 'Meu Álbum' },
+    { href: '/repetidas', label: 'Repetidas' },
+    { href: '/trocas', label: 'Trocas' },
+    { href: '/perfil', label: 'Perfil' }
+  ];
+
   return (
     <header className="bg-gradient-to-r from-brasil-blue via-brasil-green to-brasil-yellow">
       <div className="container mx-auto px-4">
@@ -29,37 +38,27 @@ export default function Header() {
             <span className="text-white font-bold text-lg">Álbum 2025</span>
           </Link>
 
+          {/* Menu Mobile */}
+          <button
+            className="md:hidden text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Menu Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              href="/dashboard"
-              className="text-white hover:text-brasil-yellow transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/meu-album"
-              className="text-white hover:text-brasil-yellow transition-colors"
-            >
-              Meu Álbum
-            </Link>
-            <Link
-              href="/pacotes"
-              className="text-white hover:text-brasil-yellow transition-colors"
-            >
-              Pacotes
-            </Link>
-            <Link
-              href="/repetidas"
-              className="text-white hover:text-brasil-yellow transition-colors"
-            >
-              Repetidas
-            </Link>
-            <Link
-              href="/trocas"
-              className="text-white hover:text-brasil-yellow transition-colors"
-            >
-              Trocas
-            </Link>
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-white hover:text-brasil-yellow transition-colors ${
+                  pathname === item.href ? 'font-bold text-brasil-yellow' : ''
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -70,7 +69,7 @@ export default function Header() {
                   href="/perfil"
                   className="flex items-center space-x-2 text-white hover:text-brasil-yellow transition-colors"
                 >
-                  <span className="hidden md:inline">{session.user?.name}</span>
+                  <span className="hidden md:inline">Olá, {session.user?.name}</span>
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
@@ -89,6 +88,26 @@ export default function Header() {
             )}
           </div>
         </div>
+
+        {/* Menu Mobile Expandido */}
+        {isMenuOpen && (
+          <nav className="md:hidden py-4">
+            <div className="flex flex-col space-y-4">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-white hover:text-brasil-yellow transition-colors ${
+                    pathname === item.href ? 'font-bold text-brasil-yellow' : ''
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );

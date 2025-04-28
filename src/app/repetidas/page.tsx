@@ -277,7 +277,12 @@ export default function Repetidas() {
                     </button>
                 )}
                 {figurinhasEmTroca.includes(figurinha.id) && (
-                  <span className="text-sm text-brasil-yellow">Disponível para troca</span>
+                  <button
+                    className="text-sm text-brasil-yellow underline hover:text-brasil-blue transition-colors"
+                    onClick={() => window.location.href = '/trocas'}
+                  >
+                    Disponível para troca
+                  </button>
                 )}
                 {normalize(figurinha.raridade) === 'lendario' && (
                     <span className="text-sm text-gray-500 text-center">Figurinha lendária não pode ser trocada</span>

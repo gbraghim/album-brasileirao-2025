@@ -70,14 +70,13 @@ export default function PerfilPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Meu Perfil</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-100 to-blue-500">
+      <div className="w-full max-w-2xl px-4 md:px-6 py-6 md:py-8 flex flex-col items-center justify-center">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue text-center">Meu Perfil</h1>
+        <div className="w-full flex flex-col items-center justify-center">
           {/* Informações do Usuário */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Informações Pessoais</h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20 w-full max-w-md mx-auto">
+            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue text-center">Informações Pessoais</h2>
             <div className="space-y-3 md:space-y-4">
               <div className="flex flex-col items-center space-y-4">
                 <div className="text-center">
@@ -85,7 +84,6 @@ export default function PerfilPage() {
                   <p className="text-sm md:text-base text-gray-600">{session?.user?.email}</p>
                 </div>
               </div>
-
               <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg">
                   <span className="text-sm md:text-base text-brasil-blue font-medium">Data de Cadastro</span>
@@ -96,50 +94,6 @@ export default function PerfilPage() {
                 <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg">
                   <span className="text-sm md:text-base text-brasil-blue font-medium">Total de Figurinhas</span>
                   <span className="text-sm md:text-base text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Estatísticas */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Estatísticas</h2>
-            <div className="space-y-3 md:space-y-4">
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="bg-brasil-green/10 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue mb-1">Times Completos</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-brasil-green">
-                    {stats?.timesCompletos}/{stats?.totalTimes}
-                  </p>
-                </div>
-                <div className="bg-brasil-yellow/10 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue mb-1">Pacotes Abertos</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-brasil-yellow">{stats?.totalPacotes}</p>
-                </div>
-              </div>
-
-              <div className="bg-white/50 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue">Progresso do Álbum</h3>
-                  <span className="text-sm md:text-base font-medium text-brasil-green">
-                    {stats?.timesCompletos}/{stats?.totalTimes} times completos
-                  </span>
-                </div>
-                <div className="relative w-full bg-gray-200 rounded-full h-2.5 md:h-3 overflow-hidden">
-                  <div
-                    className="absolute left-0 top-0 bg-brasil-green h-full rounded-full transition-all duration-300 ease-in-out"
-                    style={{
-                      width: `${Math.min(((stats?.timesCompletos || 0) / (stats?.totalTimes || 1)) * 100, 100)}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-sm md:text-base text-brasil-green">
-                    {stats?.totalFigurinhas || 0} de {stats?.totalJogadoresBase || 0} figurinhas coletadas
-                  </p>
-                  <p className="text-sm md:text-base font-medium text-brasil-green">
-                    {Math.round(((stats?.totalFigurinhas || 0) / (stats?.totalJogadoresBase || 1)) * 100)}%
-                  </p>
                 </div>
               </div>
             </div>

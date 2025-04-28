@@ -91,7 +91,7 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
                     <div className="mt-4">
                       <h4 className="text-sm font-medium text-gray-900">Selecione uma figurinha para troca:</h4>
                       <div className="mt-2 grid grid-cols-2 gap-4">
-                        {figurinhasRepetidas.map((figurinha) => {
+                        {figurinhasRepetidas.filter(f => f.raridade.toLowerCase() !== 'lendário' && f.raridade.toLowerCase() !== 'lendario').map((figurinha) => {
                           const caminhos = formatarCaminhoImagem(
                             figurinha.jogador.time.nome,
                             figurinha.jogador.nome
