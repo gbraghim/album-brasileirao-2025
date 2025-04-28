@@ -36,7 +36,7 @@ interface ModalProporTrocaProps {
       quantidade: number;
     };
   } | null;
-  onProporTroca: (figurinha: Figurinha) => void;
+  onProporTroca: (figurinha: Figurinha) => Promise<void>;
   loading?: boolean;
   figurinhasRepetidas: Figurinha[];
 }

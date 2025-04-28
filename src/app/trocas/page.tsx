@@ -12,33 +12,20 @@ import { TrocaStatus } from '@prisma/client';
 interface Jogador {
   id: string;
   nome: string;
-  posicao: string;
-  numero: number;
-  nacionalidade: string;
-  foto?: string | null;
+  numero: number | null;
+  posicao: string | null;
+  nacionalidade: string | null;
+  foto: string | null;
   time: {
     id: string;
     nome: string;
-    escudo: string;
+    escudo: string | null;
   };
 }
 
 interface Figurinha {
   id: string;
-  jogador: {
-    id: string;
-    nome: string;
-    numero: number | null;
-    posicao: string | null;
-    nacionalidade: string | null;
-    foto: string | null;
-    raridade: string;
-    time: {
-      id: string;
-      nome: string;
-      escudo: string | null;
-    };
-  };
+  jogador: Jogador;
   quantidade: number;
   raridade: string;
 }
@@ -350,7 +337,7 @@ export default function Trocas() {
     }
   };
 
-  const handleProporTroca = async (figurinha: Figurinha) => {
+  const handleProporTroca = async (figurinha: Figurinha): Promise<void> => {
     if (!trocaSelecionada) return;
 
     try {
