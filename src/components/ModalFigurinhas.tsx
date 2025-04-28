@@ -190,6 +190,7 @@ export default function ModalFigurinhas({
                                 src={imagemAtual}
                                 alt={figurinha.jogador.nome}
                                 fill
+                                sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
                                 className="object-cover"
                                 onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
                                 onLoad={() => handleImageLoad(figurinha.jogador.id.toString(), imagemAtual)}

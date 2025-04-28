@@ -74,6 +74,7 @@ export default function EscudosCarousel() {
                 src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
                 alt={`Escudo do ${time.nome}`}
                 fill
+                sizes="(max-width: 640px) 96px, (max-width: 1024px) 120px, 96px"
                 data-time={time.nome}
                 onError={() => handleImageError(time.nome, time.escudo)}
                 className="object-contain"
@@ -89,6 +90,7 @@ export default function EscudosCarousel() {
                 src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
                 alt={`Escudo do ${time.nome}`}
                 fill
+                sizes="(max-width: 640px) 96px, (max-width: 1024px) 120px, 96px"
                 data-time={time.nome}
                 onError={() => handleImageError(time.nome, time.escudo)}
                 className="object-contain"

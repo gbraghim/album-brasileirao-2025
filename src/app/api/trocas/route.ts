@@ -26,6 +26,27 @@ const trocaInclude = {
       }
     }
   },
+  figurinhaSolicitada: {
+    include: {
+      jogador: {
+        select: {
+          id: true,
+          nome: true,
+          posicao: true,
+          numero: true,
+          foto: true,
+          raridade: true,
+          time: {
+            select: {
+              id: true,
+              nome: true,
+              escudo: true
+            }
+          }
+        }
+      }
+    }
+  },
   usuarioEnvia: {
     select: {
       id: true,
@@ -110,7 +131,11 @@ export async function GET() {
         figurinhaOferta: {
           ...troca.figurinhaOferta,
           raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
-        }
+        },
+        figurinhaSolicitada: troca.figurinhaSolicitada ? {
+          ...troca.figurinhaSolicitada,
+          raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
+        } : null
       })),
       ofertasEnviadas: ofertasEnviadas.map(troca => ({
         ...troca,
@@ -129,7 +154,11 @@ export async function GET() {
         figurinhaOferta: {
           ...troca.figurinhaOferta,
           raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
-        }
+        },
+        figurinhaSolicitada: troca.figurinhaSolicitada ? {
+          ...troca.figurinhaSolicitada,
+          raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
+        } : null
       })),
       trocasRecebidas: trocasRecebidas.map(troca => ({
         ...troca,
@@ -148,7 +177,11 @@ export async function GET() {
         figurinhaOferta: {
           ...troca.figurinhaOferta,
           raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
-        }
+        },
+        figurinhaSolicitada: troca.figurinhaSolicitada ? {
+          ...troca.figurinhaSolicitada,
+          raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
+        } : null
       })),
       trocasDisponiveis: trocasDisponiveis.map(troca => ({
         ...troca,
@@ -167,7 +200,11 @@ export async function GET() {
         figurinhaOferta: {
           ...troca.figurinhaOferta,
           raridade: troca.figurinhaOferta.jogador?.raridade || 'Prata'
-        }
+        },
+        figurinhaSolicitada: troca.figurinhaSolicitada ? {
+          ...troca.figurinhaSolicitada,
+          raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
+        } : null
       }))
     };
 

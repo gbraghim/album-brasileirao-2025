@@ -246,6 +246,8 @@ export default function Repetidas() {
                 )}
               </div>
               <div className="flex items-center space-x-2">
+               
+
                 {figurinha.jogador.time.escudo && (
                   <Image
                     src={figurinha.jogador.time.escudo}
@@ -255,6 +257,7 @@ export default function Repetidas() {
                     className="w-6 h-6"
                   />
                 )}
+                 <p></p> <p></p>
                 <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
               </div>
               <div className="mt-2 flex justify-between items-center">

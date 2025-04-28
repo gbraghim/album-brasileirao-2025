@@ -164,7 +164,8 @@ export default function Trocas() {
                 id: troca.figurinhaOferta?.jogador?.time?.id || '',
                 nome: troca.figurinhaOferta?.jogador?.time?.nome || '',
                 escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
-              }
+              },
+              raridade: troca.figurinhaOferta?.jogador?.raridade || 'Prata'
             },
             quantidade: troca.figurinhaOferta?.quantidade || 0
           },
@@ -181,7 +182,8 @@ export default function Trocas() {
                 id: troca.figurinhaSolicitada.jogador?.time?.id || '',
                 nome: troca.figurinhaSolicitada.jogador?.time?.nome || '',
                 escudo: troca.figurinhaSolicitada.jogador?.time?.escudo || ''
-              }
+              },
+              raridade: troca.figurinhaSolicitada.jogador?.raridade || 'Prata'
             }
           } : null,
           usuarioEnvia: {
@@ -271,7 +273,8 @@ export default function Trocas() {
               id: troca.figurinhaOferta?.jogador?.time?.id || '',
               nome: troca.figurinhaOferta?.jogador?.time?.nome || '',
               escudo: troca.figurinhaOferta?.jogador?.time?.escudo || ''
-            }
+            },
+            raridade: troca.figurinhaOferta?.jogador?.raridade || 'Prata'
           },
           quantidade: troca.figurinhaOferta?.quantidade || 0
         },
@@ -458,6 +461,34 @@ export default function Trocas() {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
+  // Função para definir a cor da borda de acordo com a raridade
+  function getRaridadeStyle(raridade: string) {
+    switch (raridade) {
+      case 'Lendário':
+        return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
+      case 'Ouro':
+        return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
+      case 'Prata':
+        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+      default:
+        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+    }
+  }
+
+  // Adicionar função para retornar a cor da label de raridade
+  function getRaridadeLabelStyle(raridade: string) {
+    switch (raridade) {
+      case 'Lendário':
+        return 'bg-purple-600 text-white';
+      case 'Ouro':
+        return 'bg-yellow-500 text-yellow-900';
+      case 'Prata':
+        return 'bg-gray-400 text-white';
+      default:
+        return 'bg-gray-400 text-white';
+    }
+  }
+
   if (!session) {
     return (
       <div className="min-h-screen  text-white p-8">
@@ -504,7 +535,7 @@ export default function Trocas() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {repetidas.map((figurinha) => (
               <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
+                <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-4 ${getRaridadeStyle(figurinha.raridade)}`}>
                   <Image
                     src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                     alt={figurinha.jogador.nome}
@@ -521,6 +552,7 @@ export default function Trocas() {
                       }
                     }}
                   />
+                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(figurinha.raridade)}`}>{figurinha.raridade}</span>
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
                   {figurinha.jogador.time.escudo && (
@@ -598,6 +630,7 @@ export default function Trocas() {
                       }
                     }}
                   />
+                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
                   {troca.figurinhaOferta.jogador.time.escudo && (
@@ -661,6 +694,7 @@ export default function Trocas() {
                       }
                     }}
                   />
+                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
                   {troca.figurinhaOferta.jogador.time.escudo && (
@@ -714,7 +748,7 @@ export default function Trocas() {
                   {/* Figurinha Ofertada */}
                   <div className="flex-1 min-w-[170px] max-w-[220px] flex flex-col items-center">
                     <span className="block text-xs font-semibold text-gray-500 mb-1">Você tem</span>
-                    <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 border-brasil-yellow/20 bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10">
+                    <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`}>
                       <Image
                         src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                         alt={troca.figurinhaOferta.jogador.nome}
@@ -731,6 +765,7 @@ export default function Trocas() {
                           }
                         }}
                       />
+                      <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
                     </div>
                     <div className="flex items-center space-x-2 mt-2 mb-1">
                       {troca.figurinhaOferta.jogador.time.escudo && (
@@ -762,7 +797,7 @@ export default function Trocas() {
                     <span className="block text-xs font-semibold text-gray-500 mb-1">Você vai receber</span>
                     {troca.figurinhaSolicitada ? (
                       <>
-                        <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 border-brasil-yellow/20 bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10">
+                        <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`}>
                           <Image
                             src={formatarCaminhoImagem(troca.figurinhaSolicitada.jogador.time.nome, troca.figurinhaSolicitada.jogador.nome)[0]}
                             alt={troca.figurinhaSolicitada.jogador.nome}
@@ -779,6 +814,7 @@ export default function Trocas() {
                               }
                             }}
                           />
+                          <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaSolicitada.jogador.raridade)}`}>{troca.figurinhaSolicitada.jogador.raridade}</span>
                         </div>
                         <div className="flex items-center space-x-2 mt-2 mb-1">
                           {troca.figurinhaSolicitada.jogador.time.escudo && (
@@ -845,7 +881,7 @@ export default function Trocas() {
                   {/* Figurinha Ofertada */}
                   <div className="flex-1 min-w-[170px] max-w-[220px] flex flex-col items-center">
                     <span className="block text-xs font-semibold text-gray-500 mb-1">Você tem</span>
-                    <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 border-brasil-yellow/20 bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10">
+                    <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaSolicitada?.jogador.raridade)}`}>
                       <Image
                         src={formatarCaminhoImagem(troca.figurinhaSolicitada?.jogador.time.nome, troca.figurinhaSolicitada?.jogador.nome)[0]}
                         alt={troca.figurinhaSolicitada?.jogador.nome}
@@ -862,6 +898,7 @@ export default function Trocas() {
                           }
                         }}
                       />
+                      <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaSolicitada?.jogador.raridade)}`}>{troca.figurinhaSolicitada?.jogador.raridade}</span>
                     </div>
                     <div className="flex items-center space-x-2 mt-2 mb-1">
                       {troca.figurinhaSolicitada?.jogador.time.escudo && (
@@ -891,7 +928,7 @@ export default function Trocas() {
                   {/* Figurinha Oferta */}
                   <div className="flex-1 min-w-[170px] max-w-[220px] flex flex-col items-center">
                     <span className="block text-xs font-semibold text-gray-500 mb-1">Você vai receber</span>
-                    <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 border-brasil-yellow/20 bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10">
+                    <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`}>
                       <Image
                         src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                         alt={troca.figurinhaOferta.jogador.nome}
@@ -908,6 +945,7 @@ export default function Trocas() {
                           }
                         }}
                       />
+                      <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
                     </div>
                     <div className="flex items-center space-x-2 mt-2 mb-1">
                       {troca.figurinhaOferta.jogador.time.escudo && (

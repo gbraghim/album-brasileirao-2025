@@ -54,6 +54,7 @@ export default function FigurinhaCard({
             src={currentPath}
             alt={jogador.nome}
             fill
+            sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
             className="object-cover"
             onError={onImageError}
           />
