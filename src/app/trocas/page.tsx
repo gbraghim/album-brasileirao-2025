@@ -393,7 +393,8 @@ export default function Trocas() {
         throw new Error('Erro ao remover troca');
       }
 
-      setTrocas(trocas.filter(t => t.figurinhaOferta.id !== figurinha.id));
+      // Atualiza todas as listas de trocas após remoção
+      await fetchTrocas();
     } catch (error) {
       console.error('Erro ao remover troca:', error);
     }
