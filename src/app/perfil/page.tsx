@@ -3,6 +3,10 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { EditarAvatar } from '@/components/EditarAvatar';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { MinhasFigurinhas } from '@/components/MinhasFigurinhas';
 
 type User = {
   id: string;
@@ -16,133 +20,34 @@ type User = {
   createdAt: Date;
 };
 
-export default function PerfilPage() {
-  const { data: session } = useSession();
-  const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState<any>(null);
-  const [avatarUrl, setAvatarUrl] = useState(session?.user?.image || '/default-avatar.png');
+export default async function PerfilPage() {
+  const session = await getServerSession(authOptions);
+  
+  if (!session?.user?.email) {
+    return <div>Não autorizado</div>;
+  }
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (session?.user?.email) {
-        try {
-          const response = await fetch('/api/user');
-          if (!response.ok) {
-            throw new Error('Erro ao carregar dados do usuário');
-          }
-          const data = await response.json();
-          setUser(data);
-        } catch (error) {
-          console.error('Erro ao carregar dados do usuário:', error);
-          setUser(null);
-        }
-      }
-    };
+  const usuario = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
 
-    fetchUser();
-  }, [session]);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (session?.user?.email) {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-        setStats(data);
-      }
-    };
-
-    fetchStats();
-  }, [session]);
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
-            Acesso Negado
-          </h2>
-          <p className="text-center text-gray-600">
-            Você precisa estar logado para acessar esta página.
-          </p>
-        </div>
-      </div>
-    );
+  if (!usuario) {
+    return <div>Usuário não encontrado</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Meu Perfil</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {/* Informações do Usuário */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Informações Pessoais</h2>
-            <div className="space-y-3 md:space-y-4">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="text-center">
-                  <h3 className="text-lg md:text-xl font-semibold text-brasil-blue">{session?.user?.name}</h3>
-                  <p className="text-sm md:text-base text-gray-600">{session?.user?.email}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg">
-                  <span className="text-sm md:text-base text-brasil-blue font-medium">Data de Cadastro</span>
-                  <span className="text-sm md:text-base text-brasil-green font-bold">
-                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'Não disponível'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg">
-                  <span className="text-sm md:text-base text-brasil-blue font-medium">Total de Figurinhas</span>
-                  <span className="text-sm md:text-base text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
-                </div>
-              </div>
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">Meu Perfil</h1>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Informações do Usuário</h2>
+        <div className="space-y-4">
+          <div>
+            <p className="text-gray-600">Nome:</p>
+            <p className="font-semibold">{usuario.name}</p>
           </div>
-
-          {/* Estatísticas */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Estatísticas</h2>
-            <div className="space-y-3 md:space-y-4">
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="bg-brasil-green/10 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue mb-1">Times Completos</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-brasil-green">
-                    {stats?.timesCompletos}/{stats?.totalTimes}
-                  </p>
-                </div>
-                <div className="bg-brasil-yellow/10 p-3 md:p-4 rounded-lg">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue mb-1">Pacotes Abertos</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-brasil-yellow">{stats?.totalPacotes}</p>
-                </div>
-              </div>
-
-              <div className="bg-white/50 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-sm md:text-base font-medium text-brasil-blue">Progresso do Álbum</h3>
-                  <span className="text-sm md:text-base font-medium text-brasil-green">
-                    {stats?.timesCompletos}/{stats?.totalTimes} times completos
-                  </span>
-                </div>
-                <div className="relative w-full bg-gray-200 rounded-full h-2.5 md:h-3 overflow-hidden">
-                  <div
-                    className="absolute left-0 top-0 bg-brasil-green h-full rounded-full transition-all duration-300 ease-in-out"
-                    style={{
-                      width: `${Math.min(((stats?.timesCompletos || 0) / (stats?.totalTimes || 1)) * 100, 100)}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-sm md:text-base text-brasil-green">
-                    {stats?.totalFigurinhas || 0} de {stats?.totalJogadoresBase || 0} figurinhas coletadas
-                  </p>
-                  <p className="text-sm md:text-base font-medium text-brasil-green">
-                    {Math.round(((stats?.totalFigurinhas || 0) / (stats?.totalJogadoresBase || 1)) * 100)}%
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div>
+            <p className="text-gray-600">Email:</p>
+            <p className="font-semibold">{usuario.email}</p>
           </div>
         </div>
       </div>
