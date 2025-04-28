@@ -4,26 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
 import React from 'react';
-
-interface Jogador {
-  id: string;
-  nome: string;
-  numero: number | null;
-  posicao: string | null;
-  nacionalidade: string | null;
-  foto: string | null;
-  time: {
-    id: string;
-    nome: string;
-    escudo: string | null;
-  };
-}
-
-interface Figurinha {
-  id: string;
-  jogador: Jogador;
-  quantidade: number;
-}
+import { Figurinha, Jogador } from '@/types';
 
 interface ModalProporTrocaProps {
   isOpen: boolean;

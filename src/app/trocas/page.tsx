@@ -8,65 +8,19 @@ import Modal from '@/components/Modal';
 import ModalProporTroca from '@/components/ModalProporTroca';
 import { formatarCaminhoImagem } from '@/lib/utils';
 import { TrocaStatus } from '@prisma/client';
-
-interface Jogador {
-  id: string;
-  nome: string;
-  numero: number | null;
-  posicao: string | null;
-  nacionalidade: string | null;
-  foto: string | null;
-  time: {
-    id: string;
-    nome: string;
-    escudo: string | null;
-  };
-}
-
-interface Figurinha {
-  id: string;
-  jogador: Jogador;
-  quantidade: number;
-  raridade: string;
-}
+import { Figurinha, Jogador } from '@/types';
 
 interface Troca {
   id: string;
   figurinhaOferta: {
     id: string;
-    jogador: {
-      id: string;
-      nome: string;
-      posicao: string;
-      numero: number;
-      nacionalidade: string;
-      foto: string;
-      raridade: string;
-      time: {
-        id: string;
-        nome: string;
-        escudo: string;
-      };
-    };
+    jogador: Jogador;
     quantidade: number;
     raridade: string;
   };
   figurinhaSolicitada: {
     id: string;
-    jogador: {
-      id: string;
-      nome: string;
-      posicao: string;
-      numero: number;
-      nacionalidade: string;
-      foto: string;
-      raridade: string;
-      time: {
-        id: string;
-        nome: string;
-        escudo: string;
-      };
-    };
+    jogador: Jogador;
   };
   usuarioEnvia: {
     id: string;
