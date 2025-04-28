@@ -30,7 +30,11 @@ export async function POST(
     const troca = await prisma.troca.findUnique({
       where: { id: trocaId },
       include: {
-        figurinhaOferta: true,
+        figurinhaOferta: {
+          include: {
+            jogador: true
+          }
+        },
         figurinhaSolicitada: true
       }
     });
@@ -154,12 +158,45 @@ export async function POST(
           data: { status: TrocaStatus.ACEITA }
         })
       ]);
+
+      // Criar notificação para o usuário que fez a proposta
+      try {
+        console.log('Criando notificação de troca aceita para', troca.usuarioRecebeId);
+        await prisma.notificacao.create({
+          data: {
+            usuarioId: troca.usuarioRecebeId!,
+            tipo: 'TROCA_ACEITA',
+            mensagem: `Sua proposta de troca pela figurinha ${troca.figurinhaOferta?.jogador?.nome || 'desconhecido'} foi aceita!`,
+            lida: false,
+            trocaId: trocaId
+          }
+        });
+        console.log('Notificação de troca aceita criada com sucesso!');
+      } catch (err) {
+        console.error('Erro ao criar notificação de troca aceita:', err);
+      }
     } else {
       // Atualizar o status da troca para recusado
       await prisma.troca.update({
         where: { id: trocaId },
         data: { status: TrocaStatus.RECUSADA }
       });
+      // Criar notificação para o usuário que fez a proposta
+      try {
+        console.log('Criando notificação de troca recusada para', troca.usuarioRecebeId);
+        await prisma.notificacao.create({
+          data: {
+            usuarioId: troca.usuarioRecebeId!,
+            tipo: 'TROCA_RECUSADA',
+            mensagem: `Sua proposta de troca pela figurinha ${troca.figurinhaOferta?.jogador?.nome || 'desconhecido'} foi recusada!`,
+            lida: false,
+            trocaId: trocaId
+          }
+        });
+        console.log('Notificação de troca recusada criada com sucesso!');
+      } catch (err) {
+        console.error('Erro ao criar notificação de troca recusada:', err);
+      }
     }
 
     return NextResponse.json({ success: true });

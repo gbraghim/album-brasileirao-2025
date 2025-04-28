@@ -80,19 +80,24 @@ const trocaInclude: TrocaInclude = {
 
 export async function POST(request: Request) {
   try {
+    console.log('1. Iniciando POST /api/trocas/responder');
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
+      console.log('2. Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { trocaId, aceitar } = await request.json();
+    console.log('3. Dados recebidos:', { trocaId, aceitar });
 
     const usuario = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
+    console.log('4. Usuário autenticado:', usuario?.id, usuario?.name);
 
     if (!usuario) {
+      console.log('5. Usuário não encontrado');
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
@@ -104,54 +109,71 @@ export async function POST(request: Request) {
       },
       include: trocaInclude
     });
+    console.log('6. Troca encontrada:', troca?.id, troca?.status);
 
     if (!troca) {
+      console.log('7. Troca não encontrada ou não está mais pendente');
       return NextResponse.json({ error: 'Troca não encontrada ou não está mais pendente' }, { status: 404 });
     }
 
     // Verificar se o usuário é o destinatário da troca
     if (troca.usuarioRecebeId !== usuario.id) {
+      console.log('8. Usuário não tem permissão para responder a troca');
       return NextResponse.json({ error: 'Você não tem permissão para responder a esta troca' }, { status: 403 });
     }
 
     if (aceitar) {
+      console.log('9. Aceitando troca...');
       // Atualizar o status da troca para ACEITA
       const trocaAtualizada = await prisma.troca.update({
         where: { id: trocaId },
         data: { status: TrocaStatus.ACEITA },
         include: trocaInclude
       });
+      console.log('10. Troca atualizada para ACEITA:', trocaAtualizada.id);
 
       // Criar notificação para o usuário que enviou a proposta
-      await prisma.notificacao.create({
-        data: {
-          usuarioId: troca.usuarioEnviaId,
-          tipo: 'TROCA_ACEITA',
-          mensagem: `${usuario.name} aceitou sua proposta de troca do ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'}!`,
-          lida: false,
-          trocaId: trocaId
-        }
-      });
+      try {
+        const notificacao = await prisma.notificacao.create({
+          data: {
+            usuarioId: troca.usuarioEnviaId,
+            tipo: 'TROCA_ACEITA',
+            mensagem: `Sua proposta de troca pela figurinha ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'} foi aceita por ${usuario.name}!`,
+            lida: false,
+            trocaId: trocaId
+          }
+        });
+        console.log('11. Notificação de troca aceita criada:', notificacao.id);
+      } catch (err) {
+        console.error('Erro ao criar notificação de troca aceita:', err);
+      }
 
       return NextResponse.json(trocaAtualizada);
     } else {
+      console.log('9. Recusando troca...');
       // Atualizar o status da troca para RECUSADA
       const trocaAtualizada = await prisma.troca.update({
         where: { id: trocaId },
         data: { status: TrocaStatus.RECUSADA },
         include: trocaInclude
       });
+      console.log('10. Troca atualizada para RECUSADA:', trocaAtualizada.id);
 
       // Criar notificação para o usuário que enviou a proposta
-      await prisma.notificacao.create({
-        data: {
-          usuarioId: troca.usuarioEnviaId,
-          tipo: 'TROCA_RECUSADA',
-          mensagem: `${usuario.name} recusou sua proposta de troca do ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'}.`,
-          lida: false,
-          trocaId: trocaId
-        }
-      });
+      try {
+        const notificacao = await prisma.notificacao.create({
+          data: {
+            usuarioId: troca.usuarioEnviaId,
+            tipo: 'TROCA_RECUSADA',
+            mensagem: `Sua proposta de troca pela figurinha ${troca.figurinhaOferta.jogador?.nome || 'desconhecido'} foi recusada por ${usuario.name}.`,
+            lida: false,
+            trocaId: trocaId
+          }
+        });
+        console.log('11. Notificação de troca recusada criada:', notificacao.id);
+      } catch (err) {
+        console.error('Erro ao criar notificação de troca recusada:', err);
+      }
 
       return NextResponse.json(trocaAtualizada);
     }
