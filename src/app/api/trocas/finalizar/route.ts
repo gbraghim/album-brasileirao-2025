@@ -45,13 +45,13 @@ export async function POST(request: Request) {
 
     // Buscar a raridade correta dos jogadores (apenas para uso futuro, não para gravar em userFigurinha)
     const jogadorOferta = await prisma.jogador.findUnique({
-      where: { id: troca.figurinhaOferta.jogadorId },
+      where: { id: troca.figurinhaOferta.jogadorId ?? undefined },
       select: { raridade: true }
     });
     let jogadorSolicitada = null;
     if (troca.figurinhaSolicitada) {
       jogadorSolicitada = await prisma.jogador.findUnique({
-        where: { id: troca.figurinhaSolicitada.jogadorId },
+        where: { id: troca.figurinhaSolicitada.jogadorId ?? undefined },
         select: { raridade: true }
       });
     }
