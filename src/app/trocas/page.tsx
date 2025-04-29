@@ -1,3 +1,4 @@
+// Atualização: 2024-03-21 - Forçando novo deploy no Vercel
 'use client';
 
 import React, { useState, useEffect } from 'react';
