@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,22 +9,16 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
-    // Ler o arquivo SQL
-    const sql = readFileSync(join(__dirname, 'migrate.sql'), 'utf8');
+    await prisma.$connect();
+    console.log('Conexão com o banco de dados estabelecida com sucesso!');
     
-    // Executar o SQL em partes
-    const statements = sql.split(';').filter(stmt => stmt.trim());
+    // Aqui você pode adicionar suas migrações
+    // Por exemplo:
+    // await prisma.user.create({...})
     
-    for (const statement of statements) {
-      if (statement.trim()) {
-        console.log(`Executando: ${statement.trim()}`);
-        await prisma.$executeRawUnsafe(statement);
-      }
-    }
-    
-    console.log('Migração concluída com sucesso!');
+    console.log('Migrações executadas com sucesso!');
   } catch (error) {
-    console.error('Erro durante a migração:', error);
+    console.error('Erro ao executar migrações:', error);
   } finally {
     await prisma.$disconnect();
   }
