@@ -17,13 +17,13 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "allowJs": true,
-    "include": [".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
-    "exclude": ["node_modules"],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
-  }
+    "allowJs": true
+  },
+  "include": [".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"],
+  "plugins": [
+    {
+      "name": "next"
+    }
+  ]
 } 
