@@ -71,7 +71,8 @@ export default function Home() {
           </h1>
           <p className="text-xl text-blue-800 mb-8 max-w-2xl mx-auto">
             Colecione, abra pacotes animados, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro!<br/>
-            Figurinhas com raridades, estatísticas, ranking, trocas e muito mais. Uma experiência gamificada e moderna para fãs de futebol!
+            Figurinhas com raridades, estatísticas, ranking, trocas e muito mais. Uma experiência gamificada e moderna para fãs de futebol!<br/>
+            <span className="block mt-4 text-lg font-bold text-purple-700">⚡ Encontre jogadores LENDÁRIOS para complementar seu time e deixar sua coleção ainda mais especial!</span>
           </p>
         </div>
 
@@ -127,7 +128,7 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 text-blue-900">📦✨ Pacotes Diários & Abertura Animada</h3>
               <p className="text-blue-800">
-                Receba pacotes de figurinhas todos os dias e viva a emoção de abrir cada pacote com animações exclusivas. Descubra jogadores de todos os clubes, com raridades Prata, Ouro e Lendário!
+                Receba pacotes de figurinhas todos os dias e viva a emoção de abrir cada pacote com animações exclusivas. Descubra jogadores de todos os clubes, com raridades Prata, Ouro e <span className="font-bold text-purple-700">Lendário</span>! Complete seu álbum com os craques mais raros do Brasileirão.
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
