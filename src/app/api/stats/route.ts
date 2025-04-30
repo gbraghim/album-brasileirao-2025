@@ -149,9 +149,12 @@ export async function GET() {
       else figurinhasPrata++;
     }
 
+    // Corrigir totalFigurinhas para ser igual ao total de jogadores únicos
+    const totalFigurinhasUnicas = figurinhasLendarias + figurinhasOuro + figurinhasPrata;
+
     const stats: UserStats = {
       totalPacotes: user?.pacotes?.length ?? 0,
-      totalFigurinhas,
+      totalFigurinhas: totalFigurinhasUnicas,
       figurinhasRepetidas,
       timesCompletos,
       totalTimes,
