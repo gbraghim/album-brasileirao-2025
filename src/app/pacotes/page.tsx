@@ -158,7 +158,6 @@ export default function Pacotes() {
     if (pacotes.length > 0) {
       setModalAberto(false);
       setAnimacaoRapida(true);
-      setShowAnimation(true);
       await handleAbrirPacote(pacotes[0].id);
     }
   };
