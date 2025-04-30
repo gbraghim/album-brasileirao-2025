@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
 import { dynamic } from './config/route';
+import CarrosselJogadoresDestaque from '@/components/CarrosselJogadoresDestaque';
 
 export { dynamic };
 
@@ -147,6 +148,7 @@ export default function Home() {
         </div>
 
         {/* CTA Section */}
+        <CarrosselJogadoresDestaque />
         <div className="text-center">
           <Link
             href="/register"
