@@ -86,14 +86,22 @@ export async function POST(request: Request) {
       for (const jogador of jogadoresSelecionados) {
         console.log('Criando figurinha para jogador:', jogador.nome);
         
-        // Determinar a raridade da figurinha
+        // Determinar a raridade da figurinha com base na probabilidade
         const random = Math.random();
-        let raridade = 'Prata'; // 40% de probabilidade
+        let raridadeSorteada = 'Prata'; // 40% de probabilidade
         if (random < 0.2) {
-          raridade = 'Lendário'; // 20% de probabilidade
+          raridadeSorteada = 'Lendário'; // 20% de probabilidade
         } else if (random < 0.6) {
-          raridade = 'Ouro'; // 40% de probabilidade
+          raridadeSorteada = 'Ouro'; // 40% de probabilidade
         }
+
+        // Aplicar a raridade do jogador na figurinha
+        // Se o jogador for Lendário, a figurinha será Lendária
+        // Se o jogador for Ouro, a figurinha será Ouro
+        // Se o jogador for Prata, a figurinha manterá a raridade sorteada
+        const raridadeFinal = jogador.raridade === 'Lendário' ? 'Lendário' :
+                             jogador.raridade === 'Ouro' ? 'Ouro' :
+                             raridadeSorteada;
         
         // Criar a figurinha com todos os dados do jogador
         const figurinha = await tx.figurinha.create({
@@ -106,7 +114,7 @@ export async function POST(request: Request) {
             timeId: jogador.timeId,
             jogadorId: jogador.id,
             pacoteId: pacote.id,
-            raridade: raridade
+            raridade: raridadeFinal
           }
         });
 
@@ -122,7 +130,8 @@ export async function POST(request: Request) {
         userFigurinhasParaAtualizar.push({
           id: userFigurinha.id,
           nomeJogador: jogador.nome,
-          nomeTime: jogador.time.nome
+          nomeTime: jogador.time.nome,
+          raridade: raridadeFinal
         });
 
         // Verificar a figurinha criada
@@ -164,7 +173,7 @@ export async function POST(request: Request) {
       for (const uf of userFigurinhasParaAtualizar) {
         await tx.$executeRaw`
           UPDATE "UserFigurinha"
-          SET "nomeJogador" = ${uf.nomeJogador}, "nomeTime" = ${uf.nomeTime}
+          SET "nomeJogador" = ${uf.nomeJogador}, "nomeTime" = ${uf.nomeTime}, "raridade" = ${uf.raridade}
           WHERE id = ${uf.id}
         `;
       }
