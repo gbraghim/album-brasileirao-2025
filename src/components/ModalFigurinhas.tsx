@@ -192,9 +192,9 @@ export default function ModalFigurinhas({
 
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
+                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
                             {/* Imagem do jogador */}
-                            <div className="relative w-full h-40">
+                            <div className="relative w-full h-52">
                               <Image
                                 src={imagemAtual}
                                 alt={figurinha.jogador.nome}
@@ -206,9 +206,10 @@ export default function ModalFigurinhas({
                             </div>
 
                             {/* Informações do jogador */}
-                            <div className="p-1 bg-white/90 backdrop-blur-sm">
-                              <p className="text-sm font-bold text-center text-black truncate">{figurinha.jogador.nome}</p>
-                              <p className="text-xs text-center text-black truncate">{figurinha.jogador.posicao || 'N/A'}</p>
+                            <div className="p-4 bg-white/90 backdrop-blur-sm flex flex-col items-center min-h-[110px] justify-center">
+                              <p className="text-lg font-bold text-center text-black leading-tight break-words whitespace-normal w-full">{figurinha.jogador.nome}</p>
+                              <p className="text-sm text-center text-black mt-1 whitespace-normal w-full">{figurinha.jogador.posicao || 'N/A'}</p>
+                              <p className="text-sm font-semibold text-center text-brasil-blue mt-1 whitespace-normal w-full">{figurinha.jogador.time.nome}</p>
                             </div>
 
                             {/* Indicador de raridade */}
