@@ -151,7 +151,7 @@ export function Notificacoes() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg p-4 z-50">
+        <div className="absolute right-0 mt-2 w-96 max-w-xs sm:max-w-sm md:max-w-md lg:w-96 bg-white rounded-lg shadow-lg p-4 z-50 min-w-[220px] sm:min-w-[320px] w-full sm:w-80 md:w-96" style={{maxWidth: '95vw'}}>
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Notificações</h3>
           
           {loading ? (
