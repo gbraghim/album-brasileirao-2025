@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import Modal from '@/components/Modal';
 import Image from 'next/image';
 import { formatarCaminhoImagem } from '@/lib/utils';
+import Link from 'next/link';
 
 interface Figurinha {
   id: string;
@@ -201,7 +202,9 @@ export default function Repetidas() {
           <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
           <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 text-center">
             <p className="text-gray-600 mb-4">Você ainda não tem figurinhas repetidas.</p>
-            <p className="text-gray-600">Abra mais pacotes para conseguir figurinhas repetidas!</p>
+            <Link href="/pacotes" className="inline-block mt-2 px-6 py-3 bg-brasil-blue text-white rounded-lg font-semibold shadow hover:bg-brasil-blue/90 transition-colors">
+              Abra mais pacotes para conseguir figurinhas repetidas!
+            </Link>
           </div>
         </div>
       </div>
