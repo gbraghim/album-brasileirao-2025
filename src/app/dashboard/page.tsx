@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
+import ModalAvisoMVP from '@/components/ModalAvisoMVP';
 
 interface RankingItem {
   id: string;
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingRanking, setLoadingRanking] = useState(true);
+  const [showMVPModal, setShowMVPModal] = useState(false);
 
   useEffect(() => {
     console.log('3. useEffect executado - status:', status);
@@ -41,6 +43,10 @@ export default function Dashboard() {
       console.log('4. Usuário autenticado, buscando dados...');
       fetchStats();
       fetchRanking();
+      if (!sessionStorage.getItem('mvpModalShown')) {
+        setShowMVPModal(true);
+        sessionStorage.setItem('mvpModalShown', 'true');
+      }
     }
   }, [status, router]);
 
@@ -107,6 +113,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
+      <ModalAvisoMVP isOpen={showMVPModal} onClose={() => setShowMVPModal(false)} />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Dashboard</h1>
         

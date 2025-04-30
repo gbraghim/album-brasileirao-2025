@@ -55,25 +55,24 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="flex flex-col items-center justify-center w-full px-4 py-8">
         {/* Hero Section */}
-        <div className="text-center mb-16">
+        <div className="flex flex-col items-center text-center mb-16 w-full">
           <div className="mb-8 flex justify-center">
             <Image
               src="/logo.png"
               alt="Álbum Brasileirão 2025"
-              width={120}
-              height={120}
+              width={300}
+              height={300}
               className="rounded-lg"
             />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">
-            Álbum Digital do Brasileirão 2025
+            Álbum Brasileirão 2025
           </h1>
-          <p className="text-xl text-blue-800 mb-8 max-w-2xl mx-auto">
-            Colecione, abra pacotes animados, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro!<br/>
-            Figurinhas com raridades, estatísticas, ranking, trocas e muito mais. Uma experiência gamificada e moderna para fãs de futebol!<br/>
-            <span className="block mt-4 text-lg font-bold text-purple-700">⚡ Encontre jogadores LENDÁRIOS para complementar seu time e deixar sua coleção ainda mais especial!</span>
+          <p className="text-lg text-blue-800 mb-4 max-w-6xl w-full mx-auto">
+            Colecione, abra pacotes animados, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro! Figurinhas com raridades, estatísticas, ranking, trocas e muito mais. Uma experiência gamificada e moderna para fãs de futebol!
+            <span className="block mt-2 text-base font-bold text-purple-700">⚡ Encontre jogadores LENDÁRIOS para complementar seu time e deixar sua coleção ainda mais especial!</span>
           </p>
         </div>
 
@@ -121,7 +120,12 @@ export default function Home() {
             </Link>
           </p>
         </div>
+      </main>
 
+      {/* Carrossel de Jogadores Destaque */}
+      <CarrosselJogadoresDestaque />
+
+      <main className="flex flex-col items-center justify-center w-full px-4">
         {/* Join Community Section */}
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-8 text-blue-900">Funcionalidades do Álbum</h2>
@@ -148,8 +152,7 @@ export default function Home() {
         </div>
 
         {/* CTA Section */}
-        <CarrosselJogadoresDestaque />
-        <div className="text-center">
+        <div className="text-center mt-2 mb-6">
           <Link
             href="/register"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-200"
