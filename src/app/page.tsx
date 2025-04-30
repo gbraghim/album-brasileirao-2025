@@ -70,8 +70,8 @@ export default function Home() {
             Álbum Digital do Brasileirão 2025
           </h1>
           <p className="text-xl text-blue-800 mb-8 max-w-2xl mx-auto">
-            Colecione, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro.
-            Uma experiência única para os fãs de futebol!
+            Colecione, abra pacotes animados, troque e complete seu álbum digital com os jogadores do Campeonato Brasileiro!<br/>
+            Figurinhas com raridades, estatísticas, ranking, trocas e muito mais. Uma experiência gamificada e moderna para fãs de futebol!
           </p>
         </div>
 
@@ -122,27 +122,24 @@ export default function Home() {
 
         {/* Join Community Section */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900">Junte-se à Comunidade</h2>
+          <h2 className="text-3xl font-bold mb-8 text-blue-900">Funcionalidades do Álbum</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4 text-blue-900">Troca de Figurinhas</h3>
+              <h3 className="text-xl font-bold mb-4 text-blue-900">📦✨ Pacotes Diários & Abertura Animada</h3>
               <p className="text-blue-800">
-                Conecte-se com outros colecionadores e troque suas figurinhas repetidas. 
-                Um sistema seguro e fácil de usar para garantir trocas justas e divertidas.
+                Receba pacotes de figurinhas todos os dias e viva a emoção de abrir cada pacote com animações exclusivas. Descubra jogadores de todos os clubes, com raridades Prata, Ouro e Lendário!
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4 text-blue-900">Pacotes Diários</h3>
+              <h3 className="text-xl font-bold mb-4 text-blue-900">📊🏆 Coleção, Estatísticas e Ranking</h3>
               <p className="text-blue-800">
-                Todos os dias você recebe novos pacotes de figurinhas para completar seu álbum. 
-                Quanto mais você participa, mais chances de conseguir figurinhas raras!
+                Veja seu progresso no álbum, acompanhe estatísticas detalhadas e dispute o ranking dos maiores colecionadores do Brasileirão. Complete seu álbum e conquiste seu lugar no topo!
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4 text-blue-900">Ranking de Figurinhas</h3>
+              <h3 className="text-xl font-bold mb-4 text-blue-900">🔄🤝 Trocas e Comunidade</h3>
               <p className="text-blue-800">
-                Compita com outros colecionadores e suba no ranking semanal. 
-                Mostre quem tem a melhor coleção do Brasileirão!
+                Troque figurinhas repetidas com outros usuários de forma fácil e segura. Faça amigos, negocie e ajude outros colecionadores a completar o álbum. <b>Em breve:</b> pacotes premium!
               </p>
             </div>
           </div>
