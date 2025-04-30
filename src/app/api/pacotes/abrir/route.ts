@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       }
 
       console.log('Buscando jogadores...');
-      // Buscar todos os jogadores com seus dados completos
+      // Buscar todos os jogadores agrupados por raridade
       const jogadores = await tx.jogador.findMany({
         include: {
           time: true
@@ -71,39 +71,51 @@ export async function POST(request: Request) {
         throw new Error('Nenhum jogador encontrado');
       }
 
-      console.log('Selecionando jogadores aleatórios...');
-      const jogadoresSelecionados = [];
-      for (let i = 0; i < 4; i++) {
-        const randomIndex = Math.floor(Math.random() * jogadores.length);
-        const jogador = jogadores[randomIndex];
-        jogadoresSelecionados.push(jogador);
-      }
+      // Agrupar jogadores por raridade
+      const jogadoresPorRaridade = {
+        'Lendário': jogadores.filter(j => j.raridade === 'Lendário'),
+        'Ouro': jogadores.filter(j => j.raridade === 'Ouro'),
+        'Prata': jogadores.filter(j => j.raridade === 'Prata')
+      };
 
-      console.log('Criando figurinhas...');
+      console.log('Selecionando jogadores aleatórios...');
       const figurinhasCriadas = [];
       const userFigurinhasParaAtualizar = [];
       
-      for (const jogador of jogadoresSelecionados) {
-        console.log('Criando figurinha para jogador:', jogador.nome);
-        
-        // Determinar a raridade da figurinha com base na probabilidade
+      for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
+        // Sortear a raridade do jogador
         const random = Math.random();
-        let raridadeSorteada = 'Prata'; // 40% de probabilidade
-        if (random < 0.2) {
-          raridadeSorteada = 'Lendário'; // 20% de probabilidade
-        } else if (random < 0.6) {
-          raridadeSorteada = 'Ouro'; // 40% de probabilidade
+        let raridadeSorteada: 'Lendário' | 'Ouro' | 'Prata';
+        
+        if (random < 0.1) { // 10% de chance para Lendário
+          raridadeSorteada = 'Lendário';
+        } else if (random < 0.5) { // 40% de chance para Ouro
+          raridadeSorteada = 'Ouro';
+        } else { // 50% de chance para Prata
+          raridadeSorteada = 'Prata';
         }
 
-        // Aplicar a raridade do jogador na figurinha
-        // Se o jogador for Lendário, a figurinha será Lendária
-        // Se o jogador for Ouro, a figurinha será Ouro
-        // Se o jogador for Prata, a figurinha manterá a raridade sorteada
-        const raridadeFinal = jogador.raridade === 'Lendário' ? 'Lendário' :
-                             jogador.raridade === 'Ouro' ? 'Ouro' :
-                             raridadeSorteada;
-        
-        // Criar a figurinha com todos os dados do jogador
+        // Selecionar um jogador aleatório da raridade sorteada
+        const jogadoresDaRaridade = jogadoresPorRaridade[raridadeSorteada];
+        if (jogadoresDaRaridade.length === 0) {
+          console.log(`Nenhum jogador ${raridadeSorteada} encontrado, tentando outra raridade...`);
+          // Se não houver jogadores da raridade sorteada, tenta outra raridade
+          const raridadesDisponiveis = Object.entries(jogadoresPorRaridade)
+            .filter(([_, jogadores]) => jogadores.length > 0)
+            .map(([raridade]) => raridade as 'Lendário' | 'Ouro' | 'Prata');
+          
+          if (raridadesDisponiveis.length === 0) {
+            throw new Error('Nenhum jogador disponível para sorteio');
+          }
+          
+          raridadeSorteada = raridadesDisponiveis[Math.floor(Math.random() * raridadesDisponiveis.length)];
+        }
+
+        const jogador = jogadoresPorRaridade[raridadeSorteada][
+          Math.floor(Math.random() * jogadoresPorRaridade[raridadeSorteada].length)
+        ];
+
+        // Criar a figurinha com a raridade do jogador
         const figurinha = await tx.figurinha.create({
           data: {
             nome: jogador.nome,
@@ -114,7 +126,7 @@ export async function POST(request: Request) {
             timeId: jogador.timeId,
             jogadorId: jogador.id,
             pacoteId: pacote.id,
-            raridade: raridadeFinal
+            raridade: jogador.raridade // Usa a raridade do jogador
           }
         });
 
@@ -131,24 +143,8 @@ export async function POST(request: Request) {
           id: userFigurinha.id,
           nomeJogador: jogador.nome,
           nomeTime: jogador.time.nome,
-          raridade: raridadeFinal
+          raridade: jogador.raridade
         });
-
-        // Verificar a figurinha criada
-        const figurinhaCompleta = await tx.figurinha.findUnique({
-          where: { id: figurinha.id },
-          include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
-          }
-        });
-
-        if (!figurinhaCompleta || !figurinhaCompleta.nome) {
-          throw new Error(`Erro ao criar figurinha para ${jogador.nome}`);
-        }
 
         figurinhasCriadas.push({
           id: figurinha.id,
