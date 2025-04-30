@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession, signIn } from 'next-auth/react';
 import { Notificacoes } from './Notificacoes';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 export default function Header() {
@@ -13,6 +13,7 @@ export default function Header() {
   const pathname = usePathname() || '';
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
   
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -23,12 +24,24 @@ export default function Header() {
     { href: '/perfil', label: 'Perfil' }
   ];
 
+  useEffect(() => {
+    // Só marca como navegado se não estiver na home nem no dashboard
+    if (pathname !== '/' && pathname !== '/dashboard') {
+      setCanGoBack(true);
+      sessionStorage.setItem('hasNavigated', 'true');
+    } else if (sessionStorage.getItem('hasNavigated')) {
+      setCanGoBack(true);
+    } else {
+      setCanGoBack(false);
+    }
+  }, [pathname]);
+
   return (
     <header className="bg-gradient-to-r from-brasil-blue via-brasil-green to-brasil-yellow">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Botão de voltar: só aparece se logado ou se não estiver na home */}
-          { (session || pathname !== '/') && (
+          {/* Botão de voltar: só aparece se já navegou manualmente */}
+          { canGoBack && (
             <button
               onClick={() => router.back()}
               className="mr-4 flex items-center text-white hover:text-brasil-yellow transition-colors focus:outline-none"
@@ -91,7 +104,7 @@ export default function Header() {
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="bg-brasil-blue hover:bg-brasil-blue/80 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Sair
                 </button>
@@ -99,7 +112,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-brasil-blue hover:bg-brasil-blue/80 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Entrar
               </Link>
