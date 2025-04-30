@@ -187,7 +187,8 @@ export async function POST(request: Request) {
               escudo: jogador.time.escudo || ''
             }
           },
-          quantidadeAtual: 1
+          quantidadeAtual: 1,
+          raridade: figurinha.raridade
         });
       }
 

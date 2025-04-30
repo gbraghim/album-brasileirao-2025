@@ -42,10 +42,19 @@ interface Jogador {
 }
 
 interface Figurinha {
-  id: number;
-  jogador: Jogador;
+  id: string;
+  jogador: {
+    id: string;
+    nome: string;
+    posicao?: string;
+    time: {
+      id: string;
+      nome: string;
+      escudo?: string;
+    };
+  };
   quantidadeAtual: number;
-  raridade: string;
+  raridade: 'Lendário' | 'Ouro' | 'Prata';
 }
 
 interface ModalFigurinhasProps {
@@ -203,17 +212,15 @@ export default function ModalFigurinhas({
                             </div>
 
                             {/* Indicador de raridade */}
-                            {figurinha.raridade !== 'Bronze' && (
-                              <div className="absolute top-1 right-1">
-                                <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                  figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
-                                  figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
-                                  'bg-gray-400/80 text-black'
-                                }`}>
-                                  {figurinha.raridade}
-                                </div>
+                            <div className="absolute top-1 right-1">
+                              <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                                figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                                'bg-gray-400/80 text-black'
+                              }`}>
+                                {figurinha.raridade}
                               </div>
-                            )}
+                            </div>
                           </div>
                         </div>
                       );
