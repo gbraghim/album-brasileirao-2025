@@ -35,15 +35,22 @@ export async function GET() {
     // Calcula as estatísticas básicas
     const totalPacotes = user.pacotes.length;
 
-    // Busca todas as figurinhas do usuário, incluindo repetidas
-    const userFigurinhas = await prisma.userFigurinha.findMany({
+    // Busca todas as figurinhas do usuário, incluindo repetidas e dados do jogador
+    const userFigurinhasComJogador = await prisma.userFigurinha.findMany({
       where: {
         userId: user.id
+      },
+      include: {
+        figurinha: {
+          include: {
+            jogador: true
+          }
+        }
       }
     });
 
     // Total de figurinhas únicas (desconsiderando repetidas)
-    const totalFigurinhas = userFigurinhas.length;
+    const totalFigurinhas = userFigurinhasComJogador.length;
 
     // Busca figurinhas repetidas (quantidade > 1)
     const figurinhasRepetidasQuery = await prisma.userFigurinha.findMany({
@@ -68,7 +75,7 @@ export async function GET() {
     console.log('API Stats - Resumo:', {
       totalFigurinhasUnicas: totalFigurinhas,
       figurinhasRepetidas,
-      userFigurinhas: userFigurinhas.map(f => ({
+      userFigurinhas: userFigurinhasComJogador.map(f => ({
         figurinhaId: f.figurinhaId,
         quantidade: f.quantidade
       }))
@@ -123,6 +130,25 @@ export async function GET() {
     // Busca o total de jogadores no banco de dados
     const totalJogadoresBase = await prisma.jogador.count();
 
+    // Mapear jogadores únicos do usuário (por jogadorId)
+    const jogadoresUnicos = new Map();
+    userFigurinhasComJogador.forEach(uf => {
+      const jogador = uf.figurinha.jogador;
+      if (jogador && !jogadoresUnicos.has(jogador.id)) {
+        jogadoresUnicos.set(jogador.id, jogador.raridade || 'Prata');
+      }
+    });
+
+    // Contar jogadores únicos por raridade
+    let figurinhasLendarias = 0;
+    let figurinhasOuro = 0;
+    let figurinhasPrata = 0;
+    for (const raridade of jogadoresUnicos.values()) {
+      if (raridade === 'Lendário') figurinhasLendarias++;
+      else if (raridade === 'Ouro') figurinhasOuro++;
+      else figurinhasPrata++;
+    }
+
     const stats: UserStats = {
       totalPacotes: user?.pacotes?.length ?? 0,
       totalFigurinhas,
@@ -130,12 +156,12 @@ export async function GET() {
       timesCompletos,
       totalTimes,
       totalJogadoresBase,
-      figurinhasLendarias: user?.qtdFigurinhasLendarias ?? 0,
-      totalFigurinhasLendarias: user?.qtdFigurinhasLendarias ?? 0,
-      figurinhasOuro: user?.qtdFigurinhasOuro ?? 0,
-      totalFigurinhasOuro: user?.qtdFigurinhasOuro ?? 0,
-      figurinhasPrata: user?.qtdFigurinhasPrata ?? 0,
-      totalFigurinhasPrata: user?.qtdFigurinhasPrata ?? 0
+      figurinhasLendarias,
+      totalFigurinhasLendarias: figurinhasLendarias,
+      figurinhasOuro,
+      totalFigurinhasOuro: figurinhasOuro,
+      figurinhasPrata,
+      totalFigurinhasPrata: figurinhasPrata
     };
 
     console.log('API - Estatísticas finais:', {
