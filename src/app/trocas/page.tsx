@@ -53,6 +53,7 @@ export default function Trocas() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [loadingFigurinha, setLoadingFigurinha] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -257,6 +258,7 @@ export default function Trocas() {
   };
 
   const adicionarTroca = async (figurinha: Figurinha) => {
+    setLoadingFigurinha(figurinha.id);
     try {
       const response = await fetch('/api/trocas', {
         method: 'POST',
@@ -290,6 +292,8 @@ export default function Trocas() {
       console.error('Erro ao adicionar troca:', error);
       setErrorMessage(error instanceof Error ? error.message : 'Erro ao adicionar troca');
       setShowErrorModal(true);
+    } finally {
+      setLoadingFigurinha(null);
     }
   };
 
@@ -535,10 +539,18 @@ export default function Trocas() {
                       <button
                         onClick={() => adicionarTroca(figurinha)}
                         className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                        disabled={loadingFigurinha === figurinha.id}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                        {loadingFigurinha === figurinha.id ? (
+                          <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        )}
                         Enviar para troca
                       </button>
                     )}
