@@ -1,28 +1,7 @@
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
-
-const jogadoresDestaque = [
-  {
-    nome: 'Pelé',
-    raridade: 'Lendário',
-    imagem: '/jogadores/pele.jpg',
-  },
-  {
-    nome: 'Zico',
-    raridade: 'Lendário',
-    imagem: '/jogadores/zico.jpg',
-  },
-  {
-    nome: 'Romário',
-    raridade: 'Ouro',
-    imagem: '/jogadores/romario.jpg',
-  },
-  {
-    nome: 'Ronaldo',
-    raridade: 'Ouro',
-    imagem: '/jogadores/ronaldo.jpg',
-  },
-];
+import { useEffect, useState } from 'react';
+import { Jogador } from '@/types/index';
+import { formatarCaminhoImagem } from '@/lib/utils';
 
 const getRaridadeStyle = (raridade: string) => {
   switch (raridade) {
@@ -35,42 +14,115 @@ const getRaridadeStyle = (raridade: string) => {
   }
 };
 
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export default function CarrosselJogadoresDestaque() {
-  const [index, setIndex] = useState(0);
+  const [jogadores, setJogadores] = useState<Jogador[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % jogadoresDestaque.length);
-    }, 3500);
-    return () => clearInterval(timer);
+    const fetchJogadores = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const res = await fetch('/api/jogadores');
+        if (!res.ok) throw new Error('Falha ao carregar jogadores');
+        
+        const data: Jogador[] = await res.json();
+        const lendarios = shuffleArray(data.filter(j => j.raridade === 'Lendário')).slice(0, 10);
+        const ouros = shuffleArray(data.filter(j => j.raridade === 'Ouro')).slice(0, 20);
+        const todos = shuffleArray([...lendarios, ...ouros]);
+        
+        // Criar 3 cópias para garantir um loop suave
+        setJogadores([...todos, ...todos, ...todos]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao carregar jogadores');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchJogadores();
   }, []);
 
-  const jogador = jogadoresDestaque[index];
+  if (isLoading) {
+    return (
+      <div className="w-full h-40 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brasil-blue"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-40 flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center mb-8">
-      <div className={`relative w-40 h-56 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden transition-all duration-500 bg-white/80`}>
-        <Image
-          src={jogador.imagem}
-          alt={jogador.nome}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 backdrop-blur-sm flex flex-col items-center">
-          <span className="text-base font-bold text-black text-center leading-tight break-words">{jogador.nome}</span>
-          <span className={`text-xs font-semibold mt-1 ${jogador.raridade === 'Lendário' ? 'text-purple-700' : 'text-yellow-600'}`}>{jogador.raridade}</span>
-        </div>
+    <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden mb-8">
+      <div
+        className="flex gap-6 animate-marquee"
+        style={{
+          width: 'max-content',
+          animation: 'marquee 120s linear infinite',
+        }}
+      >
+        {jogadores.map((jogador, idx) => {
+          const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
+          return (
+            <div
+              key={`${jogador.id}-${idx}`}
+              className={`relative w-32 h-44 md:w-36 md:h-52 lg:w-40 lg:h-56 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-white/80 hover:scale-105 transition-transform duration-300`}
+            >
+              <Image
+                src={caminhos[0]}
+                alt={jogador.nome}
+                fill
+                className="object-cover"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  if (caminhos.length > 1 && img.src.includes(caminhos[0])) {
+                    img.src = caminhos[1];
+                  } else {
+                    img.src = '/placeholder.jpg';
+                  }
+                }}
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-0.5 bg-white/90 backdrop-blur-sm flex flex-col items-center min-h-[36px]">
+                <span className="text-sm font-bold text-black text-center leading-tight break-words">{jogador.nome}</span>
+                <span className={`text-xs font-semibold mt-0.5 ${jogador.raridade === 'Lendário' ? 'text-purple-700' : 'text-yellow-600'}`}>{jogador.raridade}</span>
+                {jogador.time?.escudo && (
+                  <Image
+                    src={jogador.time.escudo}
+                    alt={`Escudo do ${jogador.time.nome}`}
+                    width={15}
+                    height={15}
+                    className="mx-auto mb-0.5"
+                  />
+                )}
+                <span className="text-xs text-center text-brasil-blue mt-0.5 font-semibold">{jogador.time?.nome}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <div className="flex gap-2 mt-3">
-        {jogadoresDestaque.map((_, i) => (
-          <button
-            key={i}
-            className={`w-3 h-3 rounded-full ${i === index ? 'bg-brasil-blue' : 'bg-gray-300'}`}
-            onClick={() => setIndex(i)}
-            aria-label={`Ver jogador ${i + 1}`}
-          />
-        ))}
-      </div>
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+      `}</style>
     </div>
   );
 } 
