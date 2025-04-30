@@ -169,7 +169,7 @@ export async function POST(request: Request) {
       for (const uf of userFigurinhasParaAtualizar) {
         await tx.$executeRaw`
           UPDATE "UserFigurinha"
-          SET "nomeJogador" = ${uf.nomeJogador}, "nomeTime" = ${uf.nomeTime}, "raridade" = ${uf.raridade}
+          SET "nomeJogador" = ${uf.nomeJogador}, "nomeTime" = ${uf.nomeTime}
           WHERE id = ${uf.id}
         `;
       }
