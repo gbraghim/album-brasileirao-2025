@@ -77,7 +77,7 @@ export default function Home() {
         </div>
 
         {/* Login Form */}
-        <div className="max-w-xl mx-auto bg-white/80 backdrop-blur-lg rounded-xl p-8 mb-16 shadow-lg border border-brasil-yellow/20">
+        <div className="max-w-xl mx-auto bg-white/80 backdrop-blur-lg rounded-xl p-8 mb-16 shadow-lg border border-brasil-blue">
           <h2 className="text-2xl font-bold text-brasil-blue mb-6 text-center">Acesse seu álbum</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -87,7 +87,7 @@ export default function Home() {
                 id="email"
                 name="email"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+                className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-blue focus:outline-none focus:ring-2 focus:ring-brasil-green"
                 placeholder="seu@email.com"
               />
             </div>
@@ -98,7 +98,7 @@ export default function Home() {
                 id="password"
                 name="password"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-yellow focus:outline-none focus:ring-2 focus:ring-brasil-green"
+                className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-blue focus:outline-none focus:ring-2 focus:ring-brasil-green"
                 placeholder="••••••••"
               />
             </div>
@@ -108,7 +108,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow font-bold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+              className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-white font-bold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
@@ -155,7 +155,7 @@ export default function Home() {
         <div className="text-center mt-2 mb-6">
           <Link
             href="/register"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-200"
+            className="inline-block bg-brasil-blue hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-200"
           >
             Começar Agora
           </Link>
