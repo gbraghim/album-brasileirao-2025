@@ -24,6 +24,14 @@ interface AlbumResponse {
   jogadores: Jogador[];
 }
 
+interface PacotePremium {
+  id: string;
+  nome: string;
+  descricao: string;
+  valorCentavos: number;
+  quantidade: number;
+}
+
 export default function Pacotes() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -36,6 +44,7 @@ export default function Pacotes() {
   const [pacoteAbrindo, setPacoteAbrindo] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
   const [animacaoRapida, setAnimacaoRapida] = useState(false);
+  const [pacotesPremium, setPacotesPremium] = useState<PacotePremium[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -44,6 +53,10 @@ export default function Pacotes() {
       carregarPacotes();
       carregarFigurinhasUsuario();
     }
+    // Carregar pacotes premium
+    fetch('/api/pacotes-preco')
+      .then(res => res.json())
+      .then(data => setPacotesPremium(data));
   }, [status, router]);
 
   const carregarFigurinhasUsuario = async () => {
@@ -165,6 +178,26 @@ export default function Pacotes() {
     }
   };
 
+  const comprarPacote = async (pacoteId: string) => {
+    if (!session?.user?.id) {
+      alert('Faça login para comprar pacotes!');
+      return;
+    }
+    setLoading(true);
+    const res = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pacoteId, userId: session.user.id }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Erro ao iniciar pagamento');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -254,6 +287,31 @@ export default function Pacotes() {
                   Fique ligado para novidades!
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Seção de Compra de Pacotes Premium */}
+          <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+            <div className="text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">
+                Comprar Pacotes Premium
+              </h2>
+              <ul className="flex flex-col md:flex-row gap-4 justify-center">
+                {pacotesPremium.map((pacote) => (
+                  <li key={pacote.id} className="flex-1 border rounded-lg p-4 bg-white/90 shadow flex flex-col items-center">
+                    <div className="font-semibold text-lg mb-1">{pacote.nome}</div>
+                    <div className="text-gray-600 mb-2">{pacote.descricao}</div>
+                    <div className="text-brasil-blue font-bold text-xl mb-4">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
+                    <button
+                      onClick={() => comprarPacote(pacote.id)}
+                      disabled={loading}
+                      className="bg-brasil-blue hover:bg-brasil-blue/90 text-white px-6 py-2 rounded-lg font-semibold shadow transition-colors"
+                    >
+                      Comprar
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 

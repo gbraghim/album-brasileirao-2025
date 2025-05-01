@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Seed seguro: apenas upsert dos pacotes premium
   await prisma.pacotePreco.upsert({
     where: { stripeProductId: 'prod_SEWdEkXR93B0iM' },
     update: {},
