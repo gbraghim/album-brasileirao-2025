@@ -201,11 +201,10 @@ export default function ModalFigurinhas({
                           <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
                             {/* Imagem do jogador */}
                             <div className="relative w-full h-52">
-                              <Image
+                              <img
                                 src={imagemAtual}
                                 alt={figurinha.jogador.nome}
-                                fill
-                                className="object-cover"
+                                className="object-cover w-full h-full"
                                 onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
                                 onLoad={() => handleImageLoad(figurinha.jogador.id.toString(), imagemAtual)}
                               />
