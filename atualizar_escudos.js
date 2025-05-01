@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function atualizarEscudos() {
   try {
-    // Mapa de apiIds para caminhos locais dos escudos
+    // Mapa de apiIds para caminhos dos escudos
     const escudosMap = {
       1: '/escudos/atletico_mg.png',
       2: '/escudos/bahia.png',

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Modal from '@/components/Modal';
 import Image from 'next/image';
-import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
 import Link from 'next/link';
 
 interface Figurinha {
@@ -251,7 +251,7 @@ export default function Repetidas() {
               <div className="flex items-center space-x-1 mt-3 w-full px-2">
                 {figurinha.jogador.time.escudo && (
                   <Image
-                    src={figurinha.jogador.time.escudo}
+                    src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
                     alt={figurinha.jogador.time.nome}
                     width={18}
                     height={18}
