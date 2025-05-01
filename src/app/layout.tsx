@@ -3,14 +3,15 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import Providers from '@/components/Providers';
+import { AuthProvider } from './providers';
 import Footer from '@/components/Footer';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'eBrasileirão 2025',
-  description: 'Colecione figurinhas do Campeonato Brasileiro',
+  title: 'Álbum do Brasileirão 2025',
+  description: 'Álbum de figurinhas do Brasileirão 2025',
 };
 
 export default async function RootLayout({
@@ -29,12 +30,13 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
-        <Providers session={session}>
+        <AuthProvider>
           <main className="relative min-h-screen flex flex-col">
             {children}
             <Footer />
           </main>
-        </Providers>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

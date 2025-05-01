@@ -10,6 +10,7 @@ import ModalProporTroca from '@/components/ModalProporTroca';
 import { formatarCaminhoImagem } from '@/lib/utils';
 import { TrocaStatus } from '@prisma/client';
 import { Figurinha, Jogador } from '@/types';
+import { toast } from 'react-hot-toast';
 
 interface Troca {
   id: string;
@@ -384,30 +385,30 @@ export default function Trocas() {
     }
   };
 
-  const removerTroca = async (figurinha: Figurinha) => {
-    setLoadingFigurinha(figurinha.id);
+  const removerTroca = async (figurinhaId: string) => {
     try {
+      setLoading(true);
       const response = await fetch('/api/trocas/remover', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ figurinhaId: figurinha.id }),
+        body: JSON.stringify({ figurinhaId }),
       });
 
       if (!response.ok) {
         throw new Error('Erro ao remover troca');
       }
 
-      // Atualiza todas as listas de trocas após remoção
       await fetchTrocas();
-      setFigurinhasEmTroca(figurinhasEmTroca.filter(id => id !== figurinha.id));
+      // Dispara um evento personalizado para notificar outras páginas
+      const event = new CustomEvent('trocaRemovida', { detail: { figurinhaId } });
+      window.dispatchEvent(event);
     } catch (error) {
       console.error('Erro ao remover troca:', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Erro ao remover troca');
-      setShowErrorModal(true);
+      toast.error('Erro ao remover troca');
     } finally {
-      setLoadingFigurinha(null);
+      setLoading(false);
     }
   };
 
@@ -562,7 +563,7 @@ export default function Trocas() {
                     )}
                     {figurinhasEmTroca.includes(figurinha.id) && (
                       <button
-                        onClick={() => removerTroca(figurinha)}
+                        onClick={() => removerTroca(figurinha.id)}
                         className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
                         disabled={loadingFigurinha === figurinha.id}
                       >
@@ -645,11 +646,11 @@ export default function Trocas() {
                   </div>
                   <div className="mt-3">
                     <button
-                      onClick={() => removerTroca(troca.figurinhaOferta)}
+                      onClick={() => removerTroca(troca.id)}
                       className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
-                      disabled={loadingFigurinha === troca.figurinhaOferta.id}
+                      disabled={loadingFigurinha === troca.id}
                     >
-                      {loadingFigurinha === troca.figurinhaOferta.id ? (
+                      {loadingFigurinha === troca.id ? (
                         <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>

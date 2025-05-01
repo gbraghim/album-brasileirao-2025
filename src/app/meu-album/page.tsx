@@ -87,6 +87,7 @@ function MeuAlbumContent() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [escudoErrors, setEscudoErrors] = useState<Record<string, boolean>>({});
+  const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
 
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
     const caminhos = formatarCaminhoImagem(time, nome);
@@ -129,6 +130,18 @@ function MeuAlbumContent() {
       fetchJogadores();
       fetchTodosJogadores();
       fetchTotalJogadoresTime();
+      fetchFigurinhasEmTroca();
+
+      // Adiciona o ouvinte de evento para atualizar o estado quando uma troca é removida
+      const handleTrocaRemovida = (event: CustomEvent<{ figurinhaId: string }>) => {
+        setFigurinhasEmTroca(prev => prev.filter(id => id !== event.detail.figurinhaId));
+      };
+
+      window.addEventListener('trocaRemovida', handleTrocaRemovida as EventListener);
+
+      return () => {
+        window.removeEventListener('trocaRemovida', handleTrocaRemovida as EventListener);
+      };
     }
   }, [status, router]);
 
@@ -219,6 +232,27 @@ function MeuAlbumContent() {
       setTotalJogadoresTime(data);
     } catch (err) {
       console.error('Erro ao carregar total de jogadores por time:', err);
+    }
+  };
+
+  const fetchFigurinhasEmTroca = async () => {
+    try {
+      const response = await fetch('/api/trocas');
+      if (!response.ok) {
+        throw new Error('Erro ao buscar trocas');
+      }
+      const data = await response.json();
+      
+      // Extrair IDs das figurinhas em troca
+      const figurinhasEmTrocaIds = new Set([
+        ...(data.minhasTrocas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
+        ...(data.trocasRecebidas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
+        ...(data.trocasDisponiveis || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean),
+        ...(data.ofertasEnviadas || []).map((t: any) => t.figurinhaOferta?.id).filter(Boolean)
+      ]);
+      setFigurinhasEmTroca(Array.from(figurinhasEmTrocaIds));
+    } catch (err) {
+      console.error('Erro ao buscar figurinhas em troca:', err);
     }
   };
 
@@ -374,15 +408,23 @@ function MeuAlbumContent() {
                   {jogadoresDoTime.map((jogador) => {
                     const jogadorColetado = jogadores.some(j => j.id === jogador.id);
                     const currentIndex = currentImageIndex[jogador.id] || 0;
+                    const figurinhaId = jogadores.find(j => j.id === jogador.id)?.figurinhas?.[0]?.id;
+                    const emTroca = figurinhaId ? figurinhasEmTroca.includes(figurinhaId) : false;
                     
                     return (
-                      <FigurinhaCard
-                        key={jogador.id}
-                        jogador={jogador}
-                        jogadorColetado={jogadorColetado}
-                        currentImageIndex={currentIndex}
-                        onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
-                      />
+                      <div key={jogador.id} className="relative">
+                        <FigurinhaCard
+                          jogador={jogador}
+                          jogadorColetado={jogadorColetado}
+                          currentImageIndex={currentIndex}
+                          onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                        />
+                        {jogadorColetado && emTroca && (
+                          <div className="absolute top-2 left-2 bg-brasil-blue text-brasil-yellow px-2 py-1 rounded-lg text-xs font-semibold">
+                            Em troca
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
