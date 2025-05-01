@@ -102,6 +102,12 @@ export default function ModalFigurinhas({
     const caminhos = formatarCaminhoImagem(time, nome);
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
+    console.log(`Tentando carregar imagem para ${nome} do ${time}`, {
+      caminhos,
+      currentIndex,
+      caminhoAtual: caminhos[currentIndex]
+    });
+    
     if (currentIndex < caminhos.length - 1) {
       console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
       setCurrentImageIndex(prev => ({

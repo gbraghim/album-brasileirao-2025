@@ -27,14 +27,6 @@ export function formatarNomeArquivo(nome: string): string[] {
 }
 
 export function formatarCaminhoImagem(time: string, nome: string): string[] {
-  // Remove espaços extras e normaliza espaços
-  const nomeNormalizado = nome.trim().replace(/\s+/g, ' ');
-  // Separa em palavras, coloca a primeira letra de cada palavra em maiúsculo e o resto em minúsculo, depois junta tudo
-  const nomeFormatado = nomeNormalizado
-    .split(' ')
-    .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
-    .join('');
-
   // Trata nomes especiais dos times
   let pastaTime = time;
   if (time === 'São Paulo') {
@@ -43,13 +35,28 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     pastaTime = 'AtléticoMineiro';
   }
 
-  // Gera múltiplos caminhos possíveis
-  const caminhos = [
-    `/players/${pastaTime}/${nomeFormatado}.jpg`,
-    `/players/${pastaTime}/${nomeFormatado.toLowerCase()}.jpg`,
-    `/players/${pastaTime}/${nomeNormalizado.replace(/\s+/g, '_').toLowerCase()}.jpg`,
-    `/players/${pastaTime}/${nomeNormalizado.replace(/\s+/g, '-').toLowerCase()}.jpg`
-  ];
+  // Gera todas as variantes possíveis do nome
+  const variantesNome = formatarNomeArquivo(nome);
+  const caminhos = new Set<string>();
 
-  return caminhos;
+  // Para cada variante do nome, gera múltiplos formatos de caminho
+  variantesNome.forEach(variante => {
+    // Formato com primeira letra maiúscula
+    caminhos.add(`/players/${pastaTime}/${variante.charAt(0).toUpperCase() + variante.slice(1)}.jpg`);
+    
+    // Formato todo em minúsculas
+    caminhos.add(`/players/${pastaTime}/${variante.toLowerCase()}.jpg`);
+    
+    // Formato com underscore
+    caminhos.add(`/players/${pastaTime}/${variante.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}.jpg`);
+    
+    // Formato com hífen
+    caminhos.add(`/players/${pastaTime}/${variante.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.jpg`);
+  });
+
+  // Adiciona caminho com nome original (com espaços)
+  caminhos.add(`/players/${pastaTime}/${nome.trim()}.jpg`);
+
+  // Converte para array e remove duplicatas
+  return Array.from(caminhos);
 } 
