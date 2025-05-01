@@ -351,10 +351,10 @@ function MeuAlbumContent() {
                           atualizarTimeURL(time);
                         }
                       }}
-                      className="text-lg md:text-xl font-bold text-brasil-blue text-center bg-transparent border-none focus:ring-0 focus:outline-none cursor-pointer"
+                      className="text-lg md:text-xl font-bold text-brasil-blue text-center bg-transparent border-none focus:ring-0 focus:outline-none cursor-pointer appearance-none pr-8 bg-[url('/icons/chevron-down.svg')] bg-no-repeat bg-right bg-contain hover:opacity-80 transition-opacity"
                     >
                       {TIMES_SERIE_A.map((time) => (
-                        <option key={time.id} value={time.id}>
+                        <option key={time.id} value={time.id} className="bg-white text-brasil-blue">
                           {time.nome}
                         </option>
                       ))}
