@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
+    if (searchParams && searchParams.get('registered') === 'true') {
       setSuccess('Conta criada com sucesso! Faça login para continuar.');
     }
   }, [searchParams]);

@@ -147,7 +147,7 @@ function MeuAlbumContent() {
 
   // Efeito para carregar o time da URL quando a página carrega
   useEffect(() => {
-    const timeId = searchParams.get('time');
+    const timeId = searchParams ? searchParams.get('time') : null;
     if (timeId) {
       const time = TIMES_SERIE_A.find(t => t.id === timeId);
       if (time) {
@@ -196,7 +196,7 @@ function MeuAlbumContent() {
       setJogadores(data.jogadores);
       
       // Seleciona o primeiro time da lista por padrão apenas se não houver time na URL
-      if (TIMES_SERIE_A.length > 0 && !searchParams.get('time')) {
+      if (TIMES_SERIE_A.length > 0 && !(searchParams && searchParams.get('time'))) {
         const primeiroTime = TIMES_SERIE_A[0];
         setTimeSelecionado(primeiroTime);
         atualizarTimeURL(primeiroTime);
