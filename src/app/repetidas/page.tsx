@@ -275,45 +275,37 @@ export default function Repetidas() {
               <div className="flex justify-between items-center mt-2">
                 {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
                   <button
-                      onClick={() => enviarParaTroca(figurinha)}
-                      className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Enviar para troca
-                    </button>
+                    onClick={() => enviarParaTroca(figurinha)}
+                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Disponibilizar para troca
+                  </button>
                 )}
                 {figurinhasEmTroca.includes(figurinha.id) && (
                   <button
-                    className="text-sm text-brasil-blue underline hover:text-brasil-blue transition-colors"
-                    onClick={() => window.location.href = '/trocas'}
+                    onClick={() => removerTroca(figurinha)}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                    disabled={loadingFigurinha === figurinha.id}
                   >
-                    Disponível para troca
+                    {loadingFigurinha === figurinha.id ? (
+                      <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    )}
+                    Remover
                   </button>
                 )}
                 {normalize(figurinha.raridade) === 'lendario' && (
-                    <span className="text-sm text-gray-500 text-center">Figurinha lendária não pode ser trocada</span>
-                  )}
-              </div>
-              <div className="mt-2 flex justify-between items-center">
-                <button
-                  onClick={() => removerTroca(figurinha)}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
-                  disabled={loadingFigurinha === figurinha.id}
-                >
-                  {loadingFigurinha === figurinha.id ? (
-                    <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  )}
-                  Remover
-                </button>
+                  <span className="text-sm text-gray-500 text-center">Figurinha lendária não pode ser trocada</span>
+                )}
               </div>
             </div>
           ))}
