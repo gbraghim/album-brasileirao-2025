@@ -102,13 +102,6 @@ export default function ModalFigurinhas({
     const caminhos = formatarCaminhoImagem(time, nome);
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
-    console.log(`Tentando carregar imagem para ${nome} do ${time}`, {
-      caminhos,
-      currentIndex,
-      caminhoAtual: caminhos[currentIndex],
-      jogadorId
-    });
-    
     if (currentIndex < caminhos.length - 1) {
       console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
       setCurrentImageIndex(prev => ({
@@ -116,7 +109,7 @@ export default function ModalFigurinhas({
         [jogadorId]: currentIndex + 1
       }));
     } else {
-      console.error(`Todos os formatos falharam para ${nome} do ${time}. Caminhos tentados:`, caminhos);
+      console.error(`Todos os formatos falharam para ${nome} do ${time}`);
       setImageErrors(prev => ({
         ...prev,
         [jogadorId]: true
@@ -202,10 +195,11 @@ export default function ModalFigurinhas({
                           <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
                             {/* Imagem do jogador */}
                             <div className="relative w-full h-52">
-                              <img
-                                src={`${imagemAtual}?t=${Date.now()}`}
+                              <Image
+                                src={imagemAtual}
                                 alt={figurinha.jogador.nome}
-                                className="object-cover w-full h-full"
+                                fill
+                                className="object-cover"
                                 onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
                                 onLoad={() => handleImageLoad(figurinha.jogador.id.toString(), imagemAtual)}
                               />

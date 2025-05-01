@@ -351,8 +351,8 @@ function MeuAlbumContent() {
                 <div className="text-center mb-4">
                   <p className="text-brasil-blue/80 text-sm md:text-base">
                     <Link href="/pacotes" className="text-brasil-blue font-semibold hover:underline">
-                    Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
-A                    </Link>
+                  Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
+                    </Link>
                   </p>
                 </div>
 

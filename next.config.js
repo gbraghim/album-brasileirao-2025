@@ -14,7 +14,6 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: true
   },
   env: {
     JWT_SECRET: process.env.JWT_SECRET,
@@ -32,7 +31,7 @@ const nextConfig = {
       '@': require('path').resolve(__dirname, 'src'),
     };
     return config;
-  }
+  },
 };
 
 module.exports = nextConfig; 

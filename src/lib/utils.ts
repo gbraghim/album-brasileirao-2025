@@ -27,6 +27,14 @@ export function formatarNomeArquivo(nome: string): string[] {
 }
 
 export function formatarCaminhoImagem(time: string, nome: string): string[] {
+  // Remove espaços extras e normaliza espaços
+  const nomeNormalizado = nome.trim().replace(/\s+/g, ' ');
+  // Separa em palavras, coloca a primeira letra de cada palavra em maiúsculo e o resto em minúsculo, depois junta tudo
+  const nomeFormatado = nomeNormalizado
+    .split(' ')
+    .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
+    .join('');
+
   // Trata nomes especiais dos times
   let pastaTime = time;
   if (time === 'São Paulo') {
@@ -35,6 +43,8 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     pastaTime = 'AtléticoMineiro';
   }
 
-  // Retorna apenas o caminho exato do arquivo
-  return [`/players/${pastaTime}/${nome}.jpg`];
+  // Gera apenas o caminho correto
+  const caminho = `/players/${pastaTime}/${nomeFormatado}.jpg`;
+
+  return [caminho];
 } 
