@@ -109,7 +109,7 @@ export default function ModalFigurinhas({
         [jogadorId]: currentIndex + 1
       }));
     } else {
-      console.error(`Todos os formatos falharam para ${nome} do ${time}`);
+      console.error(`Todos os formatos falharam para ${nome} do ${time}. Caminhos tentados:`, caminhos);
       setImageErrors(prev => ({
         ...prev,
         [jogadorId]: true

@@ -43,8 +43,13 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     pastaTime = 'AtléticoMineiro';
   }
 
-  // Gera apenas o caminho correto
-  const caminho = `/players/${pastaTime}/${nomeFormatado}.jpg`;
+  // Gera múltiplos caminhos possíveis
+  const caminhos = [
+    `/players/${pastaTime}/${nomeFormatado}.jpg`,
+    `/players/${pastaTime}/${nomeFormatado.toLowerCase()}.jpg`,
+    `/players/${pastaTime}/${nomeNormalizado.replace(/\s+/g, '_').toLowerCase()}.jpg`,
+    `/players/${pastaTime}/${nomeNormalizado.replace(/\s+/g, '-').toLowerCase()}.jpg`
+  ];
 
-  return [caminho];
+  return caminhos;
 } 
