@@ -77,7 +77,7 @@ export default function Home() {
         </div>
 
         {/* Login Form */}
-        <div className="max-w-md mx-auto bg-white/80 backdrop-blur-lg rounded-xl p-8 mb-16 shadow-lg border border-brasil-yellow/20">
+        <div className="max-w-xl mx-auto bg-white/80 backdrop-blur-lg rounded-xl p-8 mb-16 shadow-lg border border-brasil-yellow/20">
           <h2 className="text-2xl font-bold text-brasil-blue mb-6 text-center">Acesse seu álbum</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
