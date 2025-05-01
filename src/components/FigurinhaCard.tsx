@@ -55,6 +55,13 @@ export default function FigurinhaCard({
     }
   };
 
+  // LOG DE DEBUG PARA DEPURAÇÃO
+  console.log('DEBUG jogador:', {
+    timeNome: jogador.time?.nome,
+    jogadorNome: jogador.nome,
+    s3Url: getS3PlayerUrl(jogador.time?.nome, jogador.nome)
+  });
+
   return (
     <div className="relative">
       <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-white/80 hover:scale-105 transition-transform duration-300`}>

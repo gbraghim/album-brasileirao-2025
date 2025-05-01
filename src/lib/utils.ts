@@ -50,13 +50,14 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
 }
 
 export function getS3PlayerUrl(time: string, jogador: string) {
-  // Normalização igual à usada no S3
-  // Exemplo: time = 'Sport', jogador = 'DiegoSouza'
-  return `https://album-brasileirao-2025.s3.amazonaws.com/players/${time}/${jogador}.jpg`;
+  // Remove acentos e espaços do nome do time
+  const pastaTime = removerAcentos(time).trim().replace(/\s+/g, '');
+  // Usa o nome do jogador exatamente como está, apenas removendo espaços extras
+  const nomeJogador = jogador.trim().replace(/\s+/g, '');
+  return `https://album-brasileirao.s3.sa-east-1.amazonaws.com/players/${pastaTime}/${nomeJogador}.jpg`;
 }
 
 export function getS3EscudoUrl(escudo: string) {
-  // escudo: 'atletico_mg.png' => https://album-brasileirao-2025.s3.amazonaws.com/escudos/atletico_mg.png
   const nome = escudo.replace('/escudos/', '');
-  return `https://album-brasileirao-2025.s3.amazonaws.com/escudos/${nome}`;
+  return `https://album-brasileirao.s3.sa-east-1.amazonaws.com/escudos/${nome}`;
 } 

@@ -8,7 +8,9 @@ const nextConfig = {
       'logodetimes.com',
       'api.dicebear.com',
       'img.a.transfermarkt.technology',
-      'localhost:3000'
+      'localhost:3000',
+      'album-brasileirao.s3.amazonaws.com',
+      'album-brasileirao.s3.sa-east-1.amazonaws.com'
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,

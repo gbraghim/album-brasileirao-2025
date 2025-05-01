@@ -344,14 +344,16 @@ function MeuAlbumContent() {
                   >
                     <div className="flex items-center space-x-2 md:space-x-3">
                       <div className="relative w-8 h-8 md:w-10 md:h-10">
-                        <Image
-                          src={escudoErrors[time.id] ? '/placeholder.jpg' : getS3EscudoUrl(time.escudo)}
-                          alt={time.nome}
-                          fill
-                          sizes="(max-width: 640px) 2rem, 2.5rem"
-                          className="object-contain"
-                          onError={() => handleEscudoError(time.id)}
-                        />
+                        {time.escudo && (
+                          <Image
+                            src={getS3EscudoUrl(time.escudo)}
+                            alt={time.nome}
+                            fill
+                            sizes="(max-width: 640px) 2rem, 2.5rem"
+                            className="object-contain"
+                            onError={() => handleEscudoError(time.id)}
+                          />
+                        )}
                       </div>
                       <span className={`font-medium ${
                         timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
