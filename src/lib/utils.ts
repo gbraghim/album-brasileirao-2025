@@ -47,4 +47,16 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
   const caminho = `/players/${pastaTime}/${nomeFormatado}.jpg`;
 
   return [caminho];
+}
+
+export function getS3PlayerUrl(time: string, jogador: string) {
+  // Normalização igual à usada no S3
+  // Exemplo: time = 'Sport', jogador = 'DiegoSouza'
+  return `https://album-brasileirao-2025.s3.amazonaws.com/players/${time}/${jogador}.jpg`;
+}
+
+export function getS3EscudoUrl(escudo: string) {
+  // escudo: 'atletico_mg.png' => https://album-brasileirao-2025.s3.amazonaws.com/escudos/atletico_mg.png
+  const nome = escudo.replace('/escudos/', '');
+  return `https://album-brasileirao-2025.s3.amazonaws.com/escudos/${nome}`;
 } 

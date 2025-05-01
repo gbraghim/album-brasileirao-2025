@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { getS3EscudoUrl } from '@/lib/utils';
 
 interface Time {
   id: string;
@@ -71,7 +72,7 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={time.id} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
+                src={imageErrors[time.nome] ? '/placeholder.jpg' : getS3EscudoUrl(time.escudo)}
                 alt={`Escudo do ${time.nome}`}
                 fill
                 data-time={time.nome}
@@ -86,7 +87,7 @@ export default function EscudosCarousel() {
           {times.map((time) => (
             <div key={`${time.id}-duplicate`} className="flex-shrink-0 w-24 h-24 relative">
               <Image
-                src={imageErrors[time.nome] ? '/public/placeholder.jpg' : time.escudo}
+                src={imageErrors[time.nome] ? '/placeholder.jpg' : getS3EscudoUrl(time.escudo)}
                 alt={`Escudo do ${time.nome}`}
                 fill
                 data-time={time.nome}

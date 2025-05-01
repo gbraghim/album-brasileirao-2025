@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { formatarCaminhoImagem } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
 
 const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
@@ -181,46 +181,32 @@ export default function ModalFigurinhas({
                 <div className="mt-2">
                   <div className="grid grid-cols-2 gap-4 justify-items-center">
                     {figurinhas.map((figurinha) => {
-                      const caminhos = formatarCaminhoImagem(
-                        figurinha.jogador.time.nome,
-                        figurinha.jogador.nome
-                      );
-                      const currentIndex = currentImageIndex[figurinha.jogador.id] || 0;
-                      const imagemAtual = imageErrors[figurinha.jogador.id]
-                        ? '/public/placeholder.jpg'
-                        : caminhos[currentIndex];
-
+                      const s3Url = getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome);
                       return (
                         <div key={figurinha.jogador.id} className="relative">
                           <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
-                            {/* Imagem do jogador */}
                             <div className="relative w-full h-52">
                               <Image
-                                src={imagemAtual}
+                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : s3Url}
                                 alt={figurinha.jogador.nome}
                                 fill
                                 className="object-cover"
-                                onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
-                                onLoad={() => handleImageLoad(figurinha.jogador.id.toString(), imagemAtual)}
+                                onError={() => handleImageError(figurinha.jogador.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
                               />
                             </div>
-
-                            {/* Informações do jogador */}
-                            <div className="p-4 bg-white/90 backdrop-blur-sm flex flex-col items-center min-h-[110px] justify-center">
-                              <p className="text-lg font-bold text-center text-black leading-tight break-words whitespace-normal w-full">{figurinha.jogador.nome}</p>
-                              <p className="text-sm text-center text-black mt-1 whitespace-normal w-full">{figurinha.jogador.posicao || 'N/A'}</p>
-                              <p className="text-sm font-semibold text-center text-brasil-blue mt-1 whitespace-normal w-full">{figurinha.jogador.time.nome}</p>
-                            </div>
-
-                            {/* Indicador de raridade */}
-                            <div className="absolute top-1 right-1">
-                              <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
-                                figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
-                                'bg-gray-400/80 text-black'
-                              }`}>
-                                {figurinha.raridade}
-                              </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-center">
+                              <span className="text-sm font-bold text-black text-center leading-tight break-words">{figurinha.jogador.nome}</span>
+                              <span className={`text-xs font-semibold mt-0.5 ${figurinha.raridade === 'Lendário' ? 'text-purple-700' : 'text-yellow-600'}`}>{figurinha.raridade}</span>
+                              {figurinha.jogador.time?.escudo && (
+                                <Image
+                                  src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
+                                  alt={`Escudo do ${figurinha.jogador.time.nome}`}
+                                  width={15}
+                                  height={15}
+                                  className="mx-auto mb-0.5"
+                                />
+                              )}
+                              <span className="text-xs text-center text-brasil-blue mt-0.5 font-semibold">{figurinha.jogador.time?.nome}</span>
                             </div>
                           </div>
                         </div>
