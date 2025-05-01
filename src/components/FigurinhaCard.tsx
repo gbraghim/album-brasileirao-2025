@@ -56,16 +56,16 @@ export default function FigurinhaCard({
   };
 
   // LOG DE DEBUG PARA DEPURAÇÃO
-  console.log('DEBUG jogador:', {
-    timeNome: jogador.time?.nome,
-    jogadorNome: jogador.nome,
-    s3Url: getS3PlayerUrl(jogador.time?.nome, jogador.nome)
-  });
+  // console.log('DEBUG jogador:', {
+  //   timeNome: jogador.time?.nome,
+  //   jogadorNome: jogador.nome,
+  //   s3Url: getS3PlayerUrl(jogador.time?.nome, jogador.nome)
+  // });
 
   return (
-    <div className="relative">
-      <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-white/80 hover:scale-105 transition-transform duration-300`}>
-        <div className="relative w-full h-52">
+    <div className="relative group">
+      <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-gradient-to-br transition-all duration-300 hover:scale-105 ${!jogadorColetado ? 'filter blur-md' : ''}`}>
+        <div className="relative w-full h-40">
           <Image
             src={imageError ? '/placeholder.jpg' : s3Url}
             alt={jogador.nome}
@@ -74,19 +74,22 @@ export default function FigurinhaCard({
             onError={handleImageError}
           />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-center">
-          <span className="text-sm font-bold text-black text-center leading-tight break-words">{jogador.nome}</span>
-          <span className={`text-xs font-semibold mt-0.5 ${jogador.raridade === 'Lendário' ? 'text-purple-700' : 'text-yellow-600'}`}>{jogador.raridade}</span>
-          {jogador.time?.escudo && (
-            <Image
-              src={getS3EscudoUrl(jogador.time.escudo)}
-              alt={`Escudo do ${jogador.time.nome}`}
-              width={15}
-              height={15}
-              className="mx-auto mb-0.5"
-            />
-          )}
-          <span className="text-xs text-center text-brasil-blue mt-0.5 font-semibold">{jogador.time?.nome}</span>
+        <div className="p-1 bg-white/90 backdrop-blur-sm">
+          <p className="text-sm font-bold text-center text-black truncate">{jogador.nome}</p>
+          <p className="text-xs text-center text-black truncate">{jogador.posicao}</p>
+        </div>
+        <div className="absolute top-1 right-1">
+          <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+            jogador.raridade === 'Lendário'
+              ? 'bg-purple-600/80 text-white'
+              : jogador.raridade === 'Ouro'
+                ? 'bg-yellow-500/80 text-black'
+                : jogador.raridade === 'Prata'
+                  ? 'bg-gray-400/80 text-black'
+                  : 'bg-gray-400/80 text-black'
+          }`}>
+            {jogador.raridade}
+          </div>
         </div>
       </div>
       {!jogadorColetado && onAdicionarRepetida && (

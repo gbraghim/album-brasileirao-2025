@@ -344,20 +344,18 @@ function MeuAlbumContent() {
                   >
                     <div className="flex items-center space-x-2 md:space-x-3">
                       <div className="relative w-8 h-8 md:w-10 md:h-10">
-                        {time.escudo && (
-                          <Image
-                            src={getS3EscudoUrl(time.escudo)}
-                            alt={time.nome}
-                            fill
-                            sizes="(max-width: 640px) 2rem, 2.5rem"
-                            className="object-contain"
-                            onError={() => handleEscudoError(time.id)}
-                          />
-                        )}
+                        <Image
+                          src={escudoErrors[time.id] ? '/public/placeholder.jpg' : time.escudo}
+                          alt={time.nome}
+                          fill
+                          sizes="(max-width: 640px) 2rem, 2.5rem"
+                          className="object-contain"
+                          onError={() => handleEscudoError(time.id)}
+                        />
                       </div>
                       <span className={`font-medium ${
                         timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
-                      }`}>
+                      } text-left block`}>
                         {time.nome}
                       </span>
                     </div>
@@ -401,26 +399,30 @@ function MeuAlbumContent() {
                 <div className="text-center mb-4">
                   <p className="text-brasil-blue/80 text-sm md:text-base">
                     <Link href="/pacotes" className="text-brasil-blue font-semibold hover:underline">
-                  Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
+                      Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
                     </Link>
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+                <div className="grid grid-cols-5 gap-6 p-2 md:p-4">
                   {jogadoresDoTime.map((jogador) => {
                     const jogadorColetado = jogadores.some(j => j.id === jogador.id);
                     const currentIndex = currentImageIndex[jogador.id] || 0;
                     const figurinhaId = jogadores.find(j => j.id === jogador.id)?.figurinhas?.[0]?.id;
                     const emTroca = figurinhaId ? figurinhasEmTroca.includes(figurinhaId) : false;
-                    
                     return (
                       <div key={jogador.id} className="relative">
-                        <FigurinhaCard
-                          jogador={jogador}
-                          jogadorColetado={jogadorColetado}
-                          currentImageIndex={currentIndex}
-                          onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
-                        />
+                        <div className={` ${
+                          jogadorColetado
+                            
+                        }`}>
+                          <FigurinhaCard
+                            jogador={jogador}
+                            jogadorColetado={jogadorColetado}
+                            currentImageIndex={currentIndex}
+                            onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                          />
+                        </div>
                         {jogadorColetado && emTroca && (
                           <div className="absolute top-2 left-2 bg-brasil-blue text-brasil-yellow px-2 py-1 rounded-lg text-xs font-semibold">
                             Em troca
