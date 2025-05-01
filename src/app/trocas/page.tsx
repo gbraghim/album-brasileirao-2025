@@ -503,15 +503,15 @@ export default function Trocas() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
               {repetidas.map((figurinha) => (
-                <div key={figurinha.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                  <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-4 ${getRaridadeStyle(figurinha.raridade)}`}>
+                <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-32 mx-auto">
+                  <div className={`relative w-28 h-40 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden mt-2`}>
                     <Image
                       src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
                       alt={figurinha.jogador.nome}
                       fill
-                      sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                      sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 160px"
                       className="object-cover"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
@@ -519,33 +519,43 @@ export default function Trocas() {
                         if (img.src.includes(caminhos[0])) {
                           img.src = caminhos[1];
                         } else {
-                          img.src = '/placeholder.jpg';
+                          img.src = '/public/placeholder.jpg';
                         }
                       }}
                     />
-                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(figurinha.raridade)}`}>{figurinha.raridade}</span>
+                    {figurinha.raridade && (
+                      <div className="absolute top-1 right-1">
+                        <div className={`px-1 py-0.5 rounded text-[10px] font-medium ${
+                          figurinha.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                          figurinha.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                          'bg-gray-400/80 text-black'
+                        }`}>
+                          {figurinha.raridade}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-1 mt-3 w-full px-2">
                     {figurinha.jogador.time.escudo && (
                       <Image
                         src={figurinha.jogador.time.escudo}
                         alt={figurinha.jogador.time.nome}
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
+                        width={18}
+                        height={18}
+                        className="w-4 h-4"
                       />
                     )}
-                    <span className="text-sm text-gray-600">{figurinha.jogador.time.nome}</span>
+                    <span className="text-xs text-gray-600 truncate">{figurinha.jogador.time.nome}</span>
                   </div>
-                  <div className="mt-2 flex justify-between items-center">
-                    <span className="text-sm text-gray-600">{figurinha.jogador.nome}</span>
-                    <span className="text-sm font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
+                  <div className="mt-0.5 flex justify-between items-center w-full px-2">
+                    <span className="text-xs text-gray-600 truncate max-w-[110px]">{figurinha.jogador.nome}</span>
+                    <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                   </div>
-                  <div className="mt-3">
+                  <div className="flex justify-between items-center mt-0.5 w-full px-2">
                     {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
                       <button
                         onClick={() => adicionarTroca(figurinha)}
-                        className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                        className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
                         disabled={loadingFigurinha === figurinha.id}
                       >
                         {loadingFigurinha === figurinha.id ? (
@@ -553,18 +563,14 @@ export default function Trocas() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                           </svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        )}
-                        Enviar para troca
+                        ) : null}
+                        Disponibilizar para troca
                       </button>
                     )}
                     {figurinhasEmTroca.includes(figurinha.id) && (
                       <button
                         onClick={() => removerTroca(figurinha.id)}
-                        className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                        className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
                         disabled={loadingFigurinha === figurinha.id}
                       >
                         {loadingFigurinha === figurinha.id ? (
@@ -572,16 +578,12 @@ export default function Trocas() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                           </svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        )}
+                        ) : null}
                         Remover
                       </button>
                     )}
                     {normalize(figurinha.raridade) === 'lendario' && (
-                      <span className="text-sm text-gray-500 text-center">Figurinha lendária não pode ser trocada</span>
+                      <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
                     )}
                   </div>
                 </div>
@@ -604,15 +606,15 @@ export default function Trocas() {
               <p className="text-brasil-blue/80">Selecione uma figurinha repetida da sua coleção para começar a trocar!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
               {minhasTrocas.map((troca) => (
-                <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                  <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
+                <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-32 mx-auto">
+                  <div className={`relative w-28 h-40 rounded-lg border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)} shadow-lg overflow-hidden mt-2`}>
                     <Image
                       src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                       alt={troca.figurinhaOferta.jogador.nome}
                       fill
-                      sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                      sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 160px"
                       className="object-cover"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
@@ -620,34 +622,42 @@ export default function Trocas() {
                         if (img.src.includes(caminhos[0])) {
                           img.src = caminhos[1];
                         } else {
-                          img.src = '/placeholder.jpg';
+                          img.src = '/public/placeholder.jpg';
                         }
                       }}
                     />
-                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
+                    {troca.figurinhaOferta.jogador.raridade && (
+                      <div className="absolute top-1 right-1">
+                        <div className={`px-1 py-0.5 rounded text-[10px] font-medium ${
+                          troca.figurinhaOferta.jogador.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                          troca.figurinhaOferta.jogador.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                          'bg-gray-400/80 text-black'
+                        }`}>
+                          {troca.figurinhaOferta.jogador.raridade}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-1 mt-3 w-full px-2">
                     {troca.figurinhaOferta.jogador.time.escudo && (
                       <Image
                         src={troca.figurinhaOferta.jogador.time.escudo}
                         alt={troca.figurinhaOferta.jogador.time.nome}
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
+                        width={18}
+                        height={18}
+                        className="w-4 h-4"
                       />
                     )}
-                    <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                    <span className="text-xs text-gray-600 truncate">{troca.figurinhaOferta.jogador.time.nome}</span>
                   </div>
-                  <div className="mt-2 flex justify-between items-center">
-                    <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <div className="mt-0.5 flex justify-between items-center w-full px-2">
+                    <span className="text-xs text-gray-600 truncate max-w-[110px]">{troca.figurinhaOferta.jogador.nome}</span>
+                    <span className="text-xs font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                   </div>
-                  <div className="mt-1">
-                    <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
-                  </div>
-                  <div className="mt-3">
+                  <div className="flex justify-between items-center mt-0.5 w-full px-2">
                     <button
                       onClick={() => removerTroca(troca.id)}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                      className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
                       disabled={loadingFigurinha === troca.id}
                     >
                       {loadingFigurinha === troca.id ? (
@@ -655,11 +665,7 @@ export default function Trocas() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                         </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      )}
+                      ) : null}
                       Remover
                     </button>
                   </div>
@@ -683,15 +689,15 @@ export default function Trocas() {
               <p className="text-brasil-blue/80">Volte mais tarde para ver novas propostas de troca!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
               {trocasDisponiveis.map((troca) => (
-                <div key={troca.id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-300">
-                  <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-brasil-green/10 to-brasil-yellow/10 rounded-lg overflow-hidden border-2 border-brasil-yellow/20">
+                <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-32 mx-auto">
+                  <div className={`relative w-28 h-40 rounded-lg border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)} shadow-lg overflow-hidden mt-2`}>
                     <Image
                       src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
                       alt={troca.figurinhaOferta.jogador.nome}
                       fill
-                      sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                      sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 160px"
                       className="object-cover"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
@@ -699,37 +705,44 @@ export default function Trocas() {
                         if (img.src.includes(caminhos[0])) {
                           img.src = caminhos[1];
                         } else {
-                          img.src = '/placeholder.jpg';
+                          img.src = '/public/placeholder.jpg';
                         }
                       }}
                     />
-                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold shadow ${getRaridadeLabelStyle(troca.figurinhaOferta.jogador.raridade)}`}>{troca.figurinhaOferta.jogador.raridade}</span>
+                    {troca.figurinhaOferta.jogador.raridade && (
+                      <div className="absolute top-1 right-1">
+                        <div className={`px-1 py-0.5 rounded text-[10px] font-medium ${
+                          troca.figurinhaOferta.jogador.raridade === 'Lendário' ? 'bg-purple-600/80 text-white' :
+                          troca.figurinhaOferta.jogador.raridade === 'Ouro' ? 'bg-yellow-500/80 text-black' :
+                          'bg-gray-400/80 text-black'
+                        }`}>
+                          {troca.figurinhaOferta.jogador.raridade}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-1 mt-3 w-full px-2">
                     {troca.figurinhaOferta.jogador.time.escudo && (
                       <Image
                         src={troca.figurinhaOferta.jogador.time.escudo}
                         alt={troca.figurinhaOferta.jogador.time.nome}
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
+                        width={18}
+                        height={18}
+                        className="w-4 h-4"
                       />
                     )}
-                    <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                    <span className="text-xs text-gray-600 truncate">{troca.figurinhaOferta.jogador.time.nome}</span>
                   </div>
-                  <div className="mt-2 flex justify-between items-center">
-                    <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                  <div className="mt-0.5 flex justify-between items-center w-full px-2">
+                    <span className="text-xs text-gray-600 truncate max-w-[110px]">{troca.figurinhaOferta.jogador.nome}</span>
+                    <span className="text-xs font-semibold text-brasil-blue">x{troca.figurinhaOferta.quantidade}</span>
                   </div>
-                  <div className="mt-1">
-                    <span className="text-xs text-gray-500">Disponibilizada por: <span className="font-semibold">{troca.usuarioEnvia.name}</span></span>
-                  </div>
-                  <div className="mt-3">
+                  <div className="flex justify-between items-center mt-0.5 w-full px-2">
                     {repetidas.length === 0 ? (
                       <Link 
                         href="/pacotes" 
-                        className="w-full bg-brasil-blue/10 hover:bg-brasil-blue/20 text-brasil-blue py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                        className="w-full bg-brasil-blue/10 hover:bg-brasil-blue/20 text-brasil-blue py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
                       >
-
                         Obtenha pacotes para ter figurinhas para troca
                       </Link>
                     ) : (
@@ -738,11 +751,8 @@ export default function Trocas() {
                           setTrocaSelecionada(troca);
                           setShowProporTrocaModal(true);
                         }}
-                        className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1.5 px-2 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-1"
+                        className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
                         Propor Troca
                       </button>
                     )}
@@ -820,7 +830,7 @@ export default function Trocas() {
 
                     {/* Figurinha Solicitada */}
                     <div className="flex-1 min-w-[170px] max-w-[220px] flex flex-col items-center">
-                      <span className="block text-xs font-semibold text-gray-500 mb-1">Você vai receber</span>
+                      <span className="block text-xs font-bold text-brasil-blue mb-1">Você vai receber</span>
                       {troca.figurinhaSolicitada ? (
                         <>
                           <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`}>
@@ -960,7 +970,7 @@ export default function Trocas() {
 
                     {/* Figurinha Oferta */}
                     <div className="flex-1 min-w-[170px] max-w-[220px] flex flex-col items-center">
-                      <span className="block text-xs font-semibold text-gray-500 mb-1">Você vai receber</span>
+                      <span className="block text-xs font-bold text-brasil-blue mb-1">Você vai receber</span>
                       <div className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`}>
                         <Image
                           src={formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome)[0]}
