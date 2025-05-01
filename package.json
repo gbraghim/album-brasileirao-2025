@@ -21,6 +21,7 @@
     "@auth/prisma-adapter": "^2.9.0",
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
+    "@stripe/stripe-js": "^7.2.0",
     "@types/axios": "^0.9.36",
     "@types/jsonwebtoken": "^9.0.9",
     "axios": "^1.8.4",
