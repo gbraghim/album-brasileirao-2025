@@ -35,28 +35,6 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
     pastaTime = 'AtléticoMineiro';
   }
 
-  // Gera todas as variantes possíveis do nome
-  const variantesNome = formatarNomeArquivo(nome);
-  const caminhos = new Set<string>();
-
-  // Para cada variante do nome, gera múltiplos formatos de caminho
-  variantesNome.forEach(variante => {
-    // Formato com primeira letra maiúscula
-    caminhos.add(`/players/${pastaTime}/${variante.charAt(0).toUpperCase() + variante.slice(1)}.jpg`);
-    
-    // Formato todo em minúsculas
-    caminhos.add(`/players/${pastaTime}/${variante.toLowerCase()}.jpg`);
-    
-    // Formato com underscore
-    caminhos.add(`/players/${pastaTime}/${variante.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}.jpg`);
-    
-    // Formato com hífen
-    caminhos.add(`/players/${pastaTime}/${variante.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.jpg`);
-  });
-
-  // Adiciona caminho com nome original (com espaços)
-  caminhos.add(`/players/${pastaTime}/${nome.trim()}.jpg`);
-
-  // Converte para array e remove duplicatas
-  return Array.from(caminhos);
+  // Retorna apenas o caminho exato do arquivo
+  return [`/players/${pastaTime}/${nome}.jpg`];
 } 

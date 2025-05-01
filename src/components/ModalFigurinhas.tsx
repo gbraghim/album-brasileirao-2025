@@ -105,7 +105,8 @@ export default function ModalFigurinhas({
     console.log(`Tentando carregar imagem para ${nome} do ${time}`, {
       caminhos,
       currentIndex,
-      caminhoAtual: caminhos[currentIndex]
+      caminhoAtual: caminhos[currentIndex],
+      jogadorId
     });
     
     if (currentIndex < caminhos.length - 1) {
@@ -202,7 +203,7 @@ export default function ModalFigurinhas({
                             {/* Imagem do jogador */}
                             <div className="relative w-full h-52">
                               <img
-                                src={imagemAtual}
+                                src={`${imagemAtual}?t=${Date.now()}`}
                                 alt={figurinha.jogador.nome}
                                 className="object-cover w-full h-full"
                                 onError={() => handleImageError(figurinha.jogador.id.toString(), figurinha.jogador.time.nome, figurinha.jogador.nome)}
