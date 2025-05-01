@@ -342,9 +342,23 @@ function MeuAlbumContent() {
               <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
                 <div className="flex flex-col items-center justify-center mb-4">
                   <div className="flex justify-between w-full items-center">
-                    <h2 className="text-lg md:text-xl font-bold text-brasil-blue text-center">
-                      {timeSelecionado.nome}
-                    </h2>
+                    <select
+                      value={timeSelecionado?.id || ''}
+                      onChange={(e) => {
+                        const time = TIMES_SERIE_A.find(t => t.id === e.target.value);
+                        if (time) {
+                          setTimeSelecionado(time);
+                          atualizarTimeURL(time);
+                        }
+                      }}
+                      className="text-lg md:text-xl font-bold text-brasil-blue text-center bg-transparent border-none focus:ring-0 focus:outline-none cursor-pointer"
+                    >
+                      {TIMES_SERIE_A.map((time) => (
+                        <option key={time.id} value={time.id}>
+                          {time.nome}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
