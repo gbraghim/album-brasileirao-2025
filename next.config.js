@@ -31,9 +31,7 @@ const nextConfig = {
       '@': require('path').resolve(__dirname, 'src'),
     };
     return config;
-  },
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/album-brasileirao-2025' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/album-brasileirao-2025' : '',
+  }
 };
 
 module.exports = nextConfig; 
