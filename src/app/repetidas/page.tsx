@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Modal from '@/components/Modal';
 import Image from 'next/image';
-import { formatarCaminhoImagem } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
 import Link from 'next/link';
 
 interface Figurinha {
@@ -225,19 +225,14 @@ export default function Repetidas() {
             <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-32 mx-auto">
               <div className={`relative w-28 h-40 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden mt-2`}>
                 <Image
-                  src={formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome)[0]}
+                  src={getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome)}
                   alt={figurinha.jogador.nome}
                   fill
                   sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 160px"
                   className="object-cover"
                   onError={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
-                    const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
-                    if (img.src.includes(caminhos[0])) {
-                      img.src = caminhos[1];
-                    } else {
-                      img.src = '/public/placeholder.jpg';
-                    }
+                    img.src = '/public/placeholder.jpg';
                   }}
                 />
                 {/* Tag de raridade */}

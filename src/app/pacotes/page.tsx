@@ -192,7 +192,6 @@ export default function Pacotes() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <AdSense 

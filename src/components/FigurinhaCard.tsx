@@ -21,6 +21,7 @@ interface FigurinhaCardProps {
   currentImageIndex: number;
   onImageError: () => void;
   onAdicionarRepetida?: (jogador: any) => void;
+  hideName?: boolean;
 }
 
 const getRaridadeStyle = (raridade: string) => {
@@ -41,7 +42,8 @@ export default function FigurinhaCard({
   jogadorColetado, 
   currentImageIndex = 0, 
   onImageError,
-  onAdicionarRepetida 
+  onAdicionarRepetida,
+  hideName = false
 }: FigurinhaCardProps) {
   const [currentPath, setCurrentPath] = useState(0);
   const [imageError, setImageError] = useState(false);
@@ -65,7 +67,7 @@ export default function FigurinhaCard({
   return (
     <div className="relative group">
       <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-gradient-to-br transition-all duration-300 hover:scale-105 ${!jogadorColetado ? 'filter blur-md' : ''}`}>
-        <div className="relative w-full h-40">
+        <div className="relative w-full h-full">
           <Image
             src={imageError ? '/placeholder.jpg' : s3Url}
             alt={jogador.nome}
@@ -74,10 +76,11 @@ export default function FigurinhaCard({
             onError={handleImageError}
           />
         </div>
-        <div className="p-1 bg-white/90 backdrop-blur-sm">
-          <p className="text-sm font-bold text-center text-black truncate">{jogador.nome}</p>
-          <p className="text-xs text-center text-black truncate">{jogador.posicao}</p>
-        </div>
+        {!hideName && (
+          <div className="p-1 bg-white/90 backdrop-blur-sm">
+            {/* Conteúdo opcional, se necessário */}
+          </div>
+        )}
         <div className="absolute top-1 right-1">
           <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
             jogador.raridade === 'Lendário'

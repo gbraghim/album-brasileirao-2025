@@ -2,9 +2,10 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { formatarCaminhoImagem } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
 import React from 'react';
 import { Figurinha, Jogador } from '@/types';
+import FigurinhaCard from './FigurinhaCard';
 
 interface ModalProporTrocaProps {
   isOpen: boolean;
@@ -38,6 +39,26 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
     } else {
       setImageErrors(prev => ({ ...prev, [figurinhaId]: true }));
     }
+  };
+
+  // Função para renderizar uma figurinha usando o FigurinhaCard
+  const renderFigurinha = (figurinha: any) => {
+    return (
+      <FigurinhaCard
+        jogador={{
+          id: figurinha.jogador.id,
+          nome: figurinha.jogador.nome,
+          numero: figurinha.jogador.numero,
+          posicao: figurinha.jogador.posicao,
+          nacionalidade: figurinha.jogador.nacionalidade,
+          time: figurinha.jogador.time,
+          raridade: figurinha.raridade
+        }}
+        jogadorColetado={true}
+        currentImageIndex={0}
+        onImageError={() => {}}
+      />
+    );
   };
 
   return (
@@ -91,36 +112,18 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
                     <div className="mt-4">
                       <h4 className="text-sm font-medium text-gray-900">Selecione uma figurinha para troca:</h4>
                       <div className="mt-2 grid grid-cols-2 gap-4">
-                        {figurinhasRepetidas.filter(f => f.raridade.toLowerCase() !== 'lendário' && f.raridade.toLowerCase() !== 'lendario').map((figurinha) => {
-                          const caminhos = formatarCaminhoImagem(
-                            figurinha.jogador.time.nome,
-                            figurinha.jogador.nome
-                          );
-                          const currentIndex = currentImageIndex[figurinha.id] || 0;
-                          const imagemAtual = imageErrors[figurinha.id]
-                            ? '/placeholder-player.png'
-                            : caminhos[currentIndex];
-                          return (
-                            <div 
-                              key={figurinha.id}
-                              className="relative flex flex-col items-center p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
-                              onClick={() => onProporTroca(figurinha)}
-                            >
-                              <div className="relative w-24 h-32 mb-2">
-                                <Image
-                                  src={imagemAtual}
-                                  alt={figurinha.jogador.nome}
-                                  fill
-                                  className="object-cover rounded"
-                                  onError={() => handleImageError(figurinha.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
-                                />
-                              </div>
-                              <span className="text-sm font-medium text-gray-900">{figurinha.jogador.nome}</span>
-                              <span className="text-xs text-gray-500">{figurinha.jogador.time.nome}</span>
-                              <span className="text-xs text-gray-500">Quantidade: {figurinha.quantidade}</span>
-                            </div>
-                          );
-                        })}
+                        {figurinhasRepetidas.filter(f => f.raridade.toLowerCase() !== 'lendário' && f.raridade.toLowerCase() !== 'lendario').map((figurinha) => (
+                          <div 
+                            key={figurinha.id}
+                            className="relative flex flex-col items-center p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
+                            onClick={() => onProporTroca(figurinha)}
+                          >
+                            {renderFigurinha(figurinha)}
+                            <span className="text-sm font-medium text-gray-900">{figurinha.jogador.nome}</span>
+                            <span className="text-xs text-gray-500">{figurinha.jogador.time.nome}</span>
+                            <span className="text-xs text-gray-500">Quantidade: {figurinha.quantidade}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
