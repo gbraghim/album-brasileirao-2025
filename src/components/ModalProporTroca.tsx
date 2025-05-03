@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
+import { formatarCaminhoImagem } from '@/lib/utils';
 import React from 'react';
 import { Figurinha, Jogador } from '@/types';
 import FigurinhaCard from './FigurinhaCard';
@@ -47,9 +47,9 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
     async function cacheImages() {
       const updates: Record<string, string> = {};
       if (troca) {
-        const s3Url = getS3PlayerUrl(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
+        const caminhos = formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
         try {
-          updates[troca.figurinhaOferta.jogador.id] = await getCachedImage(s3Url);
+          updates[troca.figurinhaOferta.jogador.id] = await getCachedImage(caminhos[0]);
         } catch {}
       }
       setCachedSrcs(updates);

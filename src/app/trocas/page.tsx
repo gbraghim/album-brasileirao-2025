@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Modal from '@/components/Modal';
 import ModalProporTroca from '@/components/ModalProporTroca';
-import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
+import { formatarCaminhoImagem } from '@/lib/utils';
 import { TrocaStatus } from '@prisma/client';
 import { Figurinha, Jogador } from '@/types';
 import { toast } from 'react-hot-toast';
