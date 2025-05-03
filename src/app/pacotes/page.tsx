@@ -10,6 +10,7 @@ import { Pacote as PacoteType } from '@/types/pacote';
 import AdSense from '@/components/AdSense';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Modal from '@/components/Modal';
 
 interface Pacote extends PacoteType {
   // Adicione propriedades adicionais específicas desta página, se necessário
@@ -45,6 +46,8 @@ export default function Pacotes() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animacaoRapida, setAnimacaoRapida] = useState(false);
   const [pacotesPremium, setPacotesPremium] = useState<PacotePremium[]>([]);
+  const [abrindoPacote, setAbrindoPacote] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -52,12 +55,22 @@ export default function Pacotes() {
     } else if (status === 'authenticated') {
       carregarPacotes();
       carregarFigurinhasUsuario();
+      // Exibir modal de boas-vindas apenas na primeira visita
+      if (typeof window !== 'undefined' && session?.user?.email) {
+        const key = `welcomeModalShown_${session.user.email}`;
+        if (!localStorage.getItem(key)) {
+          setShowWelcomeModal(true);
+          localStorage.setItem(key, 'true');
+        } else {
+          setShowWelcomeModal(false);
+        }
+      }
     }
     // Carregar pacotes premium
     fetch('/api/pacotes-preco')
       .then(res => res.json())
       .then(data => setPacotesPremium(data));
-  }, [status, router]);
+  }, [status, router, session?.user?.email]);
 
   const carregarFigurinhasUsuario = async () => {
     try {
@@ -121,10 +134,11 @@ export default function Pacotes() {
   };
 
   const handleAbrirPacote = async (pacoteId: string) => {
+    if (abrindoPacote) return;
+    setAbrindoPacote(true);
     try {
       setPacoteAbrindo(pacoteId);
       setShowAnimation(true);
-      
       const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
         headers: {
@@ -133,20 +147,17 @@ export default function Pacotes() {
         },
         body: JSON.stringify({ pacoteId }),
       });
-
       if (!response.ok) {
         if (response.status === 401) {
           router.push('/login');
           return;
         }
-        
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || 'Erro ao abrir pacote';
         setError(errorMessage);
         setShowAnimation(false);
         return;
       }
-
       const data = await response.json();
       setFigurinhasAbertas(data.figurinhas);
       carregarPacotes();
@@ -156,6 +167,7 @@ export default function Pacotes() {
       setShowAnimation(false);
     } finally {
       setPacoteAbrindo(null);
+      setAbrindoPacote(false);
     }
   };
 
@@ -198,6 +210,25 @@ export default function Pacotes() {
     }
   };
 
+  // Separar pacotes por tipo
+  const pacotesDiarios = pacotes.filter(p => p.tipo === 'DIARIO');
+  const pacotesIniciais = pacotes.filter(p => p.tipo === 'INICIAL');
+  const pacotesPremiumUser = pacotes.filter(p => p.tipo === 'COMPRADO');
+
+  const semPacotesDisponiveis =
+    pacotesDiarios.length === 0 &&
+    pacotesIniciais.length === 0 &&
+    pacotesPremiumUser.length === 0;
+
+  // Ao fechar o modal, garantir que ele não volte a aparecer
+  const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false);
+    if (typeof window !== 'undefined' && session?.user?.email) {
+      const key = `welcomeModalShown_${session.user.email}`;
+      localStorage.setItem(key, 'true');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -233,87 +264,167 @@ export default function Pacotes() {
             style={{ margin: '20px 0' }}
           />
 
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
-
-          {pacotes.length > 0 ? (
-            <div className="mb-4 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
-              <p className="text-base md:text-lg text-brasil-blue">
-                Você tem <span className="font-bold text-brasil-blue">{pacotes.length}</span> pacote{pacotes.length !== 1 ? 's' : ''} disponível{pacotes.length !== 1 ? 's' : ''}
-              </p>
+          <Modal
+            isOpen={showWelcomeModal}
+            onClose={handleCloseWelcomeModal}
+            title="Bem-vindo ao Álbum!"
+          >
+            <div className="text-center space-y-4">
+              <p className="text-lg text-white font-semibold">Parabéns! Você ganhou <span className="text-brasil-yellow font-bold">3 pacotes</span> ao se cadastrar.</p>
+              <p className="text-white">E todos os dias você ganhará mais <span className="text-brasil-yellow font-bold">3 pacotes diários</span> para continuar colecionando!</p>
+              <button
+                className="mt-4 bg-brasil-blue hover:bg-brasil-green text-white px-6 py-2 rounded-lg font-bold shadow"
+                onClick={handleCloseWelcomeModal}
+              >
+                Começar a colecionar!
+              </button>
             </div>
-          ) : (
-            <div className="mb-4 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
-              <p className="text-base md:text-lg text-brasil-blue">Você não tem pacotes disponíveis no momento.</p>
-              <p className="text-sm mt-2 text-brasil-blue">Volte amanhã para receber seu pacote diário!</p>
+          </Modal>
+
+          {/* Seção Comprar Pacotes Premium no topo se não houver pacotes disponíveis */}
+          {semPacotesDisponiveis && (
+            <div className="mt-0 mb-8 p-4 md:p-6  rounded-lg  mx-4 md:mx-6">
+              <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes Premium</h2>
+                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                  {pacotesPremium.map((pacote) => {
+                    const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
+                    const isTriplo = pacote.quantidade === 3;
+                    return (
+                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                        <div className="mb-4 flex justify-center items-center">
+                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                        </div>
+                        <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
+                        <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
+                        <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
+                        {isTriplo ? (
+                          <div className="text-brasil-green font-bold text-sm mb-2 text-center">
+                            Preço unitário: R$ {precoUnitario.toFixed(2)}
+                            <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
+                          </div>
+                        ) : (
+                          <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
+                        )}
+                        <div className="flex-grow" />
+                        <button
+                          onClick={() => comprarPacote(pacote.id)}
+                          disabled={loading}
+                          className="bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4"
+                        >
+                          Comprar
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 md:p-6">
-            {pacotes.map((pacote) => (
-              <div
-                key={pacote.id}
-                className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                onClick={() => handleAbrirPacote(pacote.id)}
-              >
-                <div className={`relative w-full h-[250px] md:h-[300px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-500 ${pacoteAbrindo === pacote.id ? 'animate-pacote-aberto' : ''}`}>
-                  <Image
-                    src="/pacote-figurinhas.png"
-                    alt="Pacote de figurinhas"
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-contain p-4"
-                  />
-                  <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${pacoteAbrindo === pacote.id ? 'hidden' : ''}`}>
-                    <button className="bg-brasil-yellow text-brasil-blue font-bold py-2 md:py-3 px-4 md:px-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-110 text-sm md:text-base">
-                      Abrir Pacote
-                    </button>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
+
+          {/* Seção Pacotes Diários */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes Diários</h2>
+            {pacotesDiarios.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pacotesDiarios.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[200px] backdrop-blur-sm rounded-lg  overflow-hidden">
+                      <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Seção de Compra de Pacotes */}
-          <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
-            <div className="text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">
-                Pacotes Premium
-              </h2>
-              <div className="bg-gradient-to-r from-brasil-yellow/10 via-brasil-green/10 to-brasil-yellow/10 p-6 rounded-lg">
-                <p className="text-brasil-blue text-lg md:text-xl font-medium mb-2">
-                  Em breve você poderá adquirir pacotinhos de figurinhas extras para completar seu álbum mais rápido e ficar no top colecionadores de figurinhas!!
-                </p>
-                <p className="text-brasil-blue/80 text-sm md:text-base">
-                  Fique ligado para novidades!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Seção de Compra de Pacotes Premium */}
-          <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
-            <div className="text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">
-                Comprar Pacotes Premium
-              </h2>
-              <ul className="flex flex-col md:flex-row gap-4 justify-center">
-                {pacotesPremium.map((pacote) => (
-                  <li key={pacote.id} className="flex-1 border rounded-lg p-4 bg-white/90 shadow flex flex-col items-center">
-                    <div className="font-semibold text-lg mb-1">{pacote.nome}</div>
-                    <div className="text-gray-600 mb-2">{pacote.descricao}</div>
-                    <div className="text-brasil-blue font-bold text-xl mb-4">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
-                    <button
-                      onClick={() => comprarPacote(pacote.id)}
-                      disabled={loading}
-                      className="bg-brasil-blue hover:bg-brasil-blue/90 text-white px-6 py-2 rounded-lg font-semibold shadow transition-colors"
-                    >
-                      Comprar
-                    </button>
-                  </li>
                 ))}
-              </ul>
-            </div>
+              </div>
+            ) : <p className="text-brasil-blue">Você não tem pacotes diários disponíveis.</p>}
           </div>
+
+          {/* Seção Pacotes de Boas-vindas */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
+            {pacotesIniciais.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pacotesIniciais.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[200px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                      <Image src="/pacote-figurinhas.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="text-brasil-blue">Você não tem pacotes de boas-vindas disponíveis.</p>}
+          </div>
+
+          {/* Seção Pacotes Premium */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes Premium</h2>
+            {pacotesPremiumUser.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pacotesPremiumUser.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[200px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                      <Image src="/pacote-figurinhas.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="text-brasil-blue">Você não tem pacotes premium disponíveis.</p>}
+          </div>
+
+          {/* Seção Comprar Pacotes Premium repaginada */}
+          {!semPacotesDisponiveis && (
+            <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+              <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes Premium</h2>
+                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                  {pacotesPremium.map((pacote) => {
+                    const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
+                    const isTriplo = pacote.quantidade === 3;
+                    return (
+                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                        <div className="mb-4 flex justify-center items-center">
+                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                        </div>
+                        <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
+                        <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
+                        <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
+                        {isTriplo ? (
+                          <div className="text-brasil-green font-bold text-sm mb-2 text-center">
+                            Preço unitário: R$ {precoUnitario.toFixed(2)}
+                            <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
+                          </div>
+                        ) : (
+                          <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
+                        )}
+                        <div className="flex-grow" />
+                        <button
+                          onClick={() => comprarPacote(pacote.id)}
+                          disabled={loading}
+                          className="bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4"
+                        >
+                          Comprar
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          )}
 
           <PacoteAnimation
             isOpen={showAnimation}
@@ -337,7 +448,6 @@ export default function Pacotes() {
           />
         </div>
       </main>
-      <Footer />
     </div>
   );
 } 

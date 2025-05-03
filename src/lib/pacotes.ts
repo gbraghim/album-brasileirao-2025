@@ -1,7 +1,7 @@
 import { prisma } from './prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './auth';
-import { Jogador, Prisma } from '@prisma/client';
+import { Jogador, Prisma, TipoPacote } from '@prisma/client';
 
 interface PacoteRaw {
   id: string;
@@ -49,8 +49,8 @@ export async function verificarPacotesIniciais(userId: string) {
       return;
     }
 
-    // Criar 5 pacotes iniciais
-    for (let i = 0; i < 5; i++) {
+    // Criar 3 pacotes iniciais
+    for (let i = 0; i < 3; i++) {
       await prisma.pacote.create({
         data: {
           userId,
@@ -174,7 +174,9 @@ async function gerarFigurinhasParaPacote(pacoteId: string, userId: string) {
         data: {
           userId: userId,
           figurinhaId: figurinha.id,
-          quantidade: 1
+          quantidade: 1,
+          nomeJogador: jogador.nome || '',
+          nomeTime: jogador.time?.nome || '',
         }
       });
 
@@ -319,4 +321,38 @@ export async function criarPacotesParaUsuario(email: string, quantidade: number)
   }
 
   return pacotes.length;
+}
+
+export async function criarPacoteDiario(userId: string) {
+  return prisma.pacote.create({
+    data: {
+      userId,
+      tipo: TipoPacote.DIARIO,
+      aberto: false
+    }
+  });
+}
+
+export async function criarPacoteInicial(userId: string) {
+  return prisma.pacote.create({
+    data: {
+      userId,
+      tipo: TipoPacote.INICIAL,
+      aberto: false
+    }
+  });
+}
+
+export async function getPacotesDoUsuario(userId: string) {
+  return prisma.pacote.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
+export async function abrirPacote(pacoteId: string) {
+  return prisma.pacote.update({
+    where: { id: pacoteId },
+    data: { aberto: true }
+  });
 } 

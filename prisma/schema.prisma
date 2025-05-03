@@ -121,7 +121,7 @@ model Figurinha {
 model Pacote {
   id         String      @id @default(cuid())
   userId     String
-  tipo       String      @default("DIARIO")
+  tipo       TipoPacote
   aberto     Boolean     @default(false)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -222,4 +222,10 @@ model PacotePreco {
   ativo           Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+enum TipoPacote {
+  COMPRADO
+  DIARIO
+  INICIAL
 }

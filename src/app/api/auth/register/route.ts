@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { criarPacoteInicial } from '@/lib/pacotes';
 
 const prisma = new PrismaClient();
 
@@ -35,6 +36,11 @@ export async function POST(request: Request) {
         password: hashedPassword
       }
     });
+
+    // Após criar o usuário, criar pacotes iniciais
+    for (let i = 0; i < 3; i++) {
+      await criarPacoteInicial(user.id);
+    }
 
     return NextResponse.json(
       { message: 'Usuário criado com sucesso' },

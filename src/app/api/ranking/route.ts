@@ -24,34 +24,34 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Busca todos os usuários e suas figurinhas
+    // Busca todos os usuários
     const usuarios = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
         email: true,
-        pacotes: {
-          include: {
-            figurinhas: true
-          }
-        }
       }
     });
 
-    // Calcula o ranking ordenando por quantidade total de figurinhas
-    const rankingCompleto = usuarios
-      .map(usuario => {
-        const totalFigurinhas = usuario.pacotes.reduce((total, pacote) => 
-          total + pacote.figurinhas.length, 0
-        );
+    // Para cada usuário, busca a soma das quantidades de figurinhas atuais
+    const rankingPromises = usuarios.map(async usuario => {
+      const userFigurinhas = await prisma.userFigurinha.findMany({
+        where: { userId: usuario.id },
+        select: { quantidade: true }
+      });
+      const totalFigurinhas = userFigurinhas.reduce((acc, uf) => acc + uf.quantidade, 0);
+      return {
+        id: usuario.id,
+        nome: usuario.name || '',
+        email: usuario.email || '',
+        totalFigurinhas
+      };
+    });
 
-        return {
-          id: usuario.id,
-          nome: usuario.name || '',
-          email: usuario.email || '',
-          totalFigurinhas
-        };
-      })
+    const rankingArray = await Promise.all(rankingPromises);
+
+    // Ordena pelo total de figurinhas (incluindo repetidas)
+    const rankingCompleto = rankingArray
       .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas)
       .map((usuario, index) => ({
         ...usuario,

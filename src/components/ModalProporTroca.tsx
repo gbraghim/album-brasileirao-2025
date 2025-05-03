@@ -6,6 +6,7 @@ import { formatarCaminhoImagem, getS3PlayerUrl } from '@/lib/utils';
 import React from 'react';
 import { Figurinha, Jogador } from '@/types';
 import FigurinhaCard from './FigurinhaCard';
+import { getCachedImage } from '@/lib/cache';
 
 interface ModalProporTrocaProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
 
   const [currentImageIndex, setCurrentImageIndex] = React.useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = React.useState<Record<string, boolean>>({});
+  const [cachedSrcs, setCachedSrcs] = React.useState<Record<string, string>>({});
 
   const handleImageError = (figurinhaId: string, time: string, nome: string) => {
     const caminhos = formatarCaminhoImagem(time, nome);
@@ -40,6 +42,20 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
       setImageErrors(prev => ({ ...prev, [figurinhaId]: true }));
     }
   };
+
+  React.useEffect(() => {
+    async function cacheImages() {
+      const updates: Record<string, string> = {};
+      if (troca) {
+        const s3Url = getS3PlayerUrl(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
+        try {
+          updates[troca.figurinhaOferta.jogador.id] = await getCachedImage(s3Url);
+        } catch {}
+      }
+      setCachedSrcs(updates);
+    }
+    if (troca) cacheImages();
+  }, [troca as ModalProporTrocaProps['troca']]);
 
   // Função para renderizar uma figurinha usando o FigurinhaCard
   const renderFigurinha = (figurinha: any) => {

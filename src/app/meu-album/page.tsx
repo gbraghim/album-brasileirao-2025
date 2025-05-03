@@ -375,7 +375,7 @@ function MeuAlbumContent() {
             {timeSelecionado && (
               <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
                 <div className="flex flex-col items-center justify-center mb-4">
-                  <div className="flex justify-between w-full items-center">
+                  <div className="flex justify-between w-full items-center" style={{ position: 'relative' }}>
                     <select
                       value={timeSelecionado?.id || ''}
                       onChange={(e) => {
@@ -385,7 +385,7 @@ function MeuAlbumContent() {
                           atualizarTimeURL(time);
                         }
                       }}
-                      className="text-lg font-semibold text-brasil-blue px-3 py-1 rounded-md bg-white/30 border border-brasil-blue/10 focus:ring-1 focus:ring-brasil-blue/20 focus:outline-none cursor-pointer appearance-none pr-8 bg-[url('/icons/chevron-down.svg')] bg-[length:16px_16px] bg-no-repeat bg-[center_right_0.5rem] hover:bg-white/50 transition-all"
+                      className="text-lg font-semibold text-brasil-blue px-3 py-1 rounded-md bg-white/30 border border-brasil-blue/10 focus:ring-1 focus:ring-brasil-blue/20 focus:outline-none cursor-pointer appearance-none pr-10 hover:bg-white/50 transition-all"
                     >
                       {TIMES_SERIE_A.map((time) => (
                         <option key={time.id} value={time.id} className="bg-white text-brasil-blue text-base">
@@ -393,6 +393,12 @@ function MeuAlbumContent() {
                         </option>
                       ))}
                     </select>
+                    <svg
+                      style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+                      width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M6 8L10 12L14 8" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
                 </div>
 
@@ -404,18 +410,13 @@ function MeuAlbumContent() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-5 gap-6 p-2 md:p-4">
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-6 p-2 md:p-4">
                   {jogadoresDoTime.map((jogador) => {
                     const jogadorColetado = jogadores.some(j => j.id === jogador.id);
                     const currentIndex = currentImageIndex[jogador.id] || 0;
-                    const figurinhaId = jogadores.find(j => j.id === jogador.id)?.figurinhas?.[0]?.id;
-                    const emTroca = figurinhaId ? figurinhasEmTroca.includes(figurinhaId) : false;
                     return (
                       <div key={jogador.id} className="relative">
-                        <div className={` ${
-                          jogadorColetado
-                            
-                        }`}>
+                        <div className={` ${jogadorColetado}`}>
                           <FigurinhaCard
                             jogador={jogador}
                             jogadorColetado={jogadorColetado}
@@ -423,11 +424,6 @@ function MeuAlbumContent() {
                             onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
                           />
                         </div>
-                        {jogadorColetado && emTroca && (
-                          <div className="absolute top-2 left-2 bg-brasil-blue text-brasil-yellow px-2 py-1 rounded-lg text-xs font-semibold">
-                            Em troca
-                          </div>
-                        )}
                       </div>
                     );
                   })}

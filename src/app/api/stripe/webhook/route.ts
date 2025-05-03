@@ -7,6 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-04
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
+  console.log('📨 Webhook recebido');
   try {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log('✅ Evento validado:', event.type);
     } catch (err) {
       console.error('⚠️ Erro ao validar assinatura do webhook:', err);
       return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
@@ -29,25 +31,29 @@ export async function POST(req: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const { userId, pacoteId } = session.metadata!;
 
-      console.log('Processando pagamento confirmado:', {
+      console.log('💰 Processando pagamento confirmado:', {
         userId,
         pacoteId,
-        sessionId: session.id
+        sessionId: session.id,
+        metadata: session.metadata
       });
 
       // Buscar o pacote para saber quantos pacotes devem ser adicionados
+      console.log('🔍 Buscando pacote no banco de dados:', pacoteId);
       const pacote = await prisma.$queryRaw`
         SELECT * FROM "PacotePreco" WHERE id = ${pacoteId}
       `;
 
       if (!pacote || !Array.isArray(pacote) || pacote.length === 0) {
-        console.error('Pacote não encontrado:', pacoteId);
+        console.error('❌ Pacote não encontrado:', pacoteId);
         return NextResponse.json({ error: 'Pacote não encontrado' }, { status: 404 });
       }
 
       const { quantidade } = pacote[0];
+      console.log('📦 Pacote encontrado:', { quantidade });
 
       // Criar os pacotes para o usuário
+      console.log('➕ Criando pacotes para o usuário');
       const pacotesPromises = Array(quantidade).fill(null).map(() => 
         prisma.pacote.create({
           data: {
@@ -58,10 +64,10 @@ export async function POST(req: Request) {
       );
 
       await Promise.all(pacotesPromises);
-
-      console.log(`${quantidade} pacotes adicionados para o usuário ${userId}`);
+      console.log('✅ Pacotes criados com sucesso');
 
       // Criar notificação para o usuário
+      console.log('📢 Criando notificação para o usuário');
       await prisma.notificacao.create({
         data: {
           usuarioId: userId,
@@ -70,13 +76,14 @@ export async function POST(req: Request) {
           tipoNovo: 'PACOTE_ABERTO'
         }
       });
+      console.log('✅ Notificação criada com sucesso');
 
       return NextResponse.json({ received: true });
     }
 
     return NextResponse.json({ received: true });
   } catch (err) {
-    console.error('Erro ao processar webhook:', err);
+    console.error('❌ Erro ao processar webhook:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

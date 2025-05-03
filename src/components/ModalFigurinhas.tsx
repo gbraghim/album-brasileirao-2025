@@ -1,8 +1,9 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { formatarCaminhoImagem, getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
+import { getCachedImage } from '@/lib/cache';
 
 const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
@@ -92,6 +93,7 @@ export default function ModalFigurinhas({
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [cachedSrcs, setCachedSrcs] = useState<Record<string, string>>({});
 
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
     if (loadedImages[jogadorId]) {
@@ -124,6 +126,20 @@ export default function ModalFigurinhas({
       [jogadorId]: true
     }));
   };
+
+  useEffect(() => {
+    async function cacheImages() {
+      const updates: Record<string, string> = {};
+      for (const figurinha of figurinhas) {
+        const s3Url = getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome);
+        try {
+          updates[figurinha.jogador.id] = await getCachedImage(s3Url);
+        } catch {}
+      }
+      setCachedSrcs(updates);
+    }
+    cacheImages();
+  }, [figurinhas]);
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -182,21 +198,45 @@ export default function ModalFigurinhas({
                   <div className="grid grid-cols-2 gap-4 justify-items-center">
                     {figurinhas.map((figurinha) => {
                       const s3Url = getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome);
+                      const isLendaria = figurinha.raridade === 'Lendário';
+                      const isOuro = figurinha.raridade === 'Ouro';
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105`}>
-                            <div className="relative w-full h-52">
+                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
+                            {isLendaria && (
+                              <div className="absolute inset-0 pointer-events-none z-20 animate-pulse-lendaria">
+                                <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-glow-lendaria"></div>
+                              </div>
+                            )}
+                            {isOuro && !isLendaria && (
+                              <div className="absolute inset-0 pointer-events-none z-10 animate-glow-ouro">
+                                <div className="absolute inset-0 rounded-lg border-4 border-yellow-400 animate-glow-ouro"></div>
+                              </div>
+                            )}
+                            <div className="relative w-full h-52 z-10">
                               <Image
-                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : s3Url}
+                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || s3Url)}
                                 alt={figurinha.jogador.nome}
                                 fill
                                 className="object-cover"
                                 onError={() => handleImageError(figurinha.jogador.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
                               />
+                              <div className="absolute top-1 right-1">
+                                <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                  figurinha.raridade === 'Lendário'
+                                    ? 'bg-purple-600/80 text-white'
+                                    : figurinha.raridade === 'Ouro'
+                                      ? 'bg-yellow-500/80 text-black'
+                                      : figurinha.raridade === 'Prata'
+                                        ? 'bg-gray-400/80 text-black'
+                                        : 'bg-gray-400/80 text-black'
+                                }`}>
+                                  {figurinha.raridade}
+                                </div>
+                              </div>
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-center">
+                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-center z-10">
                               <span className="text-sm font-bold text-black text-center leading-tight break-words">{figurinha.jogador.nome}</span>
-                              <span className={`text-xs font-semibold mt-0.5 ${figurinha.raridade === 'Lendário' ? 'text-purple-700' : 'text-yellow-600'}`}>{figurinha.raridade}</span>
                               {figurinha.jogador.time?.escudo && (
                                 <Image
                                   src={getS3EscudoUrl(figurinha.jogador.time.escudo)}

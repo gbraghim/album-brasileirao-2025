@@ -1,13 +1,13 @@
 'use client';
 
 import { useSession, signIn } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
 import { dynamic } from './config/route';
-import CarrosselJogadoresDestaque from '@/components/CarrosselJogadoresDestaque';
+import { Loading } from '@/components/loading';
+import Header from '@/components/Header';
 import AdSense from '@/components/AdSense';
 
 export { dynamic };
@@ -15,55 +15,62 @@ export { dynamic };
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    if (session) {
-      router.push('/dashboard');
-    }
-  }, [session, router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    setError('');
-
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
     try {
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
-
       if (result?.error) {
         setError('Email ou senha inválidos');
+        setLoading(false);
         return;
       }
-
       router.push('/dashboard');
-    } catch (error) {
+    } catch (err) {
       setError('Ocorreu um erro ao fazer login');
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (session) {
+      router.push('/dashboard');
+    } else {
+      setLoading(false);
+    }
+  }, [session, router]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <Header />
-      <main className="flex flex-col items-center justify-center w-full px-4 py-8">
-        <div className="w-full max-w-5xl">
-          <AdSense 
-            adClient="ca-pub-3473963599771699"
-            adSlot="1234567890"
-            style={{ margin: '20px 0' }}
-          />
-          
+      <Suspense fallback={<Loading />}>
+        <Header />
+      </Suspense>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto">
+          <Suspense fallback={<Loading />}>
+            <AdSense 
+              adClient="ca-pub-3473963599771699"
+              adSlot="4567890123"
+              style={{ margin: '20px 0' }}
+            />
+          </Suspense>
+
           {/* Hero Section */}
           <div className="flex flex-col items-center text-center mb-16 w-full">
             <div className="mb-8 flex justify-center">
@@ -97,6 +104,8 @@ export default function Home() {
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-blue focus:outline-none focus:ring-2 focus:ring-brasil-green"
                   placeholder="seu@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -108,7 +117,14 @@ export default function Home() {
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/90 text-brasil-blue placeholder-brasil-blue/50 border border-brasil-blue focus:outline-none focus:ring-2 focus:ring-brasil-green"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                 />
+              </div>
+              <div className="text-right mb-2">
+                <Link href="/login" className="text-sm text-blue-600 hover:underline focus:outline-none">
+                  Esqueceu sua senha?
+                </Link>
               </div>
               {error && (
                 <div className="text-red-500 text-sm text-center">{error}</div>
@@ -136,9 +152,6 @@ export default function Home() {
           />
         </div>
       </main>
-
-      {/* Carrossel de Jogadores Destaque */}
-      <CarrosselJogadoresDestaque />
 
       <main className="flex flex-col items-center justify-center w-full px-4">
         {/* Join Community Section */}

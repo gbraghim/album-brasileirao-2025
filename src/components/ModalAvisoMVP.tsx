@@ -42,7 +42,8 @@ export default function ModalAvisoMVP({ isOpen, onClose }: ModalAvisoMVPProps) {
                     Você está usando uma versão <b>MVP</b> (Produto Mínimo Viável) do nosso álbum digital. Isso significa que ainda estamos ajustando, testando e melhorando a plataforma — então, pode ser que você encontre algum errinho ou instabilidade pelo caminho.
                   </p>
                   <p className="text-base text-gray-700 mb-2">
-                    <b>Em breve, lançaremos a versão oficial!</b> Quando isso acontecer, faremos uma limpeza no banco de dados para que todos os usuários comecem do zero, em igualdade de condições.
+                    <b>Em breve, lançaremos a versão oficial!</b> Quando isso acontecer, faremos uma limpeza no banco de dados para que todos os usuários comecem do zero, em igualdade de condições.<br />
+                    <span className="text-brasil-green font-semibold">Se você comprou pacotes premium pagos durante o MVP, eles serão disponibilizados novamente para você após o lançamento oficial.</span>
                   </p>
                   <p className="text-base text-gray-700 mb-2">
                     Aproveite para explorar, dar feedback e se divertir!

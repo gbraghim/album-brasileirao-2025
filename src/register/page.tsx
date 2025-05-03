@@ -83,7 +83,7 @@ export default function RegisterPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none text-black relative block w-full px-3 py-2 border border-purple-300 placeholder-gray-400 text-white bg-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
                 placeholder="Email"
               />
             </div>

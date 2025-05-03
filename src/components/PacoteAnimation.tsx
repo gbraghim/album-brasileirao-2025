@@ -53,7 +53,7 @@ export default function PacoteAnimation({ isOpen, onAnimationComplete }: PacoteA
           }`}
         >
           <Image
-            src="/pacote-figurinhas.png"
+            src="/pacoteTransparente.png"
             alt="Pacote de figurinhas"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"

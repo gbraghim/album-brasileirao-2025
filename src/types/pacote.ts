@@ -2,6 +2,7 @@ export interface Pacote {
   id: string;
   createdAt: Date;
   userId: string;
+  tipo: 'DIARIO' | 'INICIAL' | 'COMPRADO';
   figurinhas: {
     id: string;
     jogadorId: string;

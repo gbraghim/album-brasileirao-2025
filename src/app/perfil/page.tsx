@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { EditarAvatar } from '@/components/EditarAvatar';
 
 type User = {
@@ -21,6 +21,12 @@ export default function PerfilPage() {
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState(session?.user?.image || '/default-avatar.png');
+  const [senhaAtual, setSenhaAtual] = useState('');
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [senhaMsg, setSenhaMsg] = useState('');
+  const [senhaLoading, setSenhaLoading] = useState(false);
+  const senhaFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -54,6 +60,31 @@ export default function PerfilPage() {
     fetchStats();
   }, [session]);
 
+  const handleTrocarSenha = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSenhaLoading(true);
+    setSenhaMsg('');
+    try {
+      const res = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senhaAtual, novaSenha, confirmarSenha })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSenhaMsg('Senha alterada com sucesso!');
+        setSenhaAtual(''); setNovaSenha(''); setConfirmarSenha('');
+        senhaFormRef.current?.reset();
+      } else {
+        setSenhaMsg(data.error || 'Erro ao trocar senha.');
+      }
+    } catch {
+      setSenhaMsg('Erro ao trocar senha.');
+    } finally {
+      setSenhaLoading(false);
+    }
+  };
+
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
@@ -75,7 +106,7 @@ export default function PerfilPage() {
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue text-center">Meu Perfil</h1>
         <div className="w-full flex flex-col items-center justify-center">
           {/* Informações do Usuário */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20 w-full max-w-md mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20 w-full max-w-md mx-auto mb-6">
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue text-center">Informações Pessoais</h2>
             <div className="space-y-3 md:space-y-4">
               <div className="flex flex-col items-center space-y-4">
@@ -97,6 +128,19 @@ export default function PerfilPage() {
                 </div>
               </div>
             </div>
+          </div>
+          {/* Troca de senha */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-blue/20 w-full max-w-md mx-auto mt-4">
+            <h2 className="text-lg font-bold mb-3 text-brasil-blue text-center">Trocar senha</h2>
+            <form ref={senhaFormRef} onSubmit={handleTrocarSenha} className="space-y-4">
+              <input type="password" required placeholder="Senha atual" value={senhaAtual} onChange={e => setSenhaAtual(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input type="password" required placeholder="Nova senha" value={novaSenha} onChange={e => setNovaSenha(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input type="password" required placeholder="Confirmar nova senha" value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <button type="submit" disabled={senhaLoading} className="w-full bg-blue-600 text-white rounded py-2 font-semibold disabled:opacity-50">
+                {senhaLoading ? 'Salvando...' : 'Trocar senha'}
+              </button>
+            </form>
+            {senhaMsg && <div className="mt-2 text-center text-sm text-gray-700">{senhaMsg}</div>}
           </div>
         </div>
       </div>
