@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession, signIn } from 'next-auth/react';
-import { Notificacoes } from './Notificacoes';
+import Notificacoes from './Notificacoes';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 

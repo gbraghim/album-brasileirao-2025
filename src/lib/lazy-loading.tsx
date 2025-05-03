@@ -1,14 +1,14 @@
-import { Suspense, lazy } from 'react';
-import { Loading } from '@/components/loading';
+import { Suspense, lazy, ComponentType, PropsWithChildren } from 'react';
+import Loading from '@/components/loading';
 
 // Função utilitária para criar componentes lazy com fallback
-export function lazyLoad<P extends object>(
-  importFn: () => Promise<{ default: React.ComponentType<P> }>,
+export function lazyLoad(
+  importFn: () => Promise<{ default: ComponentType<any> }>,
   fallback?: React.ReactNode
 ) {
   const LazyComponent = lazy(importFn);
   
-  return function LazyWrapper(props: P) {
+  return function LazyWrapper(props: any) {
     return (
       <Suspense fallback={fallback || <Loading />}>
         <LazyComponent {...props} />

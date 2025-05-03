@@ -17,7 +17,7 @@ import Footer from '@/components/Footer';
 import FigurinhaCard from '@/components/FigurinhaCard';
 import { getCachedImage } from '@/lib/cache';
 import { lazyLoadImage } from '@/lib/lazy-loading';
-import { Loading } from '@/components/loading';
+import Loading from '@/components/loading';
 
 interface Troca {
   id: string;

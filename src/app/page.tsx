@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { dynamic } from './config/route';
-import { Loading } from '@/components/loading';
+import Loading from '@/components/loading';
 import Header from '@/components/Header';
 import AdSense from '@/components/AdSense';
 
