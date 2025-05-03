@@ -11,6 +11,7 @@ export interface UserStats {
   totalFigurinhasOuro: number;
   figurinhasPrata: number;
   totalFigurinhasPrata: number;
+  timesDetalhados?: { nome: string; completo: boolean; figurinhasObtidas: number; totalFigurinhas: number }[];
 }
 
 export interface TimeStats {

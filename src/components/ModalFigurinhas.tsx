@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { formatarCaminhoImagem, getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import { getCachedImage } from '@/lib/cache';
 
 const TIMES_SERIE_A = [
@@ -131,9 +131,9 @@ export default function ModalFigurinhas({
     async function cacheImages() {
       const updates: Record<string, string> = {};
       for (const figurinha of figurinhas) {
-        const s3Url = getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome);
+        const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
         try {
-          updates[figurinha.jogador.id] = await getCachedImage(s3Url);
+          updates[figurinha.jogador.id] = await getCachedImage(caminhos[0]);
         } catch {}
       }
       setCachedSrcs(updates);
@@ -197,7 +197,7 @@ export default function ModalFigurinhas({
                 <div className="mt-2">
                   <div className="grid grid-cols-2 gap-4 justify-items-center">
                     {figurinhas.map((figurinha) => {
-                      const s3Url = getS3PlayerUrl(figurinha.jogador.time.nome, figurinha.jogador.nome);
+                      const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
                       const isLendaria = figurinha.raridade === 'Lendário';
                       const isOuro = figurinha.raridade === 'Ouro';
                       return (
@@ -215,7 +215,7 @@ export default function ModalFigurinhas({
                             )}
                             <div className="relative w-full h-52 z-10">
                               <Image
-                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || s3Url)}
+                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || caminhos[0])}
                                 alt={figurinha.jogador.nome}
                                 fill
                                 className="object-fill"

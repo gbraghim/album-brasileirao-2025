@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import { getCachedImage } from '@/lib/cache';
 import { useState, useEffect } from 'react';
 
@@ -20,7 +20,7 @@ interface CardJogadorProps {
 }
 
 export default function CardJogador({ jogador, quantidade }: CardJogadorProps) {
-  const s3Url = getS3PlayerUrl(jogador.time.nome, jogador.nome);
+  const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
   const [cachedEscudo, setCachedEscudo] = useState<string | null>(null);
   const [cachedFoto, setCachedFoto] = useState<string | null>(null);
 
@@ -29,11 +29,11 @@ export default function CardJogador({ jogador, quantidade }: CardJogadorProps) {
     getCachedImage(getS3EscudoUrl(jogador.time.escudo)).then(base64 => {
       if (isMounted) setCachedEscudo(base64);
     }).catch(() => setCachedEscudo(null));
-    getCachedImage(s3Url).then(base64 => {
+    getCachedImage(caminhos[0]).then(base64 => {
       if (isMounted) setCachedFoto(base64);
     }).catch(() => setCachedFoto(null));
     return () => { isMounted = false; };
-  }, [jogador.time.escudo, s3Url]);
+  }, [jogador.time.escudo, caminhos]);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -52,7 +52,7 @@ export default function CardJogador({ jogador, quantidade }: CardJogadorProps) {
         <div className="flex justify-center mb-4">
           <div className="relative w-32 h-32">
             <Image
-              src={cachedFoto || s3Url}
+              src={cachedFoto || caminhos[0]}
               alt={jogador.nome}
               fill
               className="object-cover rounded-full"

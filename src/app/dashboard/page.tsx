@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
@@ -33,6 +33,11 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [loadingRanking, setLoadingRanking] = useState(true);
   const [showMVPModal, setShowMVPModal] = useState(false);
+  const [showTimesAccordion, setShowTimesAccordion] = useState(false);
+  const timesDetalhados = stats?.timesDetalhados || [];
+  const timesCompletos = timesDetalhados.filter(t => t.completo).sort((a, b) => a.nome.localeCompare(b.nome));
+  const timesIncompletos = timesDetalhados.filter(t => !t.completo).sort((a, b) => a.nome.localeCompare(b.nome));
+  const timesOrdenados = [...timesCompletos, ...timesIncompletos];
 
   useEffect(() => {
     console.log('3. useEffect executado - status:', status);
@@ -123,14 +128,40 @@ export default function Dashboard() {
         <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20 mb-6 md:mb-8">
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Seu Álbum</h2>
           <div className="space-y-3 md:space-y-4">
-            <Link href="/meu-album" className="block">
-              <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg hover:bg-brasil-green/20 transition-colors">
+            {/* Progresso do Álbum com accordeon */}
+            <div className="block">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between p-3 md:p-4 bg-brasil-green/10 rounded-lg hover:bg-brasil-green/20 transition-colors focus:outline-none"
+                onClick={() => setShowTimesAccordion((v) => !v)}
+              >
                 <span className="text-sm md:text-base text-brasil-blue font-medium">Progresso do Álbum</span>
-                <span className="text-sm md:text-base text-brasil-green font-bold">
-                  {stats?.timesCompletos}/{stats?.totalTimes} times completos
+                <span className="flex items-center gap-2">
+                  <span className="text-sm md:text-base text-brasil-green font-bold">
+                    {stats?.timesCompletos}/{stats?.totalTimes} times completos
+                  </span>
+                  <svg className={`w-5 h-5 ml-2 transition-transform ${showTimesAccordion ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </span>
-              </div>
-            </Link>
+              </button>
+              {showTimesAccordion && (
+                <div className="bg-white rounded-lg shadow-inner mt-2 p-2 max-h-96 overflow-y-auto border border-brasil-green/30">
+                  <ul>
+                    {timesOrdenados.map((time) => (
+                      <li key={time.nome} className="flex items-center gap-2 py-1 px-2">
+                        {time.completo ? (
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        ) : (
+                          <svg className="w-5 h-5 text-yellow-500 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        )}
+                        <span className={time.completo ? 'text-green-700 font-semibold' : 'text-black'}>
+                          {time.nome} ({time.figurinhasObtidas}/{time.totalFigurinhas})
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
             <Link href="/meu-album" className="block">
               <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-blue/10 rounded-lg hover:bg-brasil-blue/20 transition-colors">
                 <span className="text-sm md:text-base text-brasil-blue font-medium">Figurinhas Únicas</span>

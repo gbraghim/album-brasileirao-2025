@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { formatarCaminhoImagem, getS3PlayerUrl, getS3EscudoUrl } from '@/lib/utils';
+import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import { getCachedImage } from '@/lib/cache';
 
 interface FigurinhaCardProps {
@@ -50,7 +50,6 @@ export default function FigurinhaCard({
   const [imageError, setImageError] = useState(false);
   const [cachedSrc, setCachedSrc] = useState<string | null>(null);
   const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
-  const s3Url = getS3PlayerUrl(jogador.time.nome, jogador.nome);
 
   const handleImageError = () => {
     setImageError(true);
@@ -61,13 +60,13 @@ export default function FigurinhaCard({
 
   useEffect(() => {
     let isMounted = true;
-    if (!imageError && s3Url) {
-      getCachedImage(s3Url).then(base64 => {
+    if (!imageError && caminhos[0]) {
+      getCachedImage(caminhos[0]).then(base64 => {
         if (isMounted) setCachedSrc(base64);
       }).catch(() => setCachedSrc(null));
     }
     return () => { isMounted = false; };
-  }, [s3Url, imageError]);
+  }, [caminhos, imageError]);
 
   // LOG DE DEBUG PARA DEPURAÇÃO
   // console.log('DEBUG jogador:', {
@@ -81,7 +80,7 @@ export default function FigurinhaCard({
       <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-gradient-to-br transition-all duration-300 hover:scale-105 ${!jogadorColetado ? 'filter-none' : ''}`}>
         <div className="relative w-full h-full">
           <Image
-            src={imageError ? '/placeholder.jpg' : (cachedSrc || s3Url)}
+            src={imageError ? '/placeholder.jpg' : (cachedSrc || caminhos[0])}
             alt={jogador.nome}
             fill
             className="object-cover"

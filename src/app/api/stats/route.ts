@@ -175,7 +175,26 @@ export async function GET() {
       }))
     });
 
-    return NextResponse.json(stats);
+    // Buscar todos os times
+    const allTimes = await prisma.time.findMany({
+      select: { id: true, nome: true }
+    });
+
+    // Para cada time, verificar se está completo e retornar também as quantidades
+    const timesDetalhados = await Promise.all(
+      allTimes.map(async (time) => {
+        const totalJogadoresTime = await prisma.jogador.count({ where: { timeId: time.id } });
+        const jogadoresPossuidos = jogadoresPorTime.get(time.id)?.size || 0;
+        return {
+          nome: time.nome,
+          completo: jogadoresPossuidos === totalJogadoresTime,
+          figurinhasObtidas: jogadoresPossuidos,
+          totalFigurinhas: totalJogadoresTime,
+        };
+      })
+    );
+
+    return NextResponse.json({ ...stats, timesDetalhados });
   } catch (error) {
     console.error('Erro ao buscar estatísticas:', error);
     return NextResponse.json(

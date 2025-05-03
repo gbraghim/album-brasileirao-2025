@@ -49,15 +49,8 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
   return [caminho];
 }
 
-export function getS3PlayerUrl(time: string, jogador: string) {
-  // Remove acentos e espaços do nome do time
-  const pastaTime = removerAcentos(time).trim().replace(/\s+/g, '');
-  // Usa o nome do jogador exatamente como está, apenas removendo espaços extras
-  const nomeJogador = jogador.trim().replace(/\s+/g, '');
-  return `https://album-brasileirao.s3.sa-east-1.amazonaws.com/players/${pastaTime}/${nomeJogador}.jpg`;
-}
-
 export function getS3EscudoUrl(escudo: string) {
-  const nome = escudo.replace('/escudos/', '');
-  return `https://album-brasileirao.s3.sa-east-1.amazonaws.com/escudos/${nome}`;
+  // Novo caminho local
+  const nome = escudo.replace('/escudos/', '').replace(/^\/+/, '');
+  return `/escudos/${nome}`;
 } 
