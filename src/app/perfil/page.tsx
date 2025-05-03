@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState, useRef } from 'react';
-import { EditarAvatar } from '@/components/EditarAvatar';
+import EditarAvatar from '@/components/EditarAvatar';
 
 type User = {
   id: string;
