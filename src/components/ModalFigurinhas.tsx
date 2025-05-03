@@ -218,7 +218,7 @@ export default function ModalFigurinhas({
                                 src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || s3Url)}
                                 alt={figurinha.jogador.nome}
                                 fill
-                                className="object-cover"
+                                className="object-fill"
                                 onError={() => handleImageError(figurinha.jogador.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
                               />
                               <div className="absolute top-1 right-1">

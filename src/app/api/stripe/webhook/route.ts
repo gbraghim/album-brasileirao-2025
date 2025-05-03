@@ -58,7 +58,8 @@ export async function POST(req: Request) {
         prisma.pacote.create({
           data: {
             userId,
-            aberto: false
+            aberto: false,
+            tipo: 'COMPRADO'
           }
         })
       );

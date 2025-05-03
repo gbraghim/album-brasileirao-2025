@@ -304,8 +304,8 @@ export default function Pacotes() {
                           <div className="text-brasil-green font-bold text-sm mb-2 text-center">
                             Preço unitário: R$ {precoUnitario.toFixed(2)}
                             <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
-                          </div>
-                        ) : (
+            </div>
+          ) : (
                           <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
                         )}
                         <div className="flex-grow" />
@@ -337,10 +337,10 @@ export default function Pacotes() {
                       <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
                         <button className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
-                      </div>
-                    </div>
                   </div>
-                ))}
+                </div>
+              </div>
+            ))}
               </div>
             ) : <p className="text-brasil-blue">Você não tem pacotes diários disponíveis.</p>}
           </div>
@@ -379,14 +379,14 @@ export default function Pacotes() {
                     </div>
                   </div>
                 ))}
-              </div>
+            </div>
             ) : <p className="text-brasil-blue">Você não tem pacotes premium disponíveis.</p>}
           </div>
 
           {/* Seção Comprar Pacotes Premium repaginada */}
           {!semPacotesDisponiveis && (
-            <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
-              <div className="text-center">
+          <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+            <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes Premium</h2>
                 <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
                   {pacotesPremium.map((pacote) => {
@@ -411,19 +411,19 @@ export default function Pacotes() {
                           <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
                         )}
                         <div className="flex-grow" />
-                        <button
-                          onClick={() => comprarPacote(pacote.id)}
-                          disabled={loading}
+                    <button
+                      onClick={() => comprarPacote(pacote.id)}
+                      disabled={loading}
                           className="bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4"
-                        >
-                          Comprar
-                        </button>
-                      </li>
+                    >
+                      Comprar
+                    </button>
+                  </li>
                     );
                   })}
-                </ul>
-              </div>
+              </ul>
             </div>
+          </div>
           )}
 
           <PacoteAnimation
