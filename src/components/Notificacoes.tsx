@@ -25,7 +25,7 @@ interface Notificacao {
   };
 }
 
-export function Notificacoes() {
+export default function Notificacoes() {
   const { data: session } = useSession();
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
   const [isOpen, setIsOpen] = useState(false);

@@ -19,7 +19,7 @@ interface CardJogadorProps {
   quantidade: number;
 }
 
-export function CardJogador({ jogador, quantidade }: CardJogadorProps) {
+export default function CardJogador({ jogador, quantidade }: CardJogadorProps) {
   const s3Url = getS3PlayerUrl(jogador.time.nome, jogador.nome);
   const [cachedEscudo, setCachedEscudo] = useState<string | null>(null);
   const [cachedFoto, setCachedFoto] = useState<string | null>(null);
