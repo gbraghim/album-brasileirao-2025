@@ -5,12 +5,12 @@ import { headers } from 'next/headers';
 import { TipoPacote } from '@prisma/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-04-30.basil',
 });
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = headers().get('stripe-signature');
+  const signature = (await headers()).get('stripe-signature');
 
   if (!signature) {
     return new NextResponse('No signature', { status: 400 });
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       return new NextResponse('Missing metadata', { status: 400 });
     }
 
-    const product = await prisma.produto.findUnique({
+    const product = await prisma.pacotePreco.findUnique({
       where: { id: productId }
     });
 
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Criar pacotes do tipo COMPRADO
-    for (let i = 0; i < product.quantidadePacotes; i++) {
+    for (let i = 0; i < product.quantidade; i++) {
       await prisma.pacote.create({
         data: {
           userId,
