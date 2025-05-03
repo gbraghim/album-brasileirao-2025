@@ -8,7 +8,7 @@ interface EditarAvatarProps {
   onAvatarChange: (newUrl: string) => void;
 }
 
-export function EditarAvatar({ avatarUrl, onAvatarChange }: EditarAvatarProps) {
+export default function EditarAvatar({ avatarUrl, onAvatarChange }: EditarAvatarProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
