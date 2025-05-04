@@ -22,10 +22,20 @@ export async function GET() {
     }
 
     // Verificar e criar pacotes iniciais se necessário
-    await verificarPacotesIniciais(usuario.id);
+    try {
+      await verificarPacotesIniciais(usuario.id);
+    } catch (err) {
+      console.error('Erro ao verificar/criar pacotes iniciais:', err);
+      // Não lançar erro, apenas logar
+    }
 
     // Verificar e criar pacotes diários se necessário
-    await verificarPacotesDiarios(usuario.id);
+    try {
+      await verificarPacotesDiarios(usuario.id);
+    } catch (err) {
+      console.error('Erro ao verificar/criar pacotes diários:', err);
+      // Não lançar erro, apenas logar
+    }
 
     // Buscar os pacotes do usuário
     const pacotes = await prisma.pacote.findMany({
