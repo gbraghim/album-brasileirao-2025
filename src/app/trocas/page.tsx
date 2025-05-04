@@ -42,6 +42,8 @@ interface Troca {
   createdAt: string;
 }
 
+export const metadata = { title: 'Trocas eBrasileirão' };
+
 export default function Trocas() {
   const { data: session } = useSession();
   const [minhasTrocas, setMinhasTrocas] = useState<Troca[]>([]);

@@ -43,6 +43,8 @@ function getRaridadeStyle(raridade: string) {
   }
 }
 
+export const metadata = { title: 'Repetidas eBrasileirão' };
+
 export default function Repetidas() {
   const { data: session } = useSession();
   const [figurinhas, setFigurinhas] = useState<Figurinha[]>([]);

@@ -33,6 +33,8 @@ const Modal = lazy(() => import('@/components/Modal'));
 const Header = lazy(() => import('@/components/Header'));
 const Footer = lazy(() => import('@/components/Footer'));
 
+export const metadata = { title: 'Pacotes eBrasileirão' };
+
 export default function Pacotes() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -134,11 +136,11 @@ export default function Pacotes() {
   };
 
   const handleAbrirPacote = async (pacoteId: string) => {
-    if (abrindoPacote) return;
+    if (abrindoPacote || showAnimation) return;
     setAbrindoPacote(true);
+    setShowAnimation(true);
     try {
       setPacoteAbrindo(pacoteId);
-      setShowAnimation(true);
       const response = await fetch('/api/pacotes/abrir', {
         method: 'POST',
         headers: {
@@ -150,12 +152,15 @@ export default function Pacotes() {
       if (!response.ok) {
         if (response.status === 401) {
           router.push('/login');
+          setShowAnimation(false);
+          setAbrindoPacote(false);
           return;
         }
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || 'Erro ao abrir pacote';
         setError(errorMessage);
         setShowAnimation(false);
+        setAbrindoPacote(false);
         return;
       }
       const data = await response.json();
@@ -334,7 +339,12 @@ export default function Pacotes() {
                     <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg  overflow-hidden">
                       <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -353,7 +363,12 @@ export default function Pacotes() {
                     <div className="relative w-full h-[200px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                       <Image src="/pacoteTransparente.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -372,7 +387,12 @@ export default function Pacotes() {
                     <div className="relative w-full h-[200px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                       <Image src="/pacoteTransparente.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform">Abrir Pacote</button>
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
                       </div>
                     </div>
                   </div>

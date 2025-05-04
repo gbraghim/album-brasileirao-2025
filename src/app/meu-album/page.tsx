@@ -65,6 +65,8 @@ interface TotalJogadoresTime {
   [timeId: string]: number;
 }
 
+export const metadata = { title: 'Meu Album eBrasileirão' };
+
 export default function MeuAlbum() {
   return (
     <Suspense fallback={<div>Carregando...</div>}>

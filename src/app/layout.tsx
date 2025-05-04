@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { AuthProvider } from './providers';
 import Footer from '@/components/Footer';
 import { Toaster } from 'react-hot-toast';
+import BotaoCompartilharWhatsApp from '@/components/BotaoCompartilharWhatsApp';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,6 +34,7 @@ export default async function RootLayout({
         {/* Removido Google AdSense Script */}
       </head>
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
+        <BotaoCompartilharWhatsApp />
         <AuthProvider>
           <main className="relative min-h-screen flex flex-col">
             {children}

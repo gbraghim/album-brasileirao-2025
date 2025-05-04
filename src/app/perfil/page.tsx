@@ -16,6 +16,8 @@ type User = {
   createdAt: Date;
 };
 
+export const metadata = { title: 'Perfil eBrasileirão' };
+
 export default function PerfilPage() {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
@@ -132,7 +134,7 @@ export default function PerfilPage() {
           {/* Troca de senha */}
           <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-blue/20 w-full max-w-md mx-auto mt-4">
             <h2 className="text-lg font-bold mb-3 text-brasil-blue text-center">Trocar senha</h2>
-            <form ref={senhaFormRef} onSubmit={handleTrocarSenha} className="space-y-4 text-black">
+            <form ref={senhaFormRef} onSubmit={handleTrocarSenha} className="space-y-4 ">
               <input type="password" required placeholder="Senha atual" value={senhaAtual} onChange={e => setSenhaAtual(e.target.value)} className="w-full px-3 py-2 border rounded" />
               <input type="password" required placeholder="Nova senha" value={novaSenha} onChange={e => setNovaSenha(e.target.value)} className="w-full px-3 py-2 border rounded" />
               <input type="password" required placeholder="Confirmar nova senha" value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} className="w-full px-3 py-2 border rounded" />

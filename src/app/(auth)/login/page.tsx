@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Dialog } from '@headlessui/react';
 
+export const metadata = { title: 'Login eBrasileirão' };
+
 export default function Login() {
   const { data: session } = useSession();
   const [email, setEmail] = useState('');
