@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import ModalCadastroSucesso from '@/components/ModalCadastroSucesso';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   if (session) {
     return null;
@@ -41,7 +43,7 @@ export default function RegisterPage() {
         throw new Error(data.message || 'Erro ao registrar');
       }
 
-      router.push('/login');
+      setShowSuccessModal(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao registrar');
     } finally {
@@ -145,6 +147,7 @@ export default function RegisterPage() {
           </Link>
         </div>
       </div>
+      <ModalCadastroSucesso isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
     </div>
   );
 } 
