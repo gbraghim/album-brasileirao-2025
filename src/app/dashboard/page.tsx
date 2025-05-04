@@ -40,8 +40,6 @@ interface RankingData {
   usuarioAtual?: RankingItem;
 }
 
-export const metadata = { title: 'Dashboard eBrasileirão' };
-
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [stats, setStats] = useState<UserStats | null>(null);

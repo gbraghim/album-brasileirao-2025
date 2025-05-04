@@ -33,8 +33,6 @@ const Modal = lazy(() => import('@/components/Modal'));
 const Header = lazy(() => import('@/components/Header'));
 const Footer = lazy(() => import('@/components/Footer'));
 
-export const metadata = { title: 'Pacotes eBrasileirão' };
-
 export default function Pacotes() {
   const { data: session, status } = useSession();
   const router = useRouter();

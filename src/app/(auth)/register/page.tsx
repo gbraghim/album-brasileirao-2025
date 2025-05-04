@@ -7,8 +7,6 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import ModalCadastroSucesso from '@/components/ModalCadastroSucesso';
 
-export const metadata = { title: 'Cadastro eBrasileirão' };
-
 export default function RegisterPage() {
   const router = useRouter();
   const { data: session } = useSession();

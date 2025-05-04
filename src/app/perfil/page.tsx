@@ -16,8 +16,6 @@ type User = {
   createdAt: Date;
 };
 
-export const metadata = { title: 'Perfil eBrasileirão' };
-
 export default function PerfilPage() {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
