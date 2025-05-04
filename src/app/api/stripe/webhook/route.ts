@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-04-30.basil' });
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -40,16 +39,16 @@ export async function POST(req: Request) {
 
       // Buscar o pacote para saber quantos pacotes devem ser adicionados
       console.log('🔍 Buscando pacote no banco de dados:', pacoteId);
-      const pacote = await prisma.$queryRaw`
-        SELECT * FROM "PacotePreco" WHERE id = ${pacoteId}
-      `;
+      const pacote = await prisma.pacotePreco.findUnique({
+        where: { id: pacoteId }
+      });
 
-      if (!pacote || !Array.isArray(pacote) || pacote.length === 0) {
+      if (!pacote) {
         console.error('❌ Pacote não encontrado:', pacoteId);
         return NextResponse.json({ error: 'Pacote não encontrado' }, { status: 404 });
       }
 
-      const { quantidade } = pacote[0];
+      const { quantidade } = pacote;
       console.log('📦 Pacote encontrado:', { quantidade });
 
       // Criar os pacotes para o usuário
