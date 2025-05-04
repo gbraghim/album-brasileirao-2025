@@ -72,6 +72,17 @@ export default function Dashboard() {
     }
   }, [loadingStats, status]);
 
+  // Exibir o modal MVP automaticamente ao carregar a dashboard (apenas uma vez por usuário)
+  useEffect(() => {
+    if (status === 'authenticated' && typeof window !== 'undefined' && session?.user?.email) {
+      const key = `mvpModalShown_${session.user.email}`;
+      if (!localStorage.getItem(key)) {
+        setShowMVPModal(true);
+        localStorage.setItem(key, 'true');
+      }
+    }
+  }, [status, session?.user?.email]);
+
   const fetchStats = async () => {
     try {
       console.log('5. Iniciando fetchStats');
