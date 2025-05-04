@@ -57,9 +57,7 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        {/* Remove Google AdSense script */}
-      </Head>
+      <Head></Head>
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
         <Suspense fallback={<Loading />}>
           <Header />
