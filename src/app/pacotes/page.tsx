@@ -1,16 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import ModalFigurinhas from '@/components/ModalFigurinhas';
-import PacoteAnimation from '@/components/PacoteAnimation';
 import Image from 'next/image';
 import { Pacote as PacoteType } from '@/types/pacote';
-import AdSense from '@/components/AdSense';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Modal from '@/components/Modal';
 
 interface Pacote extends PacoteType {
   // Adicione propriedades adicionais específicas desta página, se necessário
@@ -32,6 +26,13 @@ interface PacotePremium {
   valorCentavos: number;
   quantidade: number;
 }
+
+const ModalFigurinhas = lazy(() => import('@/components/ModalFigurinhas'));
+const PacoteAnimation = lazy(() => import('@/components/PacoteAnimation'));
+const Modal = lazy(() => import('@/components/Modal'));
+const AdSense = lazy(() => import('@/components/AdSense'));
+const Header = lazy(() => import('@/components/Header'));
+const Footer = lazy(() => import('@/components/Footer'));
 
 export default function Pacotes() {
   const { data: session, status } = useSession();
@@ -259,11 +260,9 @@ export default function Pacotes() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
-          <AdSense 
-            adClient="ca-pub-3473963599771699"
-            adSlot="2345678901"
-            style={{ margin: '20px 0' }}
-          />
+          <Suspense fallback={<div className="flex justify-center items-center h-16"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div></div>}>
+            <Header />
+          </Suspense>
 
           <Modal
             isOpen={showWelcomeModal}
@@ -427,26 +426,28 @@ export default function Pacotes() {
           </div>
           )}
 
-          <PacoteAnimation
-            isOpen={showAnimation}
-            onAnimationComplete={handleAnimationComplete}
-          />
+          <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+            <PacoteAnimation
+              isOpen={showAnimation}
+              onAnimationComplete={handleAnimationComplete}
+            />
+          </Suspense>
 
-          <ModalFigurinhas
-            isOpen={modalAberto}
-            onClose={handleFecharModal}
-            figurinhas={figurinhasAbertas}
-            userFigurinhas={userFigurinhas}
-            onAbrirOutroPacote={handleAbrirOutroPacote}
-            temMaisPacotes={pacotes.length > 0}
-            animacaoRapida={animacaoRapida}
-          />
+          <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+            <ModalFigurinhas
+              isOpen={modalAberto}
+              onClose={handleFecharModal}
+              figurinhas={figurinhasAbertas}
+              userFigurinhas={userFigurinhas}
+              onAbrirOutroPacote={handleAbrirOutroPacote}
+              temMaisPacotes={pacotes.length > 0}
+              animacaoRapida={animacaoRapida}
+            />
+          </Suspense>
 
-          <AdSense 
-            adClient="ca-pub-3473963599771699"
-            adSlot="3456789012"
-            style={{ margin: '20px 0' }}
-          />
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </div>
       </main>
     </div>

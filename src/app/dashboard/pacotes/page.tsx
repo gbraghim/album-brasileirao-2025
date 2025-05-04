@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import ModalFigurinhas from '@/components/ModalFigurinhas';
 import Image from 'next/image';
 
 interface Pacote {
@@ -21,6 +20,8 @@ interface Pacote {
     };
   }[];
 }
+
+const ModalFigurinhas = lazy(() => import('@/components/ModalFigurinhas'));
 
 export default function Pacotes() {
   const { data: session, status } = useSession();
@@ -196,12 +197,14 @@ export default function Pacotes() {
         </div>
       )}
 
-      <ModalFigurinhas
-        isOpen={modalAberto}
-        onClose={() => setModalAberto(false)}
-        figurinhas={figurinhasAbertas}
-        userFigurinhas={userFigurinhas}
-      />
+      <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+        <ModalFigurinhas
+          isOpen={modalAberto}
+          onClose={() => setModalAberto(false)}
+          figurinhas={figurinhasAbertas}
+          userFigurinhas={userFigurinhas}
+        />
+      </Suspense>
     </div>
   );
 } 

@@ -6,7 +6,6 @@ import { authOptions } from '@/lib/auth';
 import { AuthProvider } from './providers';
 import Footer from '@/components/Footer';
 import { Toaster } from 'react-hot-toast';
-import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,19 +31,7 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <head>
         {/* Google AdSense Script - obrigatório para verificação e exibição de anúncios */}
-        <Script
-          id="adsense-script"
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-        {/* Fallback para AdSense caso precise do script puro no HTML */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699"
-          crossOrigin="anonymous"
-        ></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699" crossOrigin="anonymous"></script>
       </head>
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
         <AuthProvider>
