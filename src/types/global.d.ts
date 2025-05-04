@@ -1,3 +1,5 @@
+// Remover interface Window adsbygoogle
+
 interface Window {
-  adsbygoogle: unknown[];
+  // ... existing code ...
 } 

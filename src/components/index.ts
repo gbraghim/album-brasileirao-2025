@@ -16,6 +16,5 @@ export const FiltrosRepetidas = lazyLoad(() => import('./FiltrosRepetidas'));
 export const UserStats = lazyLoad(() => import('./UserStats'));
 export const EditarAvatar = lazyLoad(() => import('./EditarAvatar'));
 export const Logo = lazyLoad(() => import('./Logo'));
-export const AdSense = lazyLoad(() => import('./AdSense'));
 export const ProtectedNav = lazyLoad(() => import('./ProtectedNav'));
 export const Notificacoes = lazyLoad(() => import('./Notificacoes')); 

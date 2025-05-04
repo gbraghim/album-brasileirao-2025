@@ -11,7 +11,6 @@ import { formatarCaminhoImagem } from '@/lib/utils';
 import { TrocaStatus } from '@prisma/client';
 import { Figurinha, Jogador } from '@/types';
 import { toast } from 'react-hot-toast';
-import AdSense from '@/components/AdSense';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FigurinhaCard from '@/components/FigurinhaCard';
@@ -541,11 +540,6 @@ export default function Trocas() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <Suspense fallback={<Loading />}>
-            <AdSense 
-              adClient="ca-pub-3473963599771699"
-              adSlot="4567890123"
-              style={{ margin: '20px 0' }}
-            />
           </Suspense>
 
           <div className="max-w-7xl mx-auto">
@@ -914,14 +908,6 @@ export default function Trocas() {
           </Modal>
         </Suspense>
       )}
-
-      <Suspense fallback={<Loading />}>
-        <AdSense 
-          adClient="ca-pub-3473963599771699"
-          adSlot="5678901234"
-          style={{ margin: '20px 0' }}
-        />
-      </Suspense>
     </div>
   );
 } 

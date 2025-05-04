@@ -30,8 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        {/* Google AdSense Script - obrigatório para verificação e exibição de anúncios */}
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699" crossOrigin="anonymous"></script>
+        {/* Removido Google AdSense Script */}
       </head>
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
         <AuthProvider>
