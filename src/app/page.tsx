@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { dynamic } from './config/route';
 import Loading from '@/components/loading';
 import Header from '@/components/Header';
-import AdSense from '@/components/AdSense';
+import Script from 'next/script';
 import Head from 'next/head';
 
 export { dynamic };
@@ -68,13 +68,25 @@ export default function Home() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-5xl mx-auto">
-            <Suspense fallback={<Loading />}>
-              <AdSense 
-                adClient="ca-pub-3473963599771699"
-                adSlot="4567890123"
-                style={{ margin: '20px 0' }}
-              />
-            </Suspense>
+            <Script
+              id="adsense-script"
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699"
+              crossOrigin="anonymous"
+            />
+
+            <div style={{ margin: '20px 0' }}>
+              <ins className="adsbygoogle"
+                style={{ display: 'block' }}
+                data-ad-client="ca-pub-3473963599771699"
+                data-ad-slot="4567890123"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              ></ins>
+              <Script id="adsense-init" strategy="afterInteractive">
+                {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+              </Script>
+            </div>
 
             {/* Hero Section */}
             <div className="flex flex-col items-center text-center mb-16 w-full">
@@ -150,11 +162,25 @@ export default function Home() {
               </p>
             </div>
 
-            <AdSense 
-              adClient="ca-pub-3473963599771699"
-              adSlot="0987654321"
-              style={{ margin: '20px 0' }}
+            <Script
+              id="adsense-script"
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473963599771699"
+              crossOrigin="anonymous"
             />
+
+            <div style={{ margin: '20px 0' }}>
+              <ins className="adsbygoogle"
+                style={{ display: 'block' }}
+                data-ad-client="ca-pub-3473963599771699"
+                data-ad-slot="0987654321"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              ></ins>
+              <Script id="adsense-init" strategy="afterInteractive">
+                {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+              </Script>
+            </div>
           </div>
         </main>
 
