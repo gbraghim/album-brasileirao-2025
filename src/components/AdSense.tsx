@@ -1,30 +1,49 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface AdSenseProps {
-  adClient: string;
-  adSlot: string;
+  slot: string;
   style?: React.CSSProperties;
   format?: string;
+  responsive?: boolean;
 }
 
-export default function AdSense({ adClient, adSlot, style, format = 'auto' }: AdSenseProps) {
+export default function AdSense({ slot, style, format = 'auto', responsive = true }: AdSenseProps) {
+  const adRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    // Verifica se estamos em ambiente de desenvolvimento
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AdSense desativado em ambiente de desenvolvimento');
+      return;
+    }
+
     try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error('Erro ao carregar anúncio:', err);
+      // Verifica se o script já foi carregado
+      if (window.adsbygoogle && !window.adsbygoogle.loaded) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    } catch (error) {
+      console.error('Erro ao carregar anúncio:', error);
     }
   }, []);
 
+  // Em ambiente de desenvolvimento, não renderiza o componente
+  if (process.env.NODE_ENV === 'development') {
+    return null;
+  }
+
   return (
-    <ins
-      className="adsbygoogle"
-      style={{ display: 'block', ...style }}
-      data-ad-client={adClient}
-      data-ad-slot={adSlot}
-      data-ad-format={format}
-    />
+    <div ref={adRef}>
+      <ins
+        className="adsbygoogle"
+        style={style || { display: 'block' }}
+        data-ad-client="ca-pub-3473963599771699"
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-full-width-responsive={responsive}
+      />
+    </div>
   );
 } 

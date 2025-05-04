@@ -7,6 +7,25 @@ import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
 import ModalAvisoMVP from '@/components/ModalAvisoMVP';
+import Image from 'next/image';
+
+interface UserStats {
+  totalFigurinhas: number;
+  figurinhasRepetidas: number;
+  totalPacotes: number;
+  timesCompletos: number;
+  totalTimes: number;
+  totalJogadoresBase: number;
+  figurinhasLendarias: number;
+  figurinhasOuro: number;
+  figurinhasPrata: number;
+  timesDetalhados: Array<{
+    nome: string;
+    completo: boolean;
+    figurinhasObtidas: number;
+    totalFigurinhas: number;
+  }>;
+}
 
 interface RankingItem {
   id: string;
@@ -22,99 +41,105 @@ interface RankingData {
 }
 
 export default function Dashboard() {
-  console.log('1. Iniciando renderização do Dashboard');
-  
   const { data: session, status } = useSession();
-  console.log('2. Status da sessão:', status);
-  
-  const router = useRouter();
-  const [stats, setStats] = useState<UserStatsType | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingStats, setLoadingStats] = useState(true);
   const [loadingRanking, setLoadingRanking] = useState(true);
   const [showMVPModal, setShowMVPModal] = useState(false);
   const [showTimesAccordion, setShowTimesAccordion] = useState(false);
   const timesDetalhados = stats?.timesDetalhados || [];
-  const timesCompletos = timesDetalhados.filter(t => t.completo).sort((a, b) => a.nome.localeCompare(b.nome));
-  const timesIncompletos = timesDetalhados.filter(t => !t.completo).sort((a, b) => a.nome.localeCompare(b.nome));
+  const timesCompletos = timesDetalhados.filter((t: { completo: boolean }) => t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
+  const timesIncompletos = timesDetalhados.filter((t: { completo: boolean }) => !t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
   const timesOrdenados = [...timesCompletos, ...timesIncompletos];
 
   useEffect(() => {
     console.log('3. useEffect executado - status:', status);
-    if (status === 'unauthenticated') {
-      console.log('4. Usuário não autenticado, redirecionando...');
-      router.push('/login');
-    } else if (status === 'authenticated') {
+    
+    if (status === 'authenticated') {
       console.log('4. Usuário autenticado, buscando dados...');
+      // Carrega as estatísticas primeiro
       fetchStats();
-      fetchRanking();
-      if (!sessionStorage.getItem('mvpModalShown')) {
-        setShowMVPModal(true);
-        sessionStorage.setItem('mvpModalShown', 'true');
-      }
     }
-  }, [status, router]);
+  }, [status]);
+
+  // Carrega o ranking após as estatísticas serem carregadas
+  useEffect(() => {
+    if (!loadingStats && status === 'authenticated') {
+      console.log('Carregando ranking após estatísticas...');
+      fetchRanking();
+    }
+  }, [loadingStats, status]);
 
   const fetchStats = async () => {
-    console.log('5. Iniciando fetchStats');
     try {
+      console.log('5. Iniciando fetchStats');
       console.log('6. Fazendo requisição para /api/stats');
       const response = await fetch('/api/stats');
-      console.log('7. Resposta recebida - status:', response.status);
-      
-      if (!response.ok) throw new Error('Erro ao carregar estatísticas');
-      
+      if (!response.ok) {
+        throw new Error('Erro ao buscar estatísticas');
+      }
       const data = await response.json();
-      console.log('8. Dados recebidos da API:', {
-        totalPacotes: data.totalPacotes,
-        totalFigurinhas: data.totalFigurinhas,
-        figurinhasRepetidas: data.figurinhasRepetidas,
-        timesCompletos: data.timesCompletos,
-        totalTimes: data.totalTimes,
-        totalJogadoresBase: data.totalJogadoresBase
-      });
-      
       setStats(data);
-      console.log('9. Estado stats atualizado');
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
+      console.error('Erro ao buscar estatísticas:', error);
     } finally {
-      setLoading(false);
-      console.log('10. Loading finalizado');
+      setLoadingStats(false);
     }
   };
 
   const fetchRanking = async () => {
-    console.log('11. Iniciando fetchRanking');
     try {
-      setLoadingRanking(true);
+      console.log('11. Iniciando fetchRanking');
       const response = await fetch('/api/ranking');
-      if (!response.ok) throw new Error('Erro ao carregar ranking');
+      if (!response.ok) {
+        throw new Error('Erro ao buscar ranking');
+      }
       const data = await response.json();
       setRankingData(data);
-      console.log('12. Ranking atualizado');
     } catch (error) {
-      console.error('Erro ao carregar ranking:', error);
+      console.error('Erro ao buscar ranking:', error);
     } finally {
       setLoadingRanking(false);
     }
   };
 
-  if (loading) {
-    console.log('13. Renderizando loading...');
+  if (status === 'loading' || loadingStats) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 flex flex-col items-center justify-center">
+        <div className="text-center">
+          <Image
+            src="/logo.png"
+            alt="Álbum Brasileirão 2025"
+            width={200}
+            height={200}
+            className="animate-pulse mb-8"
+          />
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-brasil-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-brasil-green rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <p className="mt-4 text-brasil-blue font-medium">Carregando seu álbum...</p>
+        </div>
       </div>
     );
   }
 
-  if (!session) {
-    console.log('14. Sem sessão, retornando null');
-    return null;
+  if (status === 'unauthenticated') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Acesso Negado</h1>
+          <p className="mb-4">Você precisa estar logado para acessar esta página.</p>
+          <Link href="/login" className="text-blue-500 hover:underline">
+            Ir para o login
+          </Link>
+        </div>
+      </div>
+    );
   }
-
-  console.log('15. Renderizando dashboard completo. Stats:', stats);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
@@ -122,7 +147,34 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Dashboard</h1>
         
-        {stats && <UserStats stats={stats} />}
+        {/* Seção de Estatísticas */}
+        <div className="bg-white shadow rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Minhas Estatísticas</h2>
+          {loadingStats ? (
+            <div className="flex justify-center items-center space-x-2">
+              <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-brasil-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-brasil-green rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          ) : stats ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-blue-800">Total de Figurinhas</h3>
+                <p className="text-3xl font-bold text-blue-600">{stats.totalFigurinhas}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-green-800">Figurinhas Repetidas</h3>
+                <p className="text-3xl font-bold text-green-600">{stats.figurinhasRepetidas}</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-purple-800">Pacotes Abertos</h3>
+                <p className="text-3xl font-bold text-purple-600">{stats.totalPacotes}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-red-500">Erro ao carregar estatísticas</p>
+          )}
+        </div>
 
         {/* Seu Álbum */}
         <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20 mb-6 md:mb-8">
@@ -196,14 +248,18 @@ export default function Dashboard() {
         <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
           {loadingRanking ? (
-            <p className="text-gray-500">Carregando ranking...</p>
+            <div className="flex justify-center items-center space-x-2">
+              <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-brasil-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-brasil-green rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
           ) : (
             <div className="space-y-3 md:space-y-4">
               {rankingData?.ranking.map((item, index) => (
                 <div
                   key={item.email}
                   className={`flex items-center justify-between p-3 md:p-4 rounded-lg ${
-                    item.email === session.user?.email
+                    item.email === session?.user?.email
                       ? 'bg-brasil-green/20'
                       : 'bg-white/50'
                   }`}
@@ -225,7 +281,7 @@ export default function Dashboard() {
                       <span className="text-sm md:text-base text-gray-400 font-medium">{item.posicao}º</span>
                     )}
                     <span className={`text-sm md:text-base font-medium ${
-                      item.email === session.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'
+                      item.email === session?.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'
                     }`}>
                       {item.nome}
                     </span>
@@ -237,7 +293,7 @@ export default function Dashboard() {
               ))}
               
               {/* Exibe a posição do usuário atual se ele não estiver no top 20 */}
-              {rankingData?.usuarioAtual && !rankingData.ranking.find(item => item.email === session.user?.email) && (
+              {rankingData?.usuarioAtual && !rankingData.ranking.find(item => item.email === session?.user?.email) && (
                 <>
                   <div className="border-t border-gray-200 my-4"></div>
                   <div className="flex items-center justify-between p-3 md:p-4 rounded-lg bg-brasil-green/20">

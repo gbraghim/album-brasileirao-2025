@@ -13,29 +13,45 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios');
+        try {
+          console.log('Iniciando processo de autenticação...');
+          
+          if (!credentials?.email || !credentials?.password) {
+            console.error('Credenciais incompletas');
+            throw new Error('Email e senha são obrigatórios');
+          }
+
+          console.log('Buscando usuário:', credentials.email);
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email }
+          });
+
+          if (!user) {
+            console.error('Usuário não encontrado:', credentials.email);
+            throw new Error('Usuário não encontrado');
+          }
+
+          console.log('Usuário encontrado:', user.email);
+          console.log('Verificando senha...');
+          
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          console.log('Resultado da verificação de senha:', isValid);
+
+          if (!isValid) {
+            console.error('Senha inválida para usuário:', user.email);
+            throw new Error('Senha incorreta');
+          }
+
+          console.log('Autenticação bem-sucedida para:', user.email);
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name || 'Usuário'
+          };
+        } catch (error) {
+          console.error('Erro na autenticação:', error);
+          throw error;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-
-        if (!user) {
-          throw new Error('Usuário não encontrado');
-        }
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isValid) {
-          throw new Error('Senha incorreta');
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name || 'Usuário'
-        };
       }
     })
   ],
