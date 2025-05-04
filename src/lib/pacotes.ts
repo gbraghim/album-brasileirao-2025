@@ -100,8 +100,6 @@ export async function verificarPacotesDiarios(userId: string) {
           )
           RETURNING *
         `;
-        
-        await gerarFigurinhasParaPacote(pacote.id, userId);
       }
     }
   } catch (error) {
