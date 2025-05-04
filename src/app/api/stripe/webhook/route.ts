@@ -37,6 +37,16 @@ export async function POST(req: Request) {
         metadata: session.metadata
       });
 
+      // Validar se o usuário existe
+      const usuario = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!usuario) {
+        console.error('❌ Usuário não encontrado:', userId);
+        return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      }
+
       // Buscar o pacote para saber quantos pacotes devem ser adicionados
       console.log('🔍 Buscando pacote no banco de dados:', pacoteId);
       const pacote = await prisma.pacotePreco.findUnique({
@@ -51,32 +61,35 @@ export async function POST(req: Request) {
       const { quantidade } = pacote;
       console.log('📦 Pacote encontrado:', { quantidade });
 
-      // Criar os pacotes para o usuário
+      // Criar os pacotes para o usuário em uma transação
       console.log('➕ Criando pacotes para o usuário');
-      const pacotesPromises = Array(quantidade).fill(null).map(() => 
-        prisma.pacote.create({
+      await prisma.$transaction(async (tx) => {
+        // Criar os pacotes
+        const pacotesPromises = Array(quantidade).fill(null).map(() => 
+          tx.pacote.create({
+            data: {
+              userId,
+              aberto: false,
+              tipo: 'COMPRADO'
+            }
+          })
+        );
+
+        await Promise.all(pacotesPromises);
+        console.log('✅ Pacotes criados com sucesso');
+
+        // Criar notificação para o usuário
+        console.log('📢 Criando notificação para o usuário');
+        await tx.notificacao.create({
           data: {
-            userId,
-            aberto: false,
-            tipo: 'COMPRADO'
+            usuarioId: userId,
+            mensagem: `${quantidade} pacote${quantidade > 1 ? 's' : ''} ${quantidade > 1 ? 'foram adicionados' : 'foi adicionado'} à sua conta!`,
+            tipo: 'TROCA_PROPOSTA',
+            tipoNovo: 'PACOTE_ABERTO'
           }
-        })
-      );
-
-      await Promise.all(pacotesPromises);
-      console.log('✅ Pacotes criados com sucesso');
-
-      // Criar notificação para o usuário
-      console.log('📢 Criando notificação para o usuário');
-      await prisma.notificacao.create({
-        data: {
-          usuarioId: userId,
-          mensagem: `${quantidade} pacote${quantidade > 1 ? 's' : ''} ${quantidade > 1 ? 'foram adicionados' : 'foi adicionado'} à sua conta!`,
-          tipo: 'TROCA_PROPOSTA',
-          tipoNovo: 'PACOTE_ABERTO'
-        }
+        });
+        console.log('✅ Notificação criada com sucesso');
       });
-      console.log('✅ Notificação criada com sucesso');
 
       return NextResponse.json({ received: true });
     }
