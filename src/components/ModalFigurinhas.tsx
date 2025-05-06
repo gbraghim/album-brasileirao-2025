@@ -200,9 +200,17 @@ export default function ModalFigurinhas({
                       const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
                       const isLendaria = figurinha.raridade === 'Lendário';
                       const isOuro = figurinha.raridade === 'Ouro';
+                      const isRepetida = userFigurinhas.has(figurinha.id);
                       return (
                         <div key={figurinha.jogador.id} className="relative">
                           <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
+                            <div className="absolute top-1 left-1 z-30">
+                              {isRepetida ? (
+                                <span className="bg-gray-300/80 text-gray-700 text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm">Repetida</span>
+                              ) : (
+                                <span className="bg-green-500/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm">Nova</span>
+                              )}
+                            </div>
                             {isLendaria && (
                               <div className="absolute inset-0 pointer-events-none z-20 animate-pulse-lendaria">
                                 <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-glow-lendaria"></div>

@@ -286,7 +286,7 @@ export default function Pacotes() {
             <div className="mt-0 mb-8 p-4 md:p-6  rounded-lg  mx-4 md:mx-6">
               <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
-                <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
                   {pacotesPremium.map((pacote) => {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
@@ -296,9 +296,9 @@ export default function Pacotes() {
                         className="flex flex-col border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg items-center hover:shadow-2xl transition-shadow h-full"
                       >
                         <div className="mb-4 flex justify-center items-center">
-                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
-                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
-                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 1 && <Image src="/PacotePremiumIndividual.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/PacotePremiumDuplo.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/PacotePremiumTriplo.png" alt="3 pacotes" width={120} height={120} />}
                         </div>
                         <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
                         <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
@@ -385,7 +385,7 @@ export default function Pacotes() {
                 {pacotesPremiumUser.map((pacote) => (
                   <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
                     <div className="relative w-full h-[200px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                      <Image src="/pacoteTransparente.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                      <Image src="/PacotePremiumIndividual.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
                         <button
                           disabled={abrindoPacote || showAnimation}
@@ -406,7 +406,7 @@ export default function Pacotes() {
           <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
             <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
-                <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
                   {pacotesPremium.map((pacote) => {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
@@ -416,9 +416,9 @@ export default function Pacotes() {
                         className="flex flex-col border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg items-center hover:shadow-2xl transition-shadow h-full"
                       >
                         <div className="mb-4 flex justify-center items-center">
-                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
-                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
-                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 1 && <Image src="/PacotePremiumIndividual.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/PacotePremiumDuplo.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/PacotePremiumTriplo.png" alt="3 pacotes" width={120} height={120} />}
                         </div>
                         <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
                         <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
