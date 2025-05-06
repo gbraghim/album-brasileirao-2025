@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id                     String          @id @default(cuid())
+  name                   String?
+  email                  String          @unique
+  emailVerified          DateTime?
+  image                  String?
+  password               String
+  numeroDeLogins         Int             @default(0)
+  primeiroAcesso         Boolean         @default(true)
+  createdAt              DateTime?       @default(now())
+  updatedAt              DateTime?       @updatedAt
+  qtdFigurinhasLendarias Int             @default(0)
+  qtdFigurinhasOuro      Int             @default(0)
+  qtdFigurinhasPrata     Int             @default(0)
+  accounts               Account[]
+  notificacoes           Notificacao[]
+  pacotes                Pacote[]
+  sessions               Session[]
+  trocasEnviadas         Troca[]         @relation("TrocasEnviadas")
+  trocasRecebidas        Troca[]         @relation("TrocasRecebidas")
+  userFigurinhas         UserFigurinha[] @relation("UserFigurinhas")
+
+  @@index([email])
+}
+
+model Time {
+  id         String      @id @default(cuid())
+  nome       String
+  escudo     String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  apiId      Int         @unique
+  figurinhas Figurinha[]
+  jogadores  Jogador[]
+
+  @@index([apiId])
+}
+
+model Jogador {
+  id            String      @id @default(cuid())
+  nome          String
+  numero        Int?
+  posicao       String?
+  nacionalidade String?
+  apiId         Int         @unique
+  timeId        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  foto          String?
+  raridade      String?     @default("Prata")
+  idade         Int?
+  figurinhas    Figurinha[]
+  time          Time        @relation(fields: [timeId], references: [id])
+
+  @@index([timeId])
+  @@index([apiId])
+}
+
+model Figurinha {
+  id                String          @id @default(cuid())
+  nome              String?
+  posicao           String?
+  numero            Int?
+  nacionalidade     String?
+  foto              String?
+  timeId            String?
+  pacoteId          String?
+  jogadorId         String?
+  raridade          String?         @default("Prata")
+  jogador           Jogador?        @relation(fields: [jogadorId], references: [id])
+  pacote            Pacote?         @relation(fields: [pacoteId], references: [id])
+  time              Time?           @relation(fields: [timeId], references: [id])
+  trocasOfertadas   Troca[]         @relation("FigurinhaOferta")
+  trocasSolicitadas Troca[]         @relation("FigurinhaSolicitada")
+  userFigurinhas    UserFigurinha[]
+
+  @@index([timeId])
+  @@index([pacoteId])
+  @@index([jogadorId])
+}
+
+model Pacote {
+  id         String      @id @default(cuid())
+  userId     String
+  tipo       TipoPacote
+  aberto     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  figurinhas Figurinha[]
+  user       User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model UserFigurinha {
+  id          String    @id @default(cuid())
+  userId      String
+  figurinhaId String
+  quantidade  Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  nomeJogador String    @default("")
+  nomeTime    String    @default("")
+  figurinha   Figurinha @relation(fields: [figurinhaId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserFigurinhas", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, figurinhaId])
+  @@index([userId])
+  @@index([figurinhaId])
+}
+
+model Troca {
+  id                    String        @id @default(cuid())
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  figurinhaOfertaId     String
+  figurinhaSolicitadaId String?
+  usuarioEnviaId        String
+  usuarioRecebeId       String?
+  status                TrocaStatus   @default(PENDENTE)
+  notificacoes          Notificacao[]
+  figurinhaOferta       Figurinha     @relation("FigurinhaOferta", fields: [figurinhaOfertaId], references: [id])
+  figurinhaSolicitada   Figurinha?    @relation("FigurinhaSolicitada", fields: [figurinhaSolicitadaId], references: [id])
+  usuarioEnvia          User          @relation("TrocasEnviadas", fields: [usuarioEnviaId], references: [id])
+  usuarioRecebe         User?         @relation("TrocasRecebidas", fields: [usuarioRecebeId], references: [id])
+
+  @@index([figurinhaOfertaId])
+  @@index([figurinhaSolicitadaId])
+  @@index([usuarioEnviaId])
+  @@index([usuarioRecebeId])
+}
+
+model Notificacao {
+  id        String           @id @default(cuid())
+  mensagem  String
+  lida      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  usuarioId String
+  trocaId   String?
+  tipo      NotificacaoTipo
+  tipoNovo  TipoNotificacao?
+  troca     Troca?           @relation(fields: [trocaId], references: [id])
+  usuario   User             @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId])
+  @@index([trocaId])
+}
+
+model PacotePreco {
+  id              String   @id @default(uuid())
+  nome            String
+  descricao       String
+  stripeProductId String   @unique
+  stripePriceId   String   @unique
+  quantidade      Int
+  valorCentavos   Int
+  ativo           Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum TrocaStatus {
+  PENDENTE
+  ACEITA
+  RECUSADA
+  CANCELADA
+}
+
+enum TipoNotificacao {
+  TROCA_ACEITA
+  TROCA_RECUSADA
+  TROCA_FINALIZADA
+  TROCA_CANCELADA
+  PACOTE_ABERTO
+  FIGURINHA_NOVA
+  TROCA_RECEBIDA
+}
+
+enum NotificacaoTipo {
+  TROCA_PROPOSTA
+  TROCA_ACEITA
+  TROCA_RECUSADA
+  TROCA_CANCELADA
+  TROCA_RECEBIDA
+}
+
+enum TipoPacote {
+  COMPRADO
+  DIARIO
+  INICIAL
+}

@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+@keyframes pacoteAberto {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-pacote-aberto {
+  animation: pacoteAberto 1s ease-in-out;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: absolute;
+  animation: confetti-fall 2s linear forwards;
+}
+
+@keyframes pacote-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-pacote-bounce {
+  animation: pacote-bounce 1s ease-in-out infinite;
+}
+
+@keyframes pacote-open {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pacote-open {
+  animation: pacote-open 0.5s ease-in-out;
+}
+
+/* Efeito especial para figurinhas Lendárias */
+.lendaria-glow {
+  box-shadow: 0 0 24px 8px #a855f7, 0 0 60px 16px #facc15;
+  position: relative;
+}
+.animate-glow-lendaria {
+  animation: glow-lendaria 1.5s infinite alternate;
+}
+@keyframes glow-lendaria {
+  0% { box-shadow: 0 0 24px 8px #a855f7, 0 0 60px 16px #facc15; }
+  100% { box-shadow: 0 0 48px 16px #a855f7, 0 0 80px 32px #facc15; }
+}
+.animate-pulse-lendaria {
+  animation: pulse-lendaria 2s infinite;
+}
+@keyframes pulse-lendaria {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.animate-spin-slow {
+  animation: spin 4s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.ouro-glow {
+  box-shadow: 0 0 12px 2px #facc15, 0 0 24px 4px #fde68a;
+  position: relative;
+}
+.animate-glow-ouro {
+  animation: glow-ouro 1.5s infinite alternate;
+}
+@keyframes glow-ouro {
+  0% { box-shadow: 0 0 12px 2px #facc15, 0 0 24px 4px #fde68a; }
+  100% { box-shadow: 0 0 24px 6px #facc15, 0 0 36px 12px #fde68a; }
+} 

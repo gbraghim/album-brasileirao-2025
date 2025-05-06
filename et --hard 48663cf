@@ -1,0 +1,196 @@
+[33m7a2b080[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: simplifica formatação de caminhos e força recarregamento de imagens
+[33mc575db4[m fix: desabilita otimização de imagens e usa img nativo para imagens locais
+[33mee3510c[m fix: melhora tratamento de nomes com acentos e adiciona logs para debug
+[33mb075cb6[m chore: renomeia imagens dos jogadores para padronização
+[33mcf40628[m fix: remove configurações que causavam erro 404 em produção
+[33m2fce61c[m fix: melhora carregamento de imagens de jogadores lendários em produção
+[33m48663cf[m feat: melhora animação e performance do carrossel
+[33m7d49183[m fix: desabilita botão '+ Enviar para troca' enquanto aguarda resposta da requisição e exibe spinner
+[33mcc70962[m fix: torna o dropdown de notificações (sino) responsivo para mobile
+[33m7358f9f[m fix(api/stats): garante que totalFigurinhas seja igual à soma das raridades (jogadores únicos)
+[33mbdeff76[m fix(api/stats): corrige contagem de figurinhas por raridade para considerar jogadores únicos do usuário
+[33m24556db[m feat: transforma mensagem de abrir pacotes em link para /pacotes na página de repetidas
+[33mfba4a5f[m fix: ajusta para 5 pacotes iniciais no cadastro e altera probabilidades de raridade (Lendário 10%, Ouro 30%, Prata 60%)
+[33mb7fbbb6[m fix: ajusta exibição do botão Voltar e aplica bg-brasil-blue nos botões Sair e Entrar do header
+[33mbdfcadb[m feat: melhorias visuais, centralização, espaçamento, carrossel e modal de aviso MVP
+[33m4335c7f[m feat: adiciona carrossel de jogadores Lendários e Ouro na home para engajar usuários
+[33me930ad2[m feat: destaca jogadores lendários na homepage para engajar usuários
+[33m9647b5d[m feat: adiciona emojis e atualiza textos das funcionalidades na homepage
+[33ma87e061[m feat: aumenta tamanho da figurinha e exibe nome completo do jogador e time
+[33mad50a89[m fix: remove duplicação da animação ao abrir outro pacote
+[33md2ac9de[m fix: corrige exibição da raridade das figurinhas no frontend
+[33m35b2828[m feat: adiciona logs detalhados para acompanhar processo de sorteio
+[33m365c445[m fix: remove atualização de coluna raridade inexistente em UserFigurinha
+[33m55c30b2[m feat: implementa nova lógica de sorteio baseada na raridade do jogador
+[33mb612c4b[m feat: implementa lógica de raridade baseada no jogador
+[33m7090c14[m fix: corrige estrutura do tsconfig.json
+[33mcb5ee85[m fix: atualiza configurações do TypeScript e migrações do Prisma
+[33m8b5f460[m fix: configura aliases de importação para resolver erros de build
+[33m99de490[m feat: adiciona scripts para cadastro de jogadores e atualizações no álbum
+[33m105193b[m ajuste mensageria sem repetidas
+[33mc6bb093[m chore: forçando novo deploy no Vercel
+[33m29c5ca5[m feat: implementa fechamento do dropdown de notificações ao clicar fora e melhora a lógica de marcação de notificações como lidas
+[33maff2afc[m ajustes header
+[33m5caa3b7[m modais e ajustes
+[33mf379bcb[m Centralização das interfaces em arquivo de tipos compartilhados
+[33m6878a2c[m Correção de tipos nas interfaces Figurinha e ModalProporTroca
+[33m23f43e9[m Correção de tipos na interface Figurinha e ajustes na página de trocas
+[33me88fe81[m Corrige tipos e adiciona raridade aos jogadores
+[33m82bf0d8[m Adiciona componente EditarAvatar
+[33m188f497[m Adiciona funcionalidade de upload e atualizações no perfil
+[33m9fb8fc9[m Remove implementação de avatar
+[33mfcd7ca9[m Corrige erro de tipo no finalizar troca
+[33m065dfa5[m Atualização de arquivos do projeto
+[33m3d26051[m fix: remove image field from auth select
+[33mae9e14b[m refactor: remove avatar feature and related code
+[33m3ef1578[m fix: corrige erro de tipo no id do jogador em finalizar troca (Prisma)
+[33m3a93fa2[m Padroniza busca de imagens, corrige raridade, adiciona sizes nas imagens e melhorias de performance
+[33mf8c208f[m Padroniza layout de propostas pendentes com propostas recebidas e melhorias visuais
+[33mcf69c3d[m Correção dos modais de confirmação e ajuste do layout dos botões em /trocas
+[33m63234cc[m feat: adiciona nome do jogador nas notificações de troca
+[33md59d410[m notificação de proposta de troca
+[33m6cd9efa[m Correções: impedir troca de lendárias, garantir raridade correta nas trocas, e exibir escudos corretamente em /repetidas
+[33mfed2e02[m feat: implementa sistema de trocas com propostas pendentes e notificações
+[33m6ae713b[m fix: remove propriedade trocas que não existe no modelo User
+[33m742d776[m fix: corrige status da troca finalizada para usar valor válido do enum
+[33me6ee8d3[m fix: corrige valores do enum TrocaStatus
+[33mdc784bc[m fix: corrige tipo de notificação para usar NotificacaoTipo
+[33m55bc04d[m fix: cria tabela Notificacao e enum TipoNotificacao
+[33mc4b0603[m fix: corrige arquivo de migração para usar enum TipoNotificacao corretamente
+[33m8838124[m fix: atualiza schema do prisma e corrige seed
+[33m5568aee[m feat: implementa sistema de notificações e ajusta rotas de troca
+[33m8d78344[m fix: corrige serialização de datas e melhora tratamento de erros na rota de trocas
+[33m2438b65[m fix: corrige campo name no schema do Prisma para usuários
+[33m4317fa9[m fix: adiciona logs detalhados na rota de trocas
+[33m2658f93[m fix: adiciona logs detalhados na rota de notificações
+[33m16680af[m fix: corrige campo de nome do usuário no schema do Prisma
+[33m3361999[m fix: corrige tratamento de erros e campos do usuário na página de trocas
+[33m668c659[m fix: corrige filtragem de trocas disponíveis e adiciona logs detalhados
+[33md496e06[m fix: padroniza carregamento de imagens de figurinhas na troca usando utilitário global
+[33m2758f9b[m fix: remove todas as referências à raridade COMUM do backend e frontend, padronizando para Prata e atualizando filtros
+[33mc9505f5[m fix: permite que qualquer usuário (exceto o dono) proponha troca e atualiza usuarioRecebeId
+[33mcef4558[m fix: corrige nome do campo enviado ao propor troca (figurinhaSolicitadaId)
+[33meb9ac5c[m fix: ajustes finais na página de trocas
+[33m1294e9a[m feat: exibe nome do usuário que disponibilizou a figurinha na seção Trocas Disponíveis e corrige filtro de trocas
+[33ma901eec[m refactor: destaque visual para raridades no dashboard e ajustes de estatísticas
+[33m0360f22[m feat: ajustando probabilidades de raridade e adicionando mensagem de engajamento no modal
+[33m6a7c2a5[m feat: ajustando indicadores de raridade para formato retangular com bordas
+[33m68bb7f0[m fix: corrigindo exibição dos escudos e quantidades nas páginas de trocas e repetidas
+[33m6cd7dab[m renomeando jogadores
+[33mebce707[m imagens jogadores
+[33m497cb05[m foto romulo
+[33m2340496[m feat: centralizando nome do time e ajustando layout do cabeçalho
+[33mdbedc17[m feat: adicionando novas imagens de jogadores lendários e atualizando função de formatação de caminhos
+[33mfc981d9[m feat: atualizando fotos dos jogadores
+[33mc9341ab[m feat: adicionando placeholder.jpg e atualizando referências de imagens
+[33mbdcd47a[m feat: adicionando scripts para listar jogadores normais e lendários
+[33m3bca8f8[m feat: ajustando animação e correção na abertura de pacotes
+[33mb7a6640[m feat: ajustando layout das figurinhas no modal e ordenação por raridade
+[33m2c52559[m feat: adiciona efeito de blur nas figurinhas não colecionadas
+[33mfcb3d5e[m feat: adiciona botão para abrir outro pacote diretamente do modal
+[33m272a58a[m refactor: removendo referências ao Cloudinary e usando imagens locais
+[33mc1f364b[m merge: resolvendo conflitos e renomeando escudos
+[33m4976c64[m feat: adicionando efeito de opacidade para figurinhas não colecionadas
+[33m48dc6f1[m Rename Fortaleza.png to fortaleza.png
+[33m33466cf[m Rename Botafogo.png to botafogo.png
+[33mc6b392f[m refactor: removendo Cloudinary e usando imagens locais
+[33m8e53364[m refactor: padronizando uso de URLs do Cloudinary para escudos dos times e ajustando nomes de times
+[33m02e6c97[m Otimiza busca de imagens para retornar apenas o primeiro caminho válido encontrado
+[33m8b70e4e[m Otimiza busca de imagens para usar apenas jpg e jpeg
+[33m0091c53[m Corrige mapeamento dos nomes dos times para corresponder aos diretórios exatos
+[33m9ddf565[m Corrige exibição de imagens para times com espaço no nome em meu-album
+[33m6cdeff5[m Implementa o mesmo mecanismo de exibição de imagens do ModalFigurinhas na página meu-album
+[33m5e43027[m Adiciona e atualiza fotos dos jogadores
+[33mf938610[m Melhora tratamento de nomes de jogadores com acentos e case sensitivity
+[33mfcdb472[m Corrige case-sensitivity dos nomes dos arquivos de escudos
+[33m4e9bbf8[m Remove referências ao Cloudinary e volta a usar imagens locais
+[33med85e71[m Padroniza URLs dos escudos para usar Cloudinary
+[33m24f44e0[m Atualiza script populate-times.js para usar escudos locais
+[33m808c792[m Corrige caminhos dos escudos para São Paulo, Fortaleza e Bragantino
+[33ma4b614a[m Corrige nomes dos arquivos dos escudos para atletico_mg e sao_paulo
+[33m8bd9ea9[m Corrige nomes dos times e usa escudos locais
+[33m1067523[m Padroniza URLs dos escudos para usar Cloudinary
+[33m43d810a[m Reverte URLs dos escudos para usar arquivos locais da pasta /public/escudos
+[33m90b1189[m Padroniza URLs dos escudos do Botafogo, Bragantino e Fortaleza para usar Cloudinary
+[33m1288293[m Corrige erro de tipagem no construtor Image no EscudosCarousel
+[33m8df7166[m Remove configuração de escudos externos e usa escudos locais
+[33mf2a45f7[m Corrige carregamento de escudos em produção
+[33m5cc2016[m Corrige erros de build e configuração do Next.js
+[33m6d8a769[m Corrige erros de build e adiciona suporte a rotas dinâmicas
+[33mf6284c6[m Atualiza e adiciona novas imagens de jogadores do Grêmio, Mirassol, Santos e Sport
+[33mbd9f96a[m Atualiza imagens de jogadores e adiciona suporte a nomes com e sem acentos
+[33mdea865c[m Adiciona suporte a nomes com e sem acentos nas imagens dos jogadores
+[33m033ee12[m Corrige suporte a imagens JPG e JPEG e melhora logging
+[33mc6b0c71[m Melhora suporte a imagens PNG e tratamento de erros
+[33m1cf5e8c[m Ajusta configuração para suporte a imagens PNG
+[33m36441a6[m Implementa suporte a múltiplos formatos de imagem no ModalFigurinhas
+[33mf719bd1[m Adiciona suporte para imagens webp e outros formatos no Next.js
+[33me2f4aa8[m Adiciona suporte para múltiplos formatos de imagem (jpg, jpeg, png, webp)
+[33m1c07b89[m Melhora tratamento de nomes com apóstrofos e caracteres especiais
+[33m32c51c1[m Adiciona persistência do time selecionado usando query parameters
+[33m772a4b6[m Adiciona tratamento de erro para imagens na página de trocas
+[33mce68bdb[m Ajusta função formatarNomeArquivo para remover acentos dos nomes dos jogadores
+[33m53a1062[m Remove card de figurinhas repetidas do dashboard
+[33m92945af[m Move seção de figurinhas repetidas para o topo da página de trocas
+[33m16f0660[m Restaura seções da página de trocas e corrige erro do ModalProporTroca
+[33m90b2954[m Padroniza formatação de caminhos de imagens em todos os componentes
+[33mbd00da3[m Ajusta caminho das imagens dos jogadores e adiciona tratamento de erro
+[33m558db1e[m Ajusta tamanho da imagem do jogador no modal de figurinhas
+[33mb978f35[m Corrige caminho dos escudos dos times no modal de figurinhas
+[33m2b6cebd[m Update README.md
+[33m33affea[m Adiciona exibição de imagens dos jogadores ao abrir pacotes
+[33m30e6905[m Corrige exibição de imagens dos jogadores e ajusta nomes dos times
+[33m5e97d98[m Adiciona botão Coletar e redirecionamento para pacotes nas figurinhas não colecionadas
+[33m096cff3[m Implementa exibição de todas as figurinhas no álbum, com estilo desativado para as não colecionadas
+[33m46b7233[m Adiciona seção de pacotes premium na página de pacotes
+[33ma513175[m Implementa exibição de fotos dos jogadores e escudos dos times nas páginas de repetidas e trocas
+[33mf17c733[m Implementa reordenação de times mantendo o selecionado no topo
+[33mabf7cc1[m Corrige cálculo do total de figurinhas para considerar apenas as únicas
+[33m87fc4ac[m Corrige cálculo de figurinhas repetidas na dashboard e adiciona logs detalhados
+[33m5617bc1[m Atualiza escudos dos times com novas imagens
+[33mb3d6a85[m Adiciona escudos dos times
+[33md423bd1[m Atualiza layout das figurinhas repetidas e corrige atualização de trocas
+[33mc54380f[m status de troca sem propostas ajustado
+[33me8036ac[m nomes de jogadores e time aparecendo na tabela UserFigurinha
+[33m4a37912[m correção de banco e dados e exibição de detalhes das figurinhas
+[33m7a8490f[m footer
+[33mb00199c[m feat: adiciona scripts de importação e atualização de escudos
+[33m4489996[m correção dos campos nome e numero no script de importação
+[33m3181a77[m corrige tipo do campo name no auth.ts
+[33m696f1b6[m trata valores nulos no componente CardJogador
+[33mb15aadd[m atualiza tipo Jogador para aceitar valores nulos
+[33mfa52e30[m corrige erro de tipo no campo createdAt
+[33m7ba5c05[m remove referência ao campo createdAt que não existe no tipo User
+[33m738e86f[m corrige tipos do modelo User
+[33m0e84374[m adiciona data de cadastro no perfil do usuário
+[33m363fd75[m corrige verificações de null para jogador e tipagem do Prisma
+[33me9ead62[m corrige tipagem em figurinhas repetidas
+[33m827e483[m fix: corrige erros de tipagem e null checks
+[33ma4ad659[m fix: corrige tipagem na rota de figurinhas repetidas
+[33mfa1f5d0[m feat: adiciona campo idade ao modelo Jogador
+[33m4810a0a[m feat: adiciona campo password ao modelo User
+[33mabd5546[m fix: ajusta interface UserWithPassword e seleção de campos no Prisma
+[33mdd3af2e[m fix: remove PrismaAdapter e ajusta configuração do NextAuth
+[33m8875200[m fix: corrige tipagem da rota POST para lidar com params como Promise no Next.js 15
+[33m1c4ff23[m fix: corrige tipagem da rota POST usando o padrão do Next.js App Router
+[33m0820d0a[m fix: remove tipo de retorno explícito da função POST
+[33md0b86ea[m fix: corrige tipagem da rota POST seguindo a documentação oficial do Next.js
+[33m16b61ff[m fix: corrige tipagem da rota POST usando tipo RouteParams
+[33m968a3df[m fix: corrige tipagem da rota POST /api/trocas/[id]/responder usando o tipo correto para os parâmetros
+[33m92a2cca[m fix: corrige tipagem da rota POST /api/trocas/[id]/responder
+[33m97bcf58[m ajustes prism
+[33m44a4239[m ajuste número repetidas + trocas
+[33mcbbca59[m atualizações de troca não testadas
+[33me97d9a2[m correção de troca + proposta via notificação (sem aprovação por enquanto)
+[33m616dbb1[m times todos listados
+[33m4b147d5[m efeito pacotinho
+[33m7f0d2b5[m ajuste trocas e layout dashboard
+[33m0031e79[m ajuste mobile e cores web
+[33m7e99937[m correção type property troca
+[33m2320ecb[m correção type
+[33mac5c4a5[m ajuste type time
+[33mdfa6d73[m MENSAGEM DO COMMIT
+[33m5d12aab[m Simplifica cache para usar apenas memória local
+[33m5e632ce[m Atualização completa do projeto com sistema de trocas e melhorias gerais
+[33m8aba855[m progresso e ranking aprimorados
+[33mf9a0b97[m fix de pacotes e conexão localhost
