@@ -286,12 +286,15 @@ export default function Pacotes() {
             <div className="mt-0 mb-8 p-4 md:p-6  rounded-lg  mx-4 md:mx-6">
               <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
-                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                   {pacotesPremium.map((pacote) => {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
                     return (
-                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                      <li
+                        key={pacote.id}
+                        className="flex flex-col border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg items-center hover:shadow-2xl transition-shadow h-full"
+                      >
                         <div className="mb-4 flex justify-center items-center">
                           {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
                           {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
@@ -403,12 +406,15 @@ export default function Pacotes() {
           <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
             <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
-                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                   {pacotesPremium.map((pacote) => {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
                     return (
-                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                      <li
+                        key={pacote.id}
+                        className="flex flex-col border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg items-center hover:shadow-2xl transition-shadow h-full"
+                      >
                         <div className="mb-4 flex justify-center items-center">
                           {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
                           {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
