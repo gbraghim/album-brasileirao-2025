@@ -11,7 +11,6 @@ import { formatarCaminhoImagem } from '@/lib/utils';
 import { TrocaStatus } from '@prisma/client';
 import { Figurinha, Jogador } from '@/types';
 import { toast } from 'react-hot-toast';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FigurinhaCard from '@/components/FigurinhaCard';
 import { getCachedImage } from '@/lib/cache';
@@ -496,7 +495,7 @@ export default function Trocas() {
     return (
       <div className="min-h-screen text-white p-8">
         <Suspense fallback={<Loading />}>
-          <Header />
+          <Loading />
         </Suspense>
         <h1 className="text-3xl font-bold mb-6 text-brasil-blue">Área de Trocas</h1>
         <p>Por favor, faça login para acessar a área de trocas.</p>
@@ -508,7 +507,7 @@ export default function Trocas() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
         <Suspense fallback={<Loading />}>
-          <Header />
+          <Loading />
         </Suspense>
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Carregando...</h1>
@@ -521,7 +520,7 @@ export default function Trocas() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
         <Suspense fallback={<Loading />}>
-          <Header />
+          <Loading />
         </Suspense>
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Erro</h1>
@@ -534,9 +533,7 @@ export default function Trocas() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Suspense fallback={<Loading />}>
-  
       </Suspense>
-
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <Suspense fallback={<Loading />}>
