@@ -293,9 +293,9 @@ export default function Pacotes() {
                     return (
                       <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
                         <div className="mb-4 flex justify-center items-center">
-                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
-                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
-                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
                         </div>
                         <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
                         <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
@@ -410,9 +410,9 @@ export default function Pacotes() {
                     return (
                       <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
                         <div className="mb-4 flex justify-center items-center">
-                          {pacote.quantidade === 1 && <Image src="/pacote-figurinhas.png" alt="1 pacote" width={120} height={120} />}
-                          {pacote.quantidade === 2 && <Image src="/PacoteDuplo.png" alt="2 pacotes" width={120} height={120} />}
-                          {pacote.quantidade === 3 && <Image src="/PacoteTriplo.png" alt="3 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
                         </div>
                         <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
                         <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
@@ -461,7 +461,6 @@ export default function Pacotes() {
           </Suspense>
 
           <Suspense fallback={null}>
-            <Footer />
           </Suspense>
         </div>
       </main>

@@ -179,7 +179,7 @@ export default function Pacotes() {
               </div>
               <div className="relative w-full h-[300px]">
                 <Image
-                  src="/pacote-figurinhas.png"
+                  src="/pacoteTransparente.png"
                   alt="Pacote de Figurinhas"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
