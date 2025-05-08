@@ -65,7 +65,6 @@ interface ModalFigurinhasProps {
   userFigurinhas: Set<string>;
   onAbrirOutroPacote?: () => void;
   temMaisPacotes?: boolean;
-  animacaoRapida?: boolean;
 }
 
 const getRaridadeStyle = (raridade: string) => {
@@ -87,8 +86,7 @@ export default function ModalFigurinhas({
   figurinhas, 
   userFigurinhas,
   onAbrirOutroPacote,
-  temMaisPacotes = false,
-  animacaoRapida = false
+  temMaisPacotes = false
 }: ModalFigurinhasProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -202,7 +200,7 @@ export default function ModalFigurinhas({
                       const isOuro = figurinha.raridade === 'Ouro';
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all ${animacaoRapida ? 'duration-100' : 'duration-300'} hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
+                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
                             {isLendaria && (
                               <div className="absolute inset-0 pointer-events-none z-20 animate-pulse-lendaria">
                                 <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-glow-lendaria"></div>

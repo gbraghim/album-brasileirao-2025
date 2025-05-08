@@ -44,7 +44,6 @@ export default function Pacotes() {
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
   const [pacoteAbrindo, setPacoteAbrindo] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [animacaoRapida, setAnimacaoRapida] = useState(false);
   const [pacotesPremium, setPacotesPremium] = useState<PacotePremium[]>([]);
   const [abrindoPacote, setAbrindoPacote] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -177,7 +176,6 @@ export default function Pacotes() {
   const handleAnimationComplete = () => {
     setShowAnimation(false);
     setModalAberto(true);
-    setAnimacaoRapida(false);
   };
 
   const handleFecharModal = () => {
@@ -188,7 +186,6 @@ export default function Pacotes() {
   const handleAbrirOutroPacote = async () => {
     if (pacotes.length > 0) {
       setModalAberto(false);
-      setAnimacaoRapida(true);
       await handleAbrirPacote(pacotes[0].id);
     }
   };
@@ -456,7 +453,6 @@ export default function Pacotes() {
               userFigurinhas={userFigurinhas}
               onAbrirOutroPacote={handleAbrirOutroPacote}
               temMaisPacotes={pacotes.length > 0}
-              animacaoRapida={animacaoRapida}
             />
           </Suspense>
 

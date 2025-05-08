@@ -165,7 +165,7 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-green-600">{stats.figurinhasRepetidas}</p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-purple-800">Pacotes Abertos</h3>
+                <h3 className="text-lg font-medium text-purple-800">Pacotes Obtidos</h3>
                 <p className="text-3xl font-bold text-purple-600">{stats.totalPacotes}</p>
               </div>
             </div>

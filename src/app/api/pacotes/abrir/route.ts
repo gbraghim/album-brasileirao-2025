@@ -96,11 +96,11 @@ export async function POST(request: Request) {
         
         let raridadeSorteada: 'Lendário' | 'Ouro' | 'Prata';
         
-        if (random < 0.07) { // 7% de chance para Lendário
+        if (random < 0.06) { // 6% de chance para Lendário
           raridadeSorteada = 'Lendário';
-        } else if (random < 0.32) { // 25% de chance para Ouro (0.07 + 0.25 = 0.32)
+        } else if (random < 0.30) { // 24% de chance para Ouro (0.06 + 0.24 = 0.30)
           raridadeSorteada = 'Ouro';
-        } else { // 68% de chance para Prata
+        } else { // 70% de chance para Prata
           raridadeSorteada = 'Prata';
         }
         
