@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
-import ModalAvisoMVP from '@/components/ModalAvisoMVP';
 import Image from 'next/image';
 
 interface UserStats {
@@ -71,17 +70,6 @@ export default function Dashboard() {
       fetchRanking();
     }
   }, [loadingStats, status]);
-
-  // Exibir o modal MVP automaticamente ao carregar a dashboard (apenas uma vez por usuário)
-  useEffect(() => {
-    if (status === 'authenticated' && typeof window !== 'undefined' && session?.user?.email) {
-      const key = `mvpModalShown_${session.user.email}`;
-      if (!localStorage.getItem(key)) {
-        setShowMVPModal(true);
-        localStorage.setItem(key, 'true');
-      }
-    }
-  }, [status, session?.user?.email]);
 
   const fetchStats = async () => {
     try {
@@ -154,7 +142,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-      <ModalAvisoMVP isOpen={showMVPModal} onClose={() => setShowMVPModal(false)} />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Dashboard</h1>
         
