@@ -14,7 +14,6 @@ const nextConfig = {
     ],
     formats: ['image/webp'],
     dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     minimumCacheTTL: 2678400,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],

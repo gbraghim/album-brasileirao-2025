@@ -66,11 +66,11 @@ export default function Home() {
           <div className="flex flex-col items-center text-center mb-16 w-full">
             <div className="mb-8 flex justify-center">
               <Image
-                src="/hero.png"
+                src="/logo.png"
                 alt="Álbum Brasileirão 2025"
-                width={1200}
-                height={600}
-                className="w-full h-auto"
+                width={160}
+                height={80}
+                className="mx-auto h-auto w-auto max-w-full"
                 priority
                 quality={75}
               />
@@ -160,7 +160,7 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 text-blue-900">🔄🤝 Trocas e Comunidade</h3>
               <p className="text-blue-800">
-                Troque figurinhas repetidas com outros usuários de forma fácil e segura. Faça amigos, negocie e ajude outros colecionadores a completar o álbum. <b>Em breve:</b> pacotes premium!
+                Troque figurinhas repetidas com outros usuários de forma fácil e segura. Faça amigos, negocie e ajude outros colecionadores a completar o álbum. 
               </p>
             </div>
           </div>

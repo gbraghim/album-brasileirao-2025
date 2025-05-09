@@ -54,7 +54,7 @@ export default function Header() {
             </button>
           )}
           <Link href="/" className="flex items-center space-x-2">
-            <Image
+            <img
               src="/logo.png"
               alt="Álbum Brasileirão 2025"
               width={32}
