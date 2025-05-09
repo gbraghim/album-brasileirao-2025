@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function BotaoCompartilharWhatsApp() {
   const mensagem = encodeURIComponent(
-    "Veja que incrível o álbum digital do Campeonato Brasileiro 2025!! Vamos colecionar!?"
+    "Veja que incrível o álbum digital do Campeonato Brasileiro 2025!! Vamos colecionar!? https://ebrasileirao.fun/"
   );
   const url = typeof window !== "undefined" ? encodeURIComponent(window.location.href) : "";
   const link = `https://wa.me/?text=${mensagem}%20${url}`;

@@ -14,7 +14,9 @@ export default function TrocasLayout({
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-      <main>{children}</main>
+      <main>
+        {children}
+      </main>
     </div>
   );
 } 

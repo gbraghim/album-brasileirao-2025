@@ -422,6 +422,7 @@ function MeuAlbumContent() {
                             jogadorColetado={jogadorColetado}
                             currentImageIndex={currentIndex}
                             onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                            onAdicionarRepetida={() => {}}
                           />
                         </div>
                       </div>

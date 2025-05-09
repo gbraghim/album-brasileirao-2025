@@ -81,32 +81,24 @@ export default function FigurinhaCard({
     <div className={`relative group`}>
       <div className={`relative w-32 h-48 rounded-lg border-4 ${getRaridadeStyle(jogador.raridade)} shadow-lg overflow-hidden bg-gradient-to-br transition-all duration-300 hover:scale-105 ${!jogadorColetado ? 'filter-none' : ''}`}>
         <div className="relative w-full h-full">
-          <Image
-            src={imageError ? '/placeholder.jpg' : (cachedSrc || caminhos[0])}
-            alt={jogador.nome}
-            fill
-            className="object-cover"
-            onError={handleImageError}
-            loading={priority ? "eager" : "lazy"}
-            priority={priority}
-            sizes="(max-width: 128px) 100vw, 128px"
-            quality={75}
-          />
-          {!jogadorColetado && (
-            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10">
-              <a
-                href="/pacotes"
-                className="flex flex-col items-center justify-center gap-2 bg-white/90 hover:bg-brasil-green/90 hover:text-white text-brasil-blue px-6 py-4 rounded-full text-lg font-bold shadow-lg transition-colors duration-200 border-2 border-brasil-green/60"
-                style={{zIndex:11}}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 text-brasil-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
-                Colecionar
-              </a>
-            </div>
+          {jogadorColetado ? (
+            <Image
+              src={imageError ? '/placeholder.jpg' : (cachedSrc || caminhos[0])}
+              alt={jogador.nome}
+              fill
+              className="object-cover"
+              onError={handleImageError}
+              loading={priority ? "eager" : "lazy"}
+              priority={priority}
+              sizes="(max-width: 128px) 100vw, 128px"
+              quality={75}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-black/70 z-10 backdrop-blur-sm" />
           )}
         </div>
-        {jogadorColetado && !hideName && (
-          <div className="absolute bottom-0 left-0 right-0 p-1 bg-white/90 backdrop-blur-sm text-xs font-semibold text-center text-brasil-blue truncate">
+        {!hideName && (
+          <div className="absolute bottom-0 left-0 right-0 p-1 bg-white/90 backdrop-blur-sm text-xs font-semibold text-center text-brasil-blue truncate" style={{zIndex: 20}}>
             {jogador.nome}
           </div>
         )}
@@ -124,12 +116,25 @@ export default function FigurinhaCard({
           </div>
         </div>
         {!jogadorColetado && onAdicionarRepetida && (
-          <button
-            onClick={() => onAdicionarRepetida(jogador)}
-            className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brasil-green text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:bg-brasil-green-dark transition-colors"
+          <a
+            href="/pacotes"
+            className="absolute inset-0 flex items-center justify-center z-30"
+            title="Ir para compra de pacotes"
+            style={{zIndex: 30, pointerEvents: 'auto'}}
           >
-            Adicionar
-          </button>
+            <span
+              className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg border-2 border-white text-white text-base font-bold hover:scale-110 hover:shadow-xl transition-transform duration-200 max-w-[80%] w-auto
+                ${jogador.raridade === 'Lendário' ? 'bg-gradient-to-br from-purple-600 to-purple-400' : ''}
+                ${jogador.raridade === 'Ouro' ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : ''}
+                ${jogador.raridade === 'Prata' ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-white' : ''}
+              `}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Obter!
+            </span>
+          </a>
         )}
       </div>
     </div>

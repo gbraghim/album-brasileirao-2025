@@ -203,7 +203,7 @@ export default function Repetidas() {
   if (!loading && !error && figurinhas.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
+        <main>
           <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
           <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 text-center">
             <p className="text-gray-600 mb-4">Você ainda não tem figurinhas repetidas.</p>
@@ -211,14 +211,14 @@ export default function Repetidas() {
               Abra mais pacotes para conseguir figurinhas repetidas!
             </Link>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+      <main>
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
           {figurinhas.map((figurinha) => (
@@ -296,7 +296,7 @@ export default function Repetidas() {
             </div>
           ))}
         </div>
-      </div>
+      </main>
 
       {/* Modais */}
       {showSuccessModal && selectedFigurinha && (

@@ -14,7 +14,9 @@ export default function RepetidasLayout({
   return (
     <>
       <Header />
-      {children}
+      <main>
+        {children}
+      </main>
     </>
   );
 } 

@@ -269,7 +269,7 @@ export default function ModalFigurinhas({
                       </button>
                       <button
                         type="button"
-                        className="w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 transition-colors"
+                        className="w-full justify-center rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-200 transition-colors"
                         onClick={onClose}
                       >
                         Fechar
@@ -279,7 +279,7 @@ export default function ModalFigurinhas({
                     <div className="flex justify-center">
                       <button
                         type="button"
-                        className="w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 transition-colors sm:w-auto"
+                        className="w-full justify-center rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-200 transition-colors sm:w-auto"
                         onClick={onClose}
                       >
                         Fechar

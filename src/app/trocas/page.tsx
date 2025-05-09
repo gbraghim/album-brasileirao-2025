@@ -534,324 +534,319 @@ export default function Trocas() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Suspense fallback={<Loading />}>
       </Suspense>
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
-          <Suspense fallback={<Loading />}>
-          </Suspense>
+      <main>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold mb-8 text-brasil-blue">Trocas</h1>
 
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl md:text-3xl font-bold mb-8 text-brasil-blue">Trocas</h1>
-
-            {/* Minhas Figurinhas Repetidas */}
-            <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
-              <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                Minhas Figurinhas Repetidas
-              </h2>
-              {repetidas.length === 0 ? (
-                <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
-                  <p className="text-brasil-blue text-lg font-semibold mb-2">Que pena! Você ainda não tem figurinhas repetidas para troca.</p>
-                  <p className="text-brasil-blue/80 mb-4">Mas não se preocupe, você pode conseguir mais figurinhas comprando pacotes!</p>
-                  <Link 
-                    href="/pacotes" 
-                    className="inline-flex items-center gap-2 bg-brasil-blue hover:bg-brasil-blue/90 text-white px-6 py-3 rounded-lg transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                    Comprar Pacotes
-                  </Link>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {repetidas.map((figurinha) => (
-                    <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-36 mx-auto">
-                      {renderFigurinha(figurinha)}
-                      <div className="flex items-center space-x-1 mt-3 w-full px-2">
-                        {figurinha.jogador.time.escudo && (
-                          <Image
-                            src={cachedEscudos[figurinha.jogador.time.escudo] || figurinha.jogador.time.escudo}
-                            alt={figurinha.jogador.time.nome}
-                            width={18}
-                            height={18}
-                            className="w-4 h-4"
-                          />
-                        )}
-                        <span className="text-xs text-gray-600 truncate">{figurinha.jogador.time.nome}</span>
-                      </div>
-                      <div className="mt-0.5 flex justify-between items-center w-full px-2">
-                        <span className="text-xs text-gray-600 truncate max-w-[110px]">{figurinha.jogador.nome}</span>
-                        <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
-                      </div>
-                      <div className="flex justify-between items-center mt-0.5 w-full px-2">
-                        {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
-                          <button
-                            onClick={() => adicionarTroca(figurinha)}
-                            className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                            disabled={loadingFigurinha === figurinha.id}
-                          >
-                            {loadingFigurinha === figurinha.id ? (
-                              <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                              </svg>
-                            ) : null}
-                            Disponibilizar para troca
-                          </button>
-                        )}
-                        {figurinhasEmTroca.includes(figurinha.id) && (
-                          <button
-                            onClick={() => removerTroca(figurinha.id)}
-                            className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                            disabled={loadingFigurinha === figurinha.id}
-                          >
-                            {loadingFigurinha === figurinha.id ? (
-                              <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                              </svg>
-                            ) : null}
-                            Remover
-                          </button>
-                        )}
-                        {normalize(figurinha.raridade) === 'lendario' && (
-                          <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
-                        )}
-                      </div>
+          {/* Minhas Figurinhas Repetidas */}
+          <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+            <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              Minhas Figurinhas Repetidas
+            </h2>
+            {repetidas.length === 0 ? (
+              <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
+                <p className="text-brasil-blue text-lg font-semibold mb-2">Que pena! Você ainda não tem figurinhas repetidas para troca.</p>
+                <p className="text-brasil-blue/80 mb-4">Mas não se preocupe, você pode conseguir mais figurinhas comprando pacotes!</p>
+                <Link 
+                  href="/pacotes" 
+                  className="inline-flex items-center gap-2 bg-brasil-blue hover:bg-brasil-blue/90 text-white px-6 py-3 rounded-lg transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  Comprar Pacotes
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {repetidas.map((figurinha) => (
+                  <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-36 mx-auto">
+                    {renderFigurinha(figurinha)}
+                    <div className="flex items-center space-x-1 mt-3 w-full px-2">
+                      {figurinha.jogador.time.escudo && (
+                        <Image
+                          src={cachedEscudos[figurinha.jogador.time.escudo] || figurinha.jogador.time.escudo}
+                          alt={figurinha.jogador.time.nome}
+                          width={18}
+                          height={18}
+                          className="w-4 h-4"
+                        />
+                      )}
+                      <span className="text-xs text-gray-600 truncate">{figurinha.jogador.time.nome}</span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Trocas Disponíveis */}
-            <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
-              <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Trocas Disponíveis
-              </h2>
-              {trocasDisponiveis.length === 0 ? (
-                <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
-                  <p className="text-brasil-blue text-lg font-semibold mb-2">Não há trocas disponíveis no momento.</p>
-                  <p className="text-brasil-blue/80">Volte mais tarde para ver novas propostas de troca!</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
-                  {trocasDisponiveis.map((troca) => (
-                    <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4">
-                      {renderFigurinha(troca.figurinhaOferta)}
-                      <div className="mt-0.5 flex justify-between items-center w-full px-2">
-                        {repetidas.length === 0 ? (
-                          <Link 
-                            href="/pacotes" 
-                            className="w-full bg-brasil-blue/10 hover:bg-brasil-blue/20 text-brasil-blue py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                          >
-                            Obtenha pacotes para ter figurinhas para troca
-                          </Link>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setTrocaSelecionada(troca);
-                              setShowProporTrocaModal(true);
-                            }}
-                            className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                          >
-                            Propor Troca
-                          </button>
-                        )}
-                      </div>
+                    <div className="mt-0.5 flex justify-between items-center w-full px-2">
+                      <span className="text-xs text-gray-600 truncate max-w-[110px]">{figurinha.jogador.nome}</span>
+                      <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Propostas Pendentes */}
-            <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
-              <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Propostas Pendentes
-              </h2>
-              {ofertasEnviadas.length === 0 ? (
-                <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
-                  <p className="text-brasil-blue text-lg font-semibold mb-2">Você ainda não enviou nenhuma proposta de troca.</p>
-                  <p className="text-brasil-blue/80">Quando você propor uma troca, ela aparecerá aqui até ser aceita ou recusada.</p>
-                </div>
-              ) : (
-                <div className="w-full max-w-4xl mx-auto">
-                  {ofertasEnviadas.map((troca, idx) => (
-                    <div key={troca.id} className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 overflow-visible border-4 border-yellow-400 mb-8 ${idx === ofertasEnviadas.length - 1 ? '' : 'mt-2'}`}>
-                      <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-                        {/* Figurinha Ofertada */}
-                        <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                          <span className="block text-xs font-semibold text-gray-500 mb-1">Você ofereceu</span>
-                          <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                            {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-2 mb-1">
-                            {troca.figurinhaOferta.jogador.time.escudo && (
-                              <Image
-                                src={cachedEscudos[troca.figurinhaOferta.jogador.time.escudo] || troca.figurinhaOferta.jogador.time.escudo}
-                                alt={troca.figurinhaOferta.jogador.time.nome}
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
-                              />
-                            )}
-                            <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
-                          </div>
-                          <div className="flex flex-col items-center w-full">
-                            <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                          </div>
-                        </div>
-
-                        {/* Seta de troca */}
-                        <div className="flex flex-col items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-brasil-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                          </svg>
-                        </div>
-
-                        {/* Figurinha Solicitada */}
-                        <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                          <span className="block text-xs font-semibold text-gray-500 mb-1">Você quer</span>
-                          <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                            {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-2 mb-1">
-                            {troca.figurinhaSolicitada.jogador.time.escudo && (
-                              <Image
-                                src={cachedEscudos[troca.figurinhaSolicitada.jogador.time.escudo] || troca.figurinhaSolicitada.jogador.time.escudo}
-                                alt={troca.figurinhaSolicitada.jogador.time.nome}
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
-                              />
-                            )}
-                            <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.time.nome}</span>
-                          </div>
-                          <div className="flex flex-col items-center w-full">
-                            <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.nome}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Status e ação */}
-                      <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
-                        <span className="text-sm font-semibold text-brasil-yellow">Status: {troca.status === 'PENDENTE' ? 'Pendente' : troca.status === 'RECUSADA' ? 'Recusada' : 'Aceita'}</span>
-                        {troca.status === 'PENDENTE' && (
-                          <button
-                            onClick={() => removerTroca(troca.figurinhaOferta.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-                          >
-                            Cancelar Proposta
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Propostas Recebidas */}
-            <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
-              <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Propostas Recebidas
-              </h2>
-              {propostasRecebidas.length === 0 ? (
-                <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
-                  <p className="text-brasil-blue text-lg font-semibold mb-2">Você ainda não recebeu nenhuma proposta de troca.</p>
-                  <p className="text-brasil-blue/80">Quando alguém se interessar por suas figurinhas, as propostas aparecerão aqui!</p>
-                </div>
-              ) : (
-                <div className="w-full max-w-4xl mx-auto">
-                  {propostasRecebidas.map((troca, idx) => (
-                    <div key={troca.id} className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 overflow-visible border-4 border-blue mb-8 ${idx === propostasRecebidas.length - 1 ? '' : 'mt-2'}`}>
-                      <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-                        {/* Figurinha Ofertada */}
-                        <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                          <span className="block text-xs font-semibold text-gray-500 mb-1">Você tem</span>
-                          <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                            {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-2 mb-1">
-                            {troca.figurinhaOferta.jogador.time.escudo && (
-                              <Image
-                                src={cachedEscudos[troca.figurinhaOferta.jogador.time.escudo] || troca.figurinhaOferta.jogador.time.escudo}
-                                alt={troca.figurinhaOferta.jogador.time.nome}
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
-                              />
-                            )}
-                            <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
-                          </div>
-                          <div className="flex flex-col items-center w-full">
-                            <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
-                          </div>
-                        </div>
-
-                        {/* Seta de troca */}
-                        <div className="flex flex-col items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-brasil-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                          </svg>
-                        </div>
-
-                        {/* Figurinha Solicitada */}
-                        <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                          <span className="block text-xs font-semibold text-gray-500 mb-1">Eles querem</span>
-                          <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                            {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-2 mb-1">
-                            {troca.figurinhaSolicitada.jogador.time.escudo && (
-                              <Image
-                                src={cachedEscudos[troca.figurinhaSolicitada.jogador.time.escudo] || troca.figurinhaSolicitada.jogador.time.escudo}
-                                alt={troca.figurinhaSolicitada.jogador.time.nome}
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
-                              />
-                            )}
-                            <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.time.nome}</span>
-                          </div>
-                          <div className="flex flex-col items-center w-full">
-                            <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.nome}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Ações */}
-                      <div className="flex justify-center gap-4 mt-6">
+                    <div className="flex justify-between items-center mt-0.5 w-full px-2">
+                      {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
                         <button
-                          onClick={() => handleResponderTroca(troca.id, 'aceitar')}
-                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                          onClick={() => adicionarTroca(figurinha)}
+                          className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                          disabled={loadingFigurinha === figurinha.id}
                         >
-                          Aceitar
+                          {loadingFigurinha === figurinha.id ? (
+                            <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                          ) : null}
+                          Disponibilizar para troca
                         </button>
+                      )}
+                      {figurinhasEmTroca.includes(figurinha.id) && (
                         <button
-                          onClick={() => handleResponderTroca(troca.id, 'recusar')}
+                          onClick={() => removerTroca(figurinha.id)}
+                          className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                          disabled={loadingFigurinha === figurinha.id}
+                        >
+                          {loadingFigurinha === figurinha.id ? (
+                            <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                          ) : null}
+                          Remover
+                        </button>
+                      )}
+                      {normalize(figurinha.raridade) === 'lendario' && (
+                        <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Trocas Disponíveis */}
+          <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+            <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Trocas Disponíveis
+            </h2>
+            {trocasDisponiveis.length === 0 ? (
+              <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
+                <p className="text-brasil-blue text-lg font-semibold mb-2">Não há trocas disponíveis no momento.</p>
+                <p className="text-brasil-blue/80">Volte mais tarde para ver novas propostas de troca!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
+                {trocasDisponiveis.map((troca) => (
+                  <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4">
+                    {renderFigurinha(troca.figurinhaOferta)}
+                    <div className="mt-0.5 flex justify-between items-center w-full px-2">
+                      {repetidas.length === 0 ? (
+                        <Link 
+                          href="/pacotes" 
+                          className="w-full bg-brasil-blue/10 hover:bg-brasil-blue/20 text-brasil-blue py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                        >
+                          Obtenha pacotes para ter figurinhas para troca
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setTrocaSelecionada(troca);
+                            setShowProporTrocaModal(true);
+                          }}
+                          className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                        >
+                          Propor Troca
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Propostas Pendentes */}
+          <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+            <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Propostas Pendentes
+            </h2>
+            {ofertasEnviadas.length === 0 ? (
+              <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
+                <p className="text-brasil-blue text-lg font-semibold mb-2">Você ainda não enviou nenhuma proposta de troca.</p>
+                <p className="text-brasil-blue/80">Quando você propor uma troca, ela aparecerá aqui até ser aceita ou recusada.</p>
+              </div>
+            ) : (
+              <div className="w-full max-w-4xl mx-auto">
+                {ofertasEnviadas.map((troca, idx) => (
+                  <div key={troca.id} className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 overflow-visible border-4 border-yellow-400 mb-8 ${idx === ofertasEnviadas.length - 1 ? '' : 'mt-2'}`}>
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+                      {/* Figurinha Ofertada */}
+                      <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você ofereceu</span>
+                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2 mb-1">
+                          {troca.figurinhaOferta.jogador.time.escudo && (
+                            <Image
+                              src={cachedEscudos[troca.figurinhaOferta.jogador.time.escudo] || troca.figurinhaOferta.jogador.time.escudo}
+                              alt={troca.figurinhaOferta.jogador.time.nome}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6"
+                            />
+                          )}
+                          <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                        </div>
+                        <div className="flex flex-col items-center w-full">
+                          <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                        </div>
+                      </div>
+
+                      {/* Seta de troca */}
+                      <div className="flex flex-col items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-brasil-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                      </div>
+
+                      {/* Figurinha Solicitada */}
+                      <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você quer</span>
+                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2 mb-1">
+                          {troca.figurinhaSolicitada.jogador.time.escudo && (
+                            <Image
+                              src={cachedEscudos[troca.figurinhaSolicitada.jogador.time.escudo] || troca.figurinhaSolicitada.jogador.time.escudo}
+                              alt={troca.figurinhaSolicitada.jogador.time.nome}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6"
+                            />
+                          )}
+                          <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.time.nome}</span>
+                        </div>
+                        <div className="flex flex-col items-center w-full">
+                          <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.nome}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status e ação */}
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
+                      <span className="text-sm font-semibold text-brasil-yellow">Status: {troca.status === 'PENDENTE' ? 'Pendente' : troca.status === 'RECUSADA' ? 'Recusada' : 'Aceita'}</span>
+                      {troca.status === 'PENDENTE' && (
+                        <button
+                          onClick={() => removerTroca(troca.figurinhaOferta.id)}
                           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
                         >
-                          Recusar
+                          Cancelar Proposta
                         </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Propostas Recebidas */}
+          <div className="mb-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-brasil-yellow/20">
+            <h2 className="text-xl font-bold mb-6 text-brasil-blue flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Propostas Recebidas
+            </h2>
+            {propostasRecebidas.length === 0 ? (
+              <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
+                <p className="text-brasil-blue text-lg font-semibold mb-2">Você ainda não recebeu nenhuma proposta de troca.</p>
+                <p className="text-brasil-blue/80">Quando alguém se interessar por suas figurinhas, as propostas aparecerão aqui!</p>
+              </div>
+            ) : (
+              <div className="w-full max-w-4xl mx-auto">
+                {propostasRecebidas.map((troca, idx) => (
+                  <div key={troca.id} className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 overflow-visible border-4 border-blue mb-8 ${idx === propostasRecebidas.length - 1 ? '' : 'mt-2'}`}>
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+                      {/* Figurinha Ofertada */}
+                      <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você tem</span>
+                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2 mb-1">
+                          {troca.figurinhaOferta.jogador.time.escudo && (
+                            <Image
+                              src={cachedEscudos[troca.figurinhaOferta.jogador.time.escudo] || troca.figurinhaOferta.jogador.time.escudo}
+                              alt={troca.figurinhaOferta.jogador.time.nome}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6"
+                            />
+                          )}
+                          <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                        </div>
+                        <div className="flex flex-col items-center w-full">
+                          <span className="text-sm text-gray-600">{troca.figurinhaOferta.jogador.nome}</span>
+                        </div>
+                      </div>
+
+                      {/* Seta de troca */}
+                      <div className="flex flex-col items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-brasil-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                      </div>
+
+                      {/* Figurinha Solicitada */}
+                      <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Eles querem</span>
+                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2 mb-1">
+                          {troca.figurinhaSolicitada.jogador.time.escudo && (
+                            <Image
+                              src={cachedEscudos[troca.figurinhaSolicitada.jogador.time.escudo] || troca.figurinhaSolicitada.jogador.time.escudo}
+                              alt={troca.figurinhaSolicitada.jogador.time.nome}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6"
+                            />
+                          )}
+                          <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.time.nome}</span>
+                        </div>
+                        <div className="flex flex-col items-center w-full">
+                          <span className="text-sm text-gray-600">{troca.figurinhaSolicitada.jogador.nome}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+
+                    {/* Ações */}
+                    <div className="flex justify-center gap-4 mt-6">
+                      <button
+                        onClick={() => handleResponderTroca(troca.id, 'aceitar')}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      >
+                        Aceitar
+                      </button>
+                      <button
+                        onClick={() => handleResponderTroca(troca.id, 'recusar')}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      >
+                        Recusar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
