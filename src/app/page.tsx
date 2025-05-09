@@ -66,11 +66,13 @@ export default function Home() {
           <div className="flex flex-col items-center text-center mb-16 w-full">
             <div className="mb-8 flex justify-center">
               <Image
-                src="/logo.png"
+                src="/hero.png"
                 alt="Álbum Brasileirão 2025"
-                width={300}
-                height={300}
-                className="rounded-lg"
+                width={1200}
+                height={600}
+                className="w-full h-auto"
+                priority
+                quality={75}
               />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">

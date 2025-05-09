@@ -288,7 +288,7 @@ export default function Pacotes() {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
                     return (
-                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                      <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
                         <div className="mb-4 flex justify-center items-center">
                           {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
                           {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
@@ -309,7 +309,7 @@ export default function Pacotes() {
                         <button
                           onClick={() => comprarPacote(pacote.id)}
                           disabled={loading}
-                          className="bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4"
+                          className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
                         >
                           Comprar
                         </button>
@@ -321,11 +321,11 @@ export default function Pacotes() {
             </div>
           )}
 
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
+          <h1 className="text-2xl text-center md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
 
           {/* Seção Pacotes Diários */}
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes Diários</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes Diários</h2>
             {pacotesDiarios.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pacotesDiarios.map((pacote) => (
@@ -348,13 +348,13 @@ export default function Pacotes() {
           </div>
 
           {/* Seção Pacotes de Boas-vindas */}
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
             {pacotesIniciais.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pacotesIniciais.map((pacote) => (
                   <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
-                    <div className="relative w-full h-[200px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                    <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                       <Image src="/pacoteTransparente.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
                         <button
@@ -368,18 +368,18 @@ export default function Pacotes() {
                   </div>
                 ))}
               </div>
-            ) : <p className="text-brasil-blue">Você não tem pacotes de boas-vindas disponíveis.</p>}
+            ) : <p className="text-brasil-blue">Você já abriu seus pacotes de boas-vindas, adquira mais pacotes para completar seu álbum!</p>}
           </div>
 
           {/* Seção Pacotes Premium */}
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-brasil-blue mb-2">Pacotes Premium</h2>
+            <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes Premium</h2>
             {pacotesPremiumUser.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pacotesPremiumUser.map((pacote) => (
                   <div key={pacote.id} className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105" onClick={() => handleAbrirPacote(pacote.id)}>
-                    <div className="relative w-full h-[200px] bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                      <Image src="/pacoteTransparente.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                    <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                      <Image src="/IndividualPremium.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
                         <button
                           disabled={abrindoPacote || showAnimation}
@@ -397,15 +397,15 @@ export default function Pacotes() {
 
           {/* Seção Comprar Pacotes Premium repaginada */}
           {!semPacotesDisponiveis && (
-          <div className="mt-8 p-4 md:p-6 bg-white rounded-lg shadow-sm mx-4 md:mx-6">
+          <div className="mt-8 p-4 md:p-6  rounded-lg shadow-sm mx-4 md:mx-6">
             <div className="text-center">
-                <h2 className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
+                <h2 className="text-2xl text-center md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
                 <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
                   {pacotesPremium.map((pacote) => {
                     const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
                     const isTriplo = pacote.quantidade === 3;
                     return (
-                      <li key={pacote.id} className="flex-1 border-2 border-brasil-blue rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px]">
+                      <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
                         <div className="mb-4 flex justify-center items-center">
                           {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
                           {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
@@ -426,7 +426,7 @@ export default function Pacotes() {
                     <button
                       onClick={() => comprarPacote(pacote.id)}
                       disabled={loading}
-                          className="bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4"
+                          className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
                     >
                       Comprar
                     </button>

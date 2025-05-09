@@ -23,6 +23,7 @@ interface FigurinhaCardProps {
   onImageError: () => void;
   onAdicionarRepetida?: (jogador: any) => void;
   hideName?: boolean;
+  priority?: boolean;
 }
 
 const getRaridadeStyle = (raridade: string) => {
@@ -44,7 +45,8 @@ export default function FigurinhaCard({
   currentImageIndex = 0, 
   onImageError,
   onAdicionarRepetida,
-  hideName = false
+  hideName = false,
+  priority = false
 }: FigurinhaCardProps) {
   const [currentPath, setCurrentPath] = useState(0);
   const [imageError, setImageError] = useState(false);
@@ -85,6 +87,10 @@ export default function FigurinhaCard({
             fill
             className="object-cover"
             onError={handleImageError}
+            loading={priority ? "eager" : "lazy"}
+            priority={priority}
+            sizes="(max-width: 128px) 100vw, 128px"
+            quality={75}
           />
           {!jogadorColetado && (
             <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10">

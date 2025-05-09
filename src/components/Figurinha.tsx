@@ -15,9 +15,10 @@ interface FigurinhaProps {
   };
   onClick?: () => void;
   className?: string;
+  priority?: boolean;
 }
 
-export default function Figurinha({ figurinha, onClick, className = '' }: FigurinhaProps) {
+export default function Figurinha({ figurinha, onClick, className = '', priority = false }: FigurinhaProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [cachedSrc, setCachedSrc] = useState<string | null>(null);
 
@@ -57,6 +58,10 @@ export default function Figurinha({ figurinha, onClick, className = '' }: Figuri
             className="rounded-lg shadow-md"
             onLoad={() => setIsLoading(false)}
             onError={() => setIsLoading(false)}
+            loading={priority ? "eager" : "lazy"}
+            priority={priority}
+            sizes="(max-width: 128px) 100vw, 128px"
+            quality={75}
           />
         )}
       </div>

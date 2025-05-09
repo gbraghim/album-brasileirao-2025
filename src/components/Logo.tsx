@@ -8,6 +8,10 @@ export default function Logo() {
       width={150}
       height={50}
       className="h-auto w-auto"
+      unoptimized
+      loading="lazy"
+      priority={false}
+      quality={75}
     />
   );
 } 

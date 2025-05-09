@@ -12,10 +12,13 @@ const nextConfig = {
       'album-brasileirao.s3.amazonaws.com',
       'album-brasileirao.s3.sa-east-1.amazonaws.com'
     ],
-    formats: ['image/webp', 'image/avif'],
+    formats: ['image/webp'],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    minimumCacheTTL: 2678400,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
   env: {
     JWT_SECRET: process.env.JWT_SECRET,
