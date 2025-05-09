@@ -21,6 +21,7 @@ export default function Header() {
     { href: '/meu-album', label: 'Meu Álbum' },
     { href: '/repetidas', label: 'Repetidas' },
     { href: '/trocas', label: 'Trocas' },
+    { href: '/feed', label: 'Feed' },
     { href: '/perfil', label: 'Perfil' }
   ];
 

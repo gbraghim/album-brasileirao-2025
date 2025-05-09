@@ -7,6 +7,7 @@ import { AuthProvider } from './providers';
 import Footer from '@/components/Footer';
 import { Toaster } from 'react-hot-toast';
 import BotaoCompartilharWhatsApp from '@/components/BotaoCompartilharWhatsApp';
+import Header from '@/components/Header';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,6 +38,7 @@ export default async function RootLayout({
         <BotaoCompartilharWhatsApp />
         <AuthProvider>
           <main className="relative min-h-screen flex flex-col">
+            <Header />
             {children}
             <Footer />
           </main>

@@ -30,7 +30,7 @@ interface PacotePremium {
 const ModalFigurinhas = lazy(() => import('@/components/ModalFigurinhas'));
 const PacoteAnimation = lazy(() => import('@/components/PacoteAnimation'));
 const Modal = lazy(() => import('@/components/Modal'));
-const Header = lazy(() => import('@/components/Header'));
+
 const Footer = lazy(() => import('@/components/Footer'));
 
 export default function Pacotes() {
