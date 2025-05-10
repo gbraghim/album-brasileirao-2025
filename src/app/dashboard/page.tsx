@@ -111,10 +111,18 @@ export default function Dashboard() {
     let posicao = 1;
     let i = 0;
     while (i < ranking.length && grupos.length < 10) {
-      const grupo = ranking.filter((u: RankingItem) => u.totalFigurinhas === ranking[i].totalFigurinhas);
-      grupos.push({ posicao, usuarios: grupo });
-      i += grupo.length;
-      posicao += grupo.length;
+      if (posicao <= 3) {
+        // Agrupa empatados apenas para top 1, 2 e 3
+        const grupo = ranking.filter((u: RankingItem) => u.totalFigurinhas === ranking[i].totalFigurinhas && ranking.findIndex(r => r === u) >= i);
+        grupos.push({ posicao, usuarios: grupo });
+        i += grupo.length;
+        posicao += grupo.length;
+      } else {
+        // A partir do 4º, cada usuário é um grupo separado
+        grupos.push({ posicao, usuarios: [ranking[i]] });
+        i += 1;
+        posicao += 1;
+      }
     }
     return grupos;
   }
