@@ -132,6 +132,29 @@ export async function POST(request: Request) {
       });
       console.log('10. Troca atualizada para ACEITA:', trocaAtualizada.id);
 
+      // Cancelar todas as outras propostas pendentes que envolvam as duas figurinhas
+      const ofertaId = troca.figurinhaOfertaId || undefined;
+      const solicitadaId = troca.figurinhaSolicitadaId || undefined;
+      const orArray = [];
+      if (ofertaId) {
+        orArray.push({ figurinhaOfertaId: ofertaId });
+        orArray.push({ figurinhaSolicitadaId: ofertaId });
+      }
+      if (solicitadaId) {
+        orArray.push({ figurinhaOfertaId: solicitadaId });
+        orArray.push({ figurinhaSolicitadaId: solicitadaId });
+      }
+      if (orArray.length > 0) {
+        await prisma.troca.updateMany({
+          where: {
+            id: { not: trocaId },
+            status: TrocaStatus.PENDENTE,
+            OR: orArray
+          },
+          data: { status: TrocaStatus.CANCELADA }
+        });
+      }
+
       // Criar notificação para o usuário que enviou a proposta
       try {
         const notificacao = await prisma.notificacao.create({

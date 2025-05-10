@@ -323,7 +323,17 @@ export default function Trocas() {
       setFigurinhasEmTroca([...figurinhasEmTroca, figurinha.id]);
     } catch (error) {
       console.error('Erro ao adicionar troca:', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Erro ao adicionar troca');
+      if (error instanceof Error) {
+        if (error.message.includes('Figurinha já está disponível para troca')) {
+          setErrorMessage('Você já disponibilizou essa figurinha para troca. Remova a troca anterior para disponibilizar novamente.');
+        } else if (error.message.includes('Figurinhas lendárias não podem ser trocadas')) {
+          setErrorMessage('Figurinhas lendárias não podem ser trocadas.');
+        } else {
+          setErrorMessage('Erro ao adicionar troca: ' + error.message);
+        }
+      } else {
+        setErrorMessage('Erro inesperado ao adicionar troca. Tente novamente.');
+      }
       setShowErrorModal(true);
     } finally {
       setLoadingFigurinha(null);
@@ -350,6 +360,9 @@ export default function Trocas() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        if (errorData.error && errorData.error.includes('Figurinha não encontrada ou não está disponível para troca')) {
+          throw new Error('Você não possui essa figurinha repetida disponível para troca.');
+        }
         throw new Error(errorData.error || 'Erro ao propor troca');
       }
 
@@ -364,7 +377,12 @@ export default function Trocas() {
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Erro ao propor troca:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao propor troca');
+      if (error instanceof Error) {
+        setErrorMessage('Erro ao propor troca: ' + error.message);
+      } else {
+        setErrorMessage('Erro inesperado ao propor troca. Tente novamente.');
+      }
+      setShowErrorModal(true);
     } finally {
       setLoading(false);
     }
@@ -382,14 +400,27 @@ export default function Trocas() {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao responder à troca');
+        const errorData = await response.json();
+        if (errorData.error && errorData.error.includes('não tem mais a figurinha ofertada disponível')) {
+          throw new Error('Você não possui mais a figurinha ofertada. Remova a troca ou disponibilize outra.');
+        } else if (errorData.error && errorData.error.includes('não tem mais a figurinha solicitada disponível')) {
+          throw new Error('O outro usuário não possui mais a figurinha solicitada. Esta proposta foi invalidada.');
+        } else if (errorData.error) {
+          throw new Error(errorData.error);
+        } else {
+          throw new Error('Erro ao responder à troca.');
+        }
       }
 
       setSuccessMessage(aceitar === 'aceitar' ? 'Troca aceita com sucesso!' : 'Troca recusada com sucesso!');
       setShowSuccessModal(true);
       await fetchTrocas();
     } catch (error) {
-      setErrorMessage('Erro ao responder à troca. Tente novamente.');
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Erro inesperado ao responder à troca. Tente novamente.');
+      }
       setShowErrorModal(true);
     } finally {
       setLoading(false);
@@ -565,7 +596,7 @@ export default function Trocas() {
                 {repetidas.map((figurinha) => (
                   <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-36 mx-auto">
                     {renderFigurinha(figurinha)}
-                    <div className="flex items-center space-x-1 mt-3 w-full px-2">
+                    <div className="flex flex-col items-center justify-center mt-3 w-full px-2">
                       {figurinha.jogador.time.escudo && (
                         <Image
                           src={cachedEscudos[figurinha.jogador.time.escudo] || figurinha.jogador.time.escudo}
@@ -575,10 +606,10 @@ export default function Trocas() {
                           className="w-4 h-4"
                         />
                       )}
-                      <span className="text-xs text-gray-600 truncate">{figurinha.jogador.time.nome}</span>
+                      <span className="text-xs text-gray-600 truncate text-center w-full">{figurinha.jogador.time.nome}</span>
                     </div>
-                    <div className="mt-0.5 flex justify-between items-center w-full px-2">
-                      <span className="text-xs text-gray-600 truncate max-w-[110px]">{figurinha.jogador.nome}</span>
+                    <div className="mt-0.5 flex flex-col items-center w-full px-2">
+                      <span className="text-xs text-gray-600 truncate max-w-[110px] text-center w-full">{figurinha.jogador.nome}</span>
                       <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                     </div>
                     <div className="flex justify-between items-center mt-0.5 w-full px-2">
@@ -637,7 +668,7 @@ export default function Trocas() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
-                {trocasDisponiveis.map((troca) => (
+                {(trocasDisponiveis.filter((troca: Troca) => !figurinhasEmTroca.includes(troca.figurinhaOferta.id)) as Troca[]).map((troca) => (
                   <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4 flex flex-col items-center justify-center">
                     {renderFigurinha(troca.figurinhaOferta)}
                     <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioEnvia.name}</span></span>
@@ -724,6 +755,7 @@ export default function Trocas() {
                         <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
                         </div>
+                        <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioRecebe.name}</span></span>
                         <div className="flex items-center space-x-2 mt-2 mb-1">
                           {troca.figurinhaSolicitada.jogador.time.escudo && (
                             <Image
@@ -808,6 +840,7 @@ export default function Trocas() {
                         <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
                         </div>
+                        <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioRecebe.name}</span></span>
                         <div className="flex items-center space-x-2 mt-2 mb-1">
                           {troca.figurinhaSolicitada.jogador.time.escudo && (
                             <Image

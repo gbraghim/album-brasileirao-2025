@@ -248,7 +248,7 @@ export default function Repetidas() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center space-x-1 mt-3 w-full px-2">
+              <div className="flex flex-col items-center justify-center mt-3 w-full px-2">
                 {figurinha.jogador.time.escudo && (
                   <Image
                     src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
@@ -258,10 +258,10 @@ export default function Repetidas() {
                     className="w-4 h-4"
                   />
                 )}
-                <span className="text-xs text-gray-600 truncate">{figurinha.jogador.time.nome}</span>
+                <span className="text-xs text-gray-600 truncate text-center w-full">{figurinha.jogador.time.nome}</span>
               </div>
-              <div className="mt-0.5 flex justify-between items-center w-full px-2">
-                <span className="text-xs text-gray-600 truncate max-w-[110px]">{figurinha.jogador.nome}</span>
+              <div className="mt-0.5 flex flex-col items-center w-full px-2">
+                <span className="text-xs text-gray-600 truncate max-w-[110px] text-center w-full">{figurinha.jogador.nome}</span>
                 <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
               </div>
               <div className="flex justify-between items-center mt-0.5 w-full px-2">
