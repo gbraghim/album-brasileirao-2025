@@ -148,6 +148,9 @@ export default function Dashboard() {
   }
   const gruposRanking = agruparPorFigurinhas(rankingData?.ranking);
 
+  // Calcular corretamente o total de figurinhas para exibição
+  const totalFigurinhasExibido = stats ? (stats.totalFigurinhas + stats.figurinhasRepetidas) : 0;
+
   if (status === 'loading' || loadingStats) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 flex flex-col items-center justify-center">
@@ -202,7 +205,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-blue-800">Total de Figurinhas</h3>
-                <p className="text-3xl font-bold text-blue-600">{stats.totalFigurinhas}</p>
+                <p className="text-3xl font-bold text-blue-600">{totalFigurinhasExibido}</p>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-green-800">Figurinhas Repetidas</h3>
@@ -316,9 +319,21 @@ export default function Dashboard() {
                     <span className="text-xs text-gray-500 mb-1">{grupo.posicao}º lugar</span>
                     <div className="flex flex-col items-center mb-1">
                       {grupo.usuarios.map((item: RankingItem) => (
-                        <span key={item.email} className="text-base md:text-lg font-extrabold text-brasil-blue text-center">{item.nome}</span>
+                        <div key={item.email} className="flex flex-col items-center mb-1">
+                          <span
+                            className="text-base md:text-lg font-extrabold text-brasil-blue text-center truncate overflow-hidden whitespace-nowrap max-w-[140px]"
+                            title={item.nome}
+                          >
+                            {item.nome}
+                          </span>
+                          <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">
+                            {item.email === session?.user?.email
+                              ? totalFigurinhasExibido
+                              : item.totalFigurinhas
+                            } figurinhas
+                          </span>
+                        </div>
                       ))}
-                      <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">{grupo.usuarios[0]?.totalFigurinhas} figurinhas</span>
                     </div>
                   </div>
                 ))}
@@ -330,9 +345,16 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg font-bold text-gray-400 w-8 text-center">{grupo.posicao}º</span>
                       {grupo.usuarios.map((item: RankingItem) => (
-                        <span key={item.email} className={`text-base md:text-lg font-medium mr-4 ${item.email === session?.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'}`}>{item.nome}</span>
+                        <span key={item.email} className={`text-base md:text-lg font-medium mr-4 ${item.email === session?.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'}`}>
+                          {item.nome}
+                          <span className="text-sm md:text-base font-semibold text-brasil-green ml-2">
+                            {item.email === session?.user?.email
+                              ? totalFigurinhasExibido
+                              : item.totalFigurinhas
+                            } figurinhas
+                          </span>
+                        </span>
                       ))}
-                      <span className="text-sm md:text-base font-semibold text-brasil-green ml-2">{grupo.usuarios[0]?.totalFigurinhas} figurinhas</span>
                     </div>
                   </div>
                 ))}
