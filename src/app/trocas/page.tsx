@@ -401,11 +401,16 @@ export default function Trocas() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (errorData.error && errorData.error.includes('não tem mais a figurinha ofertada disponível')) {
-          throw new Error('Você não possui mais a figurinha ofertada. Remova a troca ou disponibilize outra.');
-        } else if (errorData.error && errorData.error.includes('não tem mais a figurinha solicitada disponível')) {
-          throw new Error('O outro usuário não possui mais a figurinha solicitada. Esta proposta foi invalidada.');
-        } else if (errorData.error) {
+        // Se a figurinha não estiver mais disponível, apenas recarrega as trocas
+        if (errorData.error && (
+          errorData.error.includes('não tem mais a figurinha ofertada disponível') ||
+          errorData.error.includes('não tem mais a figurinha solicitada disponível')
+        )) {
+          await fetchTrocas();
+          return;
+        }
+        // Para outros erros, mantém o comportamento atual
+        if (errorData.error) {
           throw new Error(errorData.error);
         } else {
           throw new Error('Erro ao responder à troca.');
@@ -415,6 +420,9 @@ export default function Trocas() {
       setSuccessMessage(aceitar === 'aceitar' ? 'Troca aceita com sucesso!' : 'Troca recusada com sucesso!');
       setShowSuccessModal(true);
       await fetchTrocas();
+      if (aceitar === 'aceitar') {
+        window.location.reload();
+      }
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);
@@ -594,20 +602,35 @@ export default function Trocas() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {(() => {
-                  // Obter todos os jogadores envolvidos em propostas recebidas pendentes
-                  const jogadoresEmPropostaRecebida = new Set<string>();
+                  // Obter todos os jogadores envolvidos em propostas pendentes (tanto recebidas quanto enviadas)
+                  const jogadoresEmPropostaPendente = new Set<string>();
+                  
+                  // Verificar propostas recebidas
                   propostasRecebidas.forEach((troca) => {
                     if (troca.status === 'PENDENTE') {
                       if (troca.figurinhaSolicitada?.jogador?.id) {
-                        jogadoresEmPropostaRecebida.add(troca.figurinhaSolicitada.jogador.id);
+                        jogadoresEmPropostaPendente.add(troca.figurinhaSolicitada.jogador.id);
                       }
                       if (troca.figurinhaOferta?.jogador?.id) {
-                        jogadoresEmPropostaRecebida.add(troca.figurinhaOferta.jogador.id);
+                        jogadoresEmPropostaPendente.add(troca.figurinhaOferta.jogador.id);
                       }
                     }
                   });
-                  // Filtrar as figurinhas repetidas
-                  return repetidas.filter(f => !jogadoresEmPropostaRecebida.has(f.jogador.id)).map((figurinha) => (
+
+                  // Verificar ofertas enviadas
+                  ofertasEnviadas.forEach((troca) => {
+                    if (troca.status === 'PENDENTE') {
+                      if (troca.figurinhaSolicitada?.jogador?.id) {
+                        jogadoresEmPropostaPendente.add(troca.figurinhaSolicitada.jogador.id);
+                      }
+                      if (troca.figurinhaOferta?.jogador?.id) {
+                        jogadoresEmPropostaPendente.add(troca.figurinhaOferta.jogador.id);
+                      }
+                    }
+                  });
+
+                  // Mostrar todas as figurinhas, mas desabilitar o botão para as que estão em proposta pendente
+                  return repetidas.map((figurinha) => (
                     <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-36 mx-auto">
                       {renderFigurinha(figurinha)}
                       <div className="flex flex-col items-center justify-center mt-3 w-full px-2">
@@ -624,41 +647,52 @@ export default function Trocas() {
                       </div>
                       <div className="mt-0.5 flex flex-col items-center w-full px-2">
                         <span className="text-xs text-gray-600 truncate max-w-[110px] text-center w-full">{figurinha.jogador.nome}</span>
-                        <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
+                        <span className="text-xs font-semibold text-brasil-blue">Repetida(s): {figurinha.quantidade - 1}</span>
                       </div>
                       <div className="flex justify-between items-center mt-0.5 w-full px-2">
-                        {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendário' && (
-                          <button
-                            onClick={() => adicionarTroca(figurinha)}
-                            className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                            disabled={loadingFigurinha === figurinha.id}
-                          >
-                            {loadingFigurinha === figurinha.id ? (
-                              <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                              </svg>
-                            ) : null}
-                            Disponibilizar para troca
-                          </button>
-                        )}
-                        {figurinhasEmTroca.includes(figurinha.id) && (
-                          <button
-                            onClick={() => removerTroca(figurinha.id)}
-                            className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                            disabled={loadingFigurinha === figurinha.id}
-                          >
-                            {loadingFigurinha === figurinha.id ? (
-                              <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                              </svg>
-                            ) : null}
-                            Remover
-                          </button>
-                        )}
-                        {normalize(figurinha.raridade) === 'lendário' && (
-                          <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
+                        {jogadoresEmPropostaPendente.has(figurinha.jogador.id) ? (
+                          <div className="w-full bg-gray-100 text-gray-500 py-1 px-1 rounded text-xs h-9 min-h-0 flex items-center justify-center gap-1 cursor-not-allowed">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Em proposta pendente
+                          </div>
+                        ) : (
+                          <>
+                            {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendário' && (
+                              <button
+                                onClick={() => adicionarTroca(figurinha)}
+                                className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                                disabled={loadingFigurinha === figurinha.id}
+                              >
+                                {loadingFigurinha === figurinha.id ? (
+                                  <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                  </svg>
+                                ) : null}
+                                Disponibilizar para troca
+                              </button>
+                            )}
+                            {figurinhasEmTroca.includes(figurinha.id) && (
+                              <button
+                                onClick={() => removerTroca(figurinha.id)}
+                                className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                                disabled={loadingFigurinha === figurinha.id}
+                              >
+                                {loadingFigurinha === figurinha.id ? (
+                                  <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                  </svg>
+                                ) : null}
+                                Remover
+                              </button>
+                            )}
+                            {normalize(figurinha.raridade) === 'lendário' && (
+                              <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -676,6 +710,12 @@ export default function Trocas() {
               </svg>
               Trocas Disponíveis
             </h2>
+            <div className="mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+              </svg>
+              <span className="text-xs text-gray-500">Apenas figurinhas que você ainda não colecionou são exibidas aqui.</span>
+            </div>
             {trocasDisponiveis.length === 0 ? (
               <div className="text-center py-8 bg-gradient-to-br from-brasil-blue/5 to-brasil-yellow/5 rounded-lg border border-brasil-blue/20">
                 <p className="text-brasil-blue text-lg font-semibold mb-2">Não há trocas disponíveis no momento.</p>
@@ -689,6 +729,18 @@ export default function Trocas() {
                     <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4 flex flex-col items-center justify-center">
                       {renderFigurinha(troca.figurinhaOferta)}
                       <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioEnvia.name}</span></span>
+                      <div className="flex items-center gap-2 mb-1">
+                        {troca.figurinhaOferta.jogador.time.escudo && (
+                          <Image
+                            src={cachedEscudos[troca.figurinhaOferta.jogador.time.escudo] || troca.figurinhaOferta.jogador.time.escudo}
+                            alt={troca.figurinhaOferta.jogador.time.nome}
+                            width={18}
+                            height={18}
+                            className="w-4 h-4"
+                          />
+                        )}
+                        <span className="text-xs text-gray-600">{troca.figurinhaOferta.jogador.time.nome}</span>
+                      </div>
                       <div className="mt-0.5 flex justify-between items-center w-full px-2">
                         {repetidas.length === 0 ? (
                           <Link 
@@ -911,6 +963,10 @@ export default function Trocas() {
             troca={trocaSelecionada}
             onProporTroca={handleProporTroca}
             figurinhasRepetidas={repetidas}
+            figurinhasEmPropostaPendente={Array.from(new Set([
+              ...propostasRecebidas.filter(t => t.status === 'PENDENTE').map(t => t.figurinhaSolicitada?.jogador?.id),
+              ...ofertasEnviadas.filter(t => t.status === 'PENDENTE').map(t => t.figurinhaSolicitada?.jogador?.id)
+            ]))}
           />
         </Suspense>
       )}

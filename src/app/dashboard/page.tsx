@@ -294,7 +294,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
               {/* Demais posições */}
               <div className="space-y-2 md:space-y-3">
                 {gruposRanking.slice(3, 10).map((grupo) => (
@@ -308,8 +308,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </>
+                  </div>
+                </>
           )}
         </div>
       </div>

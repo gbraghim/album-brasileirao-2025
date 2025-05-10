@@ -22,9 +22,10 @@ interface ModalProporTrocaProps {
   onProporTroca: (figurinha: Figurinha) => Promise<void>;
   loading?: boolean;
   figurinhasRepetidas: Figurinha[];
+  figurinhasEmPropostaPendente: string[];
 }
 
-export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca, loading = false, figurinhasRepetidas }: ModalProporTrocaProps) {
+export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca, loading = false, figurinhasRepetidas, figurinhasEmPropostaPendente }: ModalProporTrocaProps) {
   if (!troca) {
     return null;
   }
@@ -79,7 +80,7 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -89,66 +90,82 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-60 transition-opacity" />
         </Transition.Child>
 
-        <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
               leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                  <button
-                    type="button"
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onClick={onClose}
-                  >
-                    <span className="sr-only">Fechar</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+              <Dialog.Panel className="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white px-6 pb-6 pt-7 text-left shadow-2xl transition-all">
+                <button
+                  type="button"
+                  className="absolute right-4 top-4 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-brasil-blue focus:ring-offset-2 z-10"
+                  onClick={onClose}
+                >
+                  <span className="sr-only">Fechar</span>
+                  <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+                <div className="mb-2">
+                  <Dialog.Title as="h2" className="text-2xl font-bold text-brasil-blue text-center mb-1">
+                    Propor Troca
+                  </Dialog.Title>
+                  <p className="text-center text-gray-600 text-base mb-4">
+                    Você está propondo uma troca para a figurinha <span className="font-semibold text-brasil-blue">{troca.figurinhaOferta.jogador.nome}</span>
+                  </p>
                 </div>
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                    <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                      Propor Troca
-                    </Dialog.Title>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Você está propondo uma troca para a figurinha de {troca.figurinhaOferta.jogador.nome}
-                      </p>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-900">Selecione uma figurinha para troca:</h4>
-                      <div className="mt-2 grid grid-cols-2 gap-4">
-                        {figurinhasRepetidas.filter(f => f.raridade.toLowerCase() !== 'lendário' && f.raridade.toLowerCase() !== 'lendario').map((figurinha) => (
-                          <div 
-                            key={figurinha.id}
-                            className="relative flex flex-col items-center p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
-                            onClick={() => onProporTroca(figurinha)}
-                          >
-                            {renderFigurinha(figurinha)}
-                            <span className="text-sm font-medium text-gray-900">{figurinha.jogador.nome}</span>
-                            <span className="text-xs text-gray-500">{figurinha.jogador.time.nome}</span>
-                            <span className="text-xs text-gray-500">Quantidade: {figurinha.quantidade}</span>
+                <h4 className="text-lg font-semibold text-gray-800 mb-3 text-center">Selecione uma figurinha para troca:</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                  {figurinhasRepetidas.filter(f => f.raridade.toLowerCase() !== 'lendário' && f.raridade.toLowerCase() !== 'lendario').map((figurinha) => {
+                    const isEmPropostaPendente = figurinhasEmPropostaPendente.includes(figurinha.jogador.id);
+                    return (
+                      <div
+                        key={figurinha.id}
+                        className={`relative flex flex-col items-center p-3 border-2 rounded-xl shadow-md transition-all duration-200 bg-white w-full min-w-0
+                          ${isEmPropostaPendente ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60' : 'hover:shadow-xl hover:border-brasil-blue cursor-pointer'}`}
+                        onClick={() => !isEmPropostaPendente && onProporTroca(figurinha)}
+                        style={{ minHeight: 210 }}
+                      >
+                        {renderFigurinha(figurinha)}
+                        <span className="text-base font-semibold text-gray-900 mt-2 mb-0.5 text-center w-full truncate">{figurinha.jogador.nome}</span>
+                        <div className="flex items-center justify-center gap-1 mb-0.5 w-full">
+                          {figurinha.jogador.time.escudo && (
+                            <Image
+                              src={figurinha.jogador.time.escudo}
+                              alt={figurinha.jogador.time.nome}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          )}
+                          <span className="text-xs text-gray-500 text-center truncate">{figurinha.jogador.time.nome}</span>
+                        </div>
+                        {(figurinha.quantidade - 1) > 0 && (
+                          <span className="text-xs text-brasil-blue font-bold mb-1">Repetida(s): {figurinha.quantidade - 1}</span>
+                        )}
+                        {isEmPropostaPendente && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 rounded-xl z-10">
+                            <span className="text-xs text-gray-600 font-semibold flex items-center gap-1">
+                              <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4 text-yellow-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' /></svg>
+                              Em proposta pendente
+                            </span>
                           </div>
-                        ))}
+                        )}
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
-                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-
+                <div className="flex justify-center">
                   <button
                     type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-red-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    className="inline-flex items-center justify-center rounded-lg bg-red-400 hover:bg-red-500 text-white px-6 py-2 text-base font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-red-300"
                     onClick={onClose}
                     disabled={loading}
                   >
