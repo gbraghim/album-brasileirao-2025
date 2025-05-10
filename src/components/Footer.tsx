@@ -1,16 +1,22 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
+        <div className="flex flex-col md:flex-row justify-between items-center relative">
+          <div className="mb-4 md:mb-0 z-10">
             <h3 className="text-lg font-semibold">Álbum Brasileirão 2025</h3>
             <p className="text-sm text-gray-400">Colecione, troque e complete seu álbum!</p>
           </div>
-          
-          <div className="flex space-x-6">
+
+          {/* Logo centralizado */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:transform-none flex justify-center items-center z-20">
+            <Image src="/logo.png" alt="Logo Álbum Brasileirão" width={90} height={90} className="drop-shadow-lg rounded-full bg-white/80 p-2" />
+          </div>
+
+          <div className="flex space-x-6 z-10">
 
             
             <a 

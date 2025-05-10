@@ -104,6 +104,22 @@ export default function Dashboard() {
     }
   };
 
+  // Função para agrupar usuários empatados
+  function agruparPorFigurinhas(ranking: RankingItem[] | undefined) {
+    if (!ranking) return [];
+    const grupos = [];
+    let posicao = 1;
+    let i = 0;
+    while (i < ranking.length && grupos.length < 10) {
+      const grupo = ranking.filter((u: RankingItem) => u.totalFigurinhas === ranking[i].totalFigurinhas);
+      grupos.push({ posicao, usuarios: grupo });
+      i += grupo.length;
+      posicao += grupo.length;
+    }
+    return grupos;
+  }
+  const gruposRanking = agruparPorFigurinhas(rankingData?.ranking);
+
   if (status === 'loading' || loadingStats) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 flex flex-col items-center justify-center">
@@ -252,64 +268,48 @@ export default function Dashboard() {
               <div className="w-3 h-3 bg-brasil-green rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
           ) : (
-            <div className="space-y-3 md:space-y-4">
-              {rankingData?.ranking.map((item, index) => (
-                <div
-                  key={item.email}
-                  className={`flex items-center justify-between p-3 md:p-4 rounded-lg ${
-                    item.email === session?.user?.email
-                      ? 'bg-brasil-green/20'
-                      : 'bg-white/50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2 md:space-x-3">
-                    {index < 3 ? (
-                      <svg 
-                        className={`w-5 h-5 md:w-6 md:h-6 ${
-                          index === 0 ? 'text-yellow-400' : 
-                          index === 1 ? 'text-gray-400' : 
-                          'text-amber-600'
-                        }`} 
-                        fill="currentColor" 
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ) : (
-                      <span className="text-sm md:text-base text-gray-400 font-medium">{item.posicao}º</span>
-                    )}
-                    <span className={`text-sm md:text-base font-medium ${
-                      item.email === session?.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'
-                    }`}>
-                      {item.nome}
-                    </span>
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-brasil-green">
-                    {item.totalFigurinhas} figurinhas
-                  </span>
-                </div>
-              ))}
-              
-              {/* Exibe a posição do usuário atual se ele não estiver no top 20 */}
-              {rankingData?.usuarioAtual && !rankingData.ranking.find(item => item.email === session?.user?.email) && (
-                <>
-                  <div className="border-t border-gray-200 my-4"></div>
-                  <div className="flex items-center justify-between p-3 md:p-4 rounded-lg bg-brasil-green/20">
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                      <span className="text-sm md:text-base text-gray-400 font-medium">
-                        {rankingData.usuarioAtual.posicao}º
-                      </span>
-                      <span className="text-sm md:text-base font-bold text-brasil-blue">
-                        {rankingData.usuarioAtual.nome} (Você)
-                      </span>
+            <>
+              {/* Top 3 em destaque */}
+              <div className="flex flex-col sm:flex-row justify-center items-end gap-2 md:gap-4 mb-6">
+                {gruposRanking.slice(0, 3).map((grupo, idx) => (
+                  <div key={grupo.posicao} className={`flex flex-col items-center justify-end bg-white rounded-2xl shadow-xl border-4 transition-all duration-200 px-2 py-3 md:py-4 w-full sm:w-40 md:w-48
+                    ${idx === 0 ? 'border-yellow-400 z-20 scale-105 ring-4 ring-yellow-300 ring-opacity-60 shadow-[0_0_32px_8px_rgba(255,215,0,0.25)]' : ''}
+                    ${idx === 1 ? 'border-gray-400 z-10 scale-100' : ''}
+                    ${idx === 2 ? 'border-amber-600 z-10 scale-102' : ''}
+                  `}
+                  style={{ marginTop: idx === 0 ? '-1rem' : '0', background: idx === 0 ? 'linear-gradient(135deg, #fffbe6 60%, #fffde4 100%)' : idx === 1 ? 'linear-gradient(135deg, #f3f4f6 60%, #e5e7eb 100%)' : 'linear-gradient(135deg, #fff8e1 60%, #ffecb3 100%)' }}
+                  >
+                    {/* Medalha */}
+                    <div className="mb-1">
+                      {idx === 0 && <span className="inline-block text-3xl">🥇</span>}
+                      {idx === 1 && <span className="inline-block text-3xl">🥈</span>}
+                      {idx === 2 && <span className="inline-block text-3xl">🥉</span>}
                     </div>
-                    <span className="text-sm md:text-base font-medium text-brasil-green">
-                      {rankingData.usuarioAtual.totalFigurinhas} figurinhas
-                    </span>
+                    <span className="text-xs text-gray-500 mb-1">{grupo.posicao}º lugar</span>
+                    <div className="flex flex-col items-center mb-1">
+                      {grupo.usuarios.map((item: RankingItem) => (
+                        <span key={item.email} className="text-base md:text-lg font-extrabold text-brasil-blue text-center">{item.nome}</span>
+                      ))}
+                      <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">{grupo.usuarios[0]?.totalFigurinhas} figurinhas</span>
+                    </div>
                   </div>
-                </>
-              )}
-            </div>
+                ))}
+              </div>
+              {/* Demais posições */}
+              <div className="space-y-2 md:space-y-3">
+                {gruposRanking.slice(3, 10).map((grupo) => (
+                  <div key={grupo.posicao} className="flex flex-col bg-white/60 shadow border-l-4 border-brasil-blue rounded-lg p-2 md:p-4 mb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg font-bold text-gray-400 w-8 text-center">{grupo.posicao}º</span>
+                      {grupo.usuarios.map((item: RankingItem) => (
+                        <span key={item.email} className={`text-base md:text-lg font-medium mr-4 ${item.email === session?.user?.email ? 'text-brasil-blue font-bold' : 'text-gray-700'}`}>{item.nome}</span>
+                      ))}
+                      <span className="text-sm md:text-base font-semibold text-brasil-green ml-2">{grupo.usuarios[0]?.totalFigurinhas} figurinhas</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
