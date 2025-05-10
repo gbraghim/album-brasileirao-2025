@@ -76,15 +76,21 @@ export default function Dashboard() {
     if (rankingData && stats && session?.user?.email) {
       setRankingData((prev) => {
         if (!prev) return prev;
+        // Atualiza o totalFigurinhas do usuário logado
+        let novoRanking = prev.ranking.map((item) =>
+          item.email === session.user.email
+            ? { ...item, totalFigurinhas: stats.totalFigurinhas + stats.figurinhasRepetidas }
+            : item
+        );
+        // Reordena o ranking em ordem decrescente de totalFigurinhas
+        novoRanking = novoRanking.sort((a, b) => b.totalFigurinhas - a.totalFigurinhas);
+        // Atualiza a posição de cada usuário
+        novoRanking = novoRanking.map((item, idx) => ({ ...item, posicao: idx + 1 }));
         return {
           ...prev,
-          ranking: prev.ranking.map((item) =>
-            item.email === session.user.email
-              ? { ...item, totalFigurinhas: stats.totalFigurinhas }
-              : item
-          ),
+          ranking: novoRanking,
           usuarioAtual: prev.usuarioAtual && prev.usuarioAtual.email === session.user.email
-            ? { ...prev.usuarioAtual, totalFigurinhas: stats.totalFigurinhas }
+            ? { ...prev.usuarioAtual, totalFigurinhas: stats.totalFigurinhas + stats.figurinhasRepetidas }
             : prev.usuarioAtual
         };
       });
