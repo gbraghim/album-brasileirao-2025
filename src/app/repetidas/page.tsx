@@ -220,6 +220,22 @@ export default function Repetidas() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 text-white p-4 md:p-8">
       <main>
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Minhas Figurinhas Repetidas</h1>
+        <div className="mb-8 flex justify-center">
+          <div className="flex items-center gap-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-6 py-4 border border-brasil-yellow/30">
+            <span className="inline-flex items-center justify-center bg-brasil-blue/10 rounded-full p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-brasil-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-brasil-blue text-base md:text-lg font-medium mb-1">Troque suas figurinhas repetidas!</span>
+              <span className="text-gray-700 text-sm mb-2">Você pode negociar figurinhas repetidas com outros usuários na plataforma.</span>
+              <Link href="/trocas" className="inline-block bg-brasil-blue hover:bg-brasil-yellow text-white hover:text-brasil-blue font-semibold px-4 py-2 rounded-lg shadow transition-colors duration-200">
+                Ir para a página de trocas
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
           {figurinhas.map((figurinha) => (
             <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-32 mx-auto">
@@ -265,30 +281,6 @@ export default function Repetidas() {
                 <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
               </div>
               <div className="flex justify-between items-center mt-0.5 w-full px-2">
-                {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
-                  <button
-                    onClick={() => enviarParaTroca(figurinha)}
-                    className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                  >
-
-                   Disponibilizar para troca
-                  </button>
-                )}
-                {figurinhasEmTroca.includes(figurinha.id) && (
-                  <button
-                    onClick={() => removerTroca(figurinha)}
-                    className="w-full bg-red-500 hover:bg-red-600 text-white py-1 px-1 rounded text-xs h-7 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                    disabled={loadingFigurinha === figurinha.id}
-                  >
-                    {loadingFigurinha === figurinha.id ? (
-                      <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                      </svg>
-                    ) : null}
-                    Remover
-                  </button>
-                )}
                 {normalize(figurinha.raridade) === 'lendario' && (
                   <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
                 )}

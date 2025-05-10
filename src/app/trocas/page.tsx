@@ -594,36 +594,20 @@ export default function Trocas() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {(() => {
-                  // Obter todos os jogadores envolvidos em trocas pendentes do usuário
-                  const jogadoresEmTroca = new Set<string>();
-                  minhasTrocas.forEach((troca) => {
-                    if (troca.status === 'PENDENTE') {
-                      jogadoresEmTroca.add(troca.figurinhaOferta.jogador.id);
-                      if (troca.figurinhaSolicitada?.jogador?.id) {
-                        jogadoresEmTroca.add(troca.figurinhaSolicitada.jogador.id);
-                      }
-                    }
-                  });
-                  ofertasEnviadas.forEach((troca) => {
-                    if (troca.status === 'PENDENTE') {
-                      jogadoresEmTroca.add(troca.figurinhaOferta.jogador.id);
-                      if (troca.figurinhaSolicitada?.jogador?.id) {
-                        jogadoresEmTroca.add(troca.figurinhaSolicitada.jogador.id);
-                      }
-                    }
-                  });
+                  // Obter todos os jogadores envolvidos em propostas recebidas pendentes
+                  const jogadoresEmPropostaRecebida = new Set<string>();
                   propostasRecebidas.forEach((troca) => {
                     if (troca.status === 'PENDENTE') {
                       if (troca.figurinhaSolicitada?.jogador?.id) {
-                        jogadoresEmTroca.add(troca.figurinhaSolicitada.jogador.id);
+                        jogadoresEmPropostaRecebida.add(troca.figurinhaSolicitada.jogador.id);
                       }
                       if (troca.figurinhaOferta?.jogador?.id) {
-                        jogadoresEmTroca.add(troca.figurinhaOferta.jogador.id);
+                        jogadoresEmPropostaRecebida.add(troca.figurinhaOferta.jogador.id);
                       }
                     }
                   });
                   // Filtrar as figurinhas repetidas
-                  return repetidas.filter(f => !jogadoresEmTroca.has(f.jogador.id)).map((figurinha) => (
+                  return repetidas.filter(f => !jogadoresEmPropostaRecebida.has(f.jogador.id)).map((figurinha) => (
                     <div key={figurinha.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0 flex flex-col items-center min-w-0 w-36 mx-auto">
                       {renderFigurinha(figurinha)}
                       <div className="flex flex-col items-center justify-center mt-3 w-full px-2">
@@ -643,7 +627,7 @@ export default function Trocas() {
                         <span className="text-xs font-semibold text-brasil-blue">x{figurinha.quantidade}</span>
                       </div>
                       <div className="flex justify-between items-center mt-0.5 w-full px-2">
-                        {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendario' && (
+                        {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendário' && (
                           <button
                             onClick={() => adicionarTroca(figurinha)}
                             className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
@@ -673,7 +657,7 @@ export default function Trocas() {
                             Remover
                           </button>
                         )}
-                        {normalize(figurinha.raridade) === 'lendario' && (
+                        {normalize(figurinha.raridade) === 'lendário' && (
                           <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
                         )}
                       </div>
