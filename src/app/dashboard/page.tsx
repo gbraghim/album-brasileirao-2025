@@ -143,7 +143,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Dashboard</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Seja bem-vindo, {session?.user?.name}!</h1>
         
         {/* Seção de Estatísticas */}
         <div className="bg-white shadow rounded-lg p-6 mb-8">
