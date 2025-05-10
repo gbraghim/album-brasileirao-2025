@@ -347,9 +347,9 @@ export default function Pacotes() {
         </div>
 
         {/* Seção Pacotes de Boas-vindas */}
-        <div className="mb-12">
-          <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
-          {pacotesIniciais.length > 0 ? (
+        {pacotesIniciais.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
               {pacotesIniciais.map((pacote) => (
                 <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
@@ -367,8 +367,8 @@ export default function Pacotes() {
                 </div>
               ))}
             </div>
-          ) : <p className="text-brasil-blue text-center">Você já abriu seus pacotes de boas-vindas, adquira mais pacotes para completar seu álbum!</p>}
-        </div>
+          </div>
+        )}
 
         {/* Seção Pacotes Premium */}
         <div className="mb-8">

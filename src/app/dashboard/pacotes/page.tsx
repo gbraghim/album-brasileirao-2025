@@ -9,6 +9,7 @@ interface Pacote {
   id: string;
   tipo: string;
   dataCriacao: string;
+  aberto: boolean;
   figurinhas: {
     id: string;
     jogador: {
@@ -32,6 +33,13 @@ export default function Pacotes() {
   const [modalAberto, setModalAberto] = useState(false);
   const [figurinhasAbertas, setFigurinhasAbertas] = useState<any[]>([]);
   const [userFigurinhas, setUserFigurinhas] = useState<Set<string>>(new Set());
+
+  // Separar pacotes de boas-vindas dos outros pacotes
+  const pacotesBoasVindas = pacotes.filter(pacote => pacote.tipo === 'INICIAL' && !pacote.aberto);
+  const outrosPacotes = pacotes.filter(pacote => pacote.tipo !== 'INICIAL' && !pacote.aberto);
+
+  // Verificar se o usuário ainda tem pacotes de boas-vindas disponíveis
+  const temPacotesBoasVindas = pacotesBoasVindas.length > 0;
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -165,39 +173,84 @@ export default function Pacotes() {
           <p className="text-green-600">Você não tem pacotes disponíveis.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pacotes.map((pacote) => (
-            <div
-              key={pacote.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Pacote {pacote.tipo}</h2>
-                <span className="text-sm text-gray-500">
-                  {new Date(pacote.dataCriacao).toLocaleDateString()}
-                </span>
+        <>
+          {/* Seção de Pacotes de Boas-vindas */}
+          {temPacotesBoasVindas && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Pacotes de Boas-vindas</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pacotesBoasVindas.map((pacote) => (
+                  <div
+                    key={pacote.id}
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-semibold">Pacote de Boas-vindas</h2>
+                      <span className="text-sm text-gray-500">
+                        {new Date(pacote.dataCriacao).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="relative w-full h-[300px]">
+                      <Image
+                        src="/pacoteTransparente.png"
+                        alt="Pacote de Figurinhas"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-contain"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleAbrirPacote(pacote.id)}
+                      className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors mt-4"
+                    >
+                      Abrir Pacote
+                    </button>
+                  </div>
+                ))}
               </div>
-              <div className="relative w-full h-[300px]">
-                <Image
-                  src="/pacoteTransparente.png"
-                  alt="Pacote de Figurinhas"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-contain"
-                />
-              </div>
-              <button
-                onClick={() => handleAbrirPacote(pacote.id)}
-                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors mt-4"
-              >
-                Abrir Pacote
-              </button>
             </div>
-          ))}
-        </div>
+          )}
+
+          {/* Seção de Outros Pacotes */}
+          {outrosPacotes.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4 text-brasil-blue">Outros Pacotes</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {outrosPacotes.map((pacote) => (
+                  <div
+                    key={pacote.id}
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-semibold">Pacote {pacote.tipo}</h2>
+                      <span className="text-sm text-gray-500">
+                        {new Date(pacote.dataCriacao).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="relative w-full h-[300px]">
+                      <Image
+                        src="/pacoteTransparente.png"
+                        alt="Pacote de Figurinhas"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-contain"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleAbrirPacote(pacote.id)}
+                      className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors mt-4"
+                    >
+                      Abrir Pacote
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
-      <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+      <Suspense>
         <ModalFigurinhas
           isOpen={modalAberto}
           onClose={() => setModalAberto(false)}
