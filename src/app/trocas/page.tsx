@@ -638,8 +638,9 @@ export default function Trocas() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
                 {trocasDisponiveis.map((troca) => (
-                  <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4">
+                  <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4 flex flex-col items-center justify-center">
                     {renderFigurinha(troca.figurinhaOferta)}
+                    <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioEnvia.name}</span></span>
                     <div className="mt-0.5 flex justify-between items-center w-full px-2">
                       {repetidas.length === 0 ? (
                         <Link 
@@ -649,15 +650,17 @@ export default function Trocas() {
                           Obtenha pacotes para ter figurinhas para troca
                         </Link>
                       ) : (
-                        <button
-                          onClick={() => {
-                            setTrocaSelecionada(troca);
-                            setShowProporTrocaModal(true);
-                          }}
-                          className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
-                        >
-                          Propor Troca
-                        </button>
+                        <div className="w-full flex justify-center">
+                          <button
+                            onClick={() => {
+                              setTrocaSelecionada(troca);
+                              setShowProporTrocaModal(true);
+                            }}
+                            className="w-32 bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
+                          >
+                            Propor Troca
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -686,10 +689,11 @@ export default function Trocas() {
                     <div className="flex flex-col md:flex-row items-center justify-center gap-8">
                       {/* Figurinha Ofertada */}
                       <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você ofereceu</span>
-                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você quer</span>
+                        <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)} shadow-[0_0_10px_rgba(255,215,0,0.3)] hover:shadow-[0_0_15px_rgba(255,215,0,0.5)] transition-shadow duration-300`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
                         </div>
+                        <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioEnvia.name}</span></span>
                         <div className="flex items-center space-x-2 mt-2 mb-1">
                           {troca.figurinhaOferta.jogador.time.escudo && (
                             <Image
@@ -716,7 +720,7 @@ export default function Trocas() {
 
                       {/* Figurinha Solicitada */}
                       <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você quer</span>
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você ofereceu</span>
                         <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
                         </div>
@@ -740,15 +744,8 @@ export default function Trocas() {
 
                     {/* Status e ação */}
                     <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
-                      <span className="text-sm font-semibold text-brasil-yellow">Status: {troca.status === 'PENDENTE' ? 'Pendente' : troca.status === 'RECUSADA' ? 'Recusada' : 'Aceita'}</span>
-                      {troca.status === 'PENDENTE' && (
-                        <button
-                          onClick={() => removerTroca(troca.figurinhaOferta.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-                        >
-                          Cancelar Proposta
-                        </button>
-                      )}
+                      <span className="text-sm font-semibold text-brasil-blue">Status: {troca.status === 'PENDENTE' ? 'Pendente' : troca.status === 'RECUSADA' ? 'Recusada' : 'Aceita'}</span>
+                      
                     </div>
                   </div>
                 ))}
@@ -780,6 +777,7 @@ export default function Trocas() {
                         <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaOferta.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaOferta, size: 'lg', hideName: true})}
                         </div>
+                        <span className="block text-xs text-gray-500 mt-2 mb-1">Oferecido por <span className="font-semibold text-brasil-blue">{troca.usuarioEnvia.name}</span></span>
                         <div className="flex items-center space-x-2 mt-2 mb-1">
                           {troca.figurinhaOferta.jogador.time.escudo && (
                             <Image
