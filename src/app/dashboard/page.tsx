@@ -71,6 +71,26 @@ export default function Dashboard() {
     }
   }, [loadingStats, status]);
 
+  // Após carregar rankingData e stats, garantir que o totalFigurinhas do usuário logado seja igual ao exibido no dashboard
+  useEffect(() => {
+    if (rankingData && stats && session?.user?.email) {
+      setRankingData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          ranking: prev.ranking.map((item) =>
+            item.email === session.user.email
+              ? { ...item, totalFigurinhas: stats.totalFigurinhas }
+              : item
+          ),
+          usuarioAtual: prev.usuarioAtual && prev.usuarioAtual.email === session.user.email
+            ? { ...prev.usuarioAtual, totalFigurinhas: stats.totalFigurinhas }
+            : prev.usuarioAtual
+        };
+      });
+    }
+  }, [rankingData, stats, session?.user?.email]);
+
   const fetchStats = async () => {
     try {
       console.log('5. Iniciando fetchStats');
