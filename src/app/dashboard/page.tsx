@@ -95,7 +95,7 @@ export default function Dashboard() {
         };
       });
     }
-  }, [rankingData, stats, session?.user?.email]);
+  }, [stats, session?.user?.email]);
 
   const fetchStats = async () => {
     try {
