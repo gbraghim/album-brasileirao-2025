@@ -324,12 +324,15 @@ export default function Dashboard() {
                     </div>
                     <span className="text-xs text-gray-500 mb-1">{grupo.posicao}º lugar</span>
                     <div className="flex flex-col items-center mb-1">
-                      <span
-                        className="text-base md:text-lg font-extrabold text-brasil-blue text-center truncate overflow-hidden whitespace-nowrap max-w-[140px]"
-                        title={grupo.usuarios.map((item: RankingItem) => item.nome).join(', ')}
-                      >
-                        {grupo.usuarios.map((item: RankingItem) => item.nome).join(', ')}
-                      </span>
+                      {grupo.usuarios.map((item: RankingItem) => (
+                        <span
+                          key={item.email}
+                          className="text-base md:text-lg font-extrabold text-brasil-blue text-center truncate overflow-hidden whitespace-nowrap max-w-[140px]"
+                          title={item.nome}
+                        >
+                          {item.nome}
+                        </span>
+                      ))}
                       <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">
                         {grupo.usuarios.some((item: RankingItem) => item.email === session?.user?.email)
                           ? totalFigurinhasExibido

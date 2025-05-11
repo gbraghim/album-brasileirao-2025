@@ -650,7 +650,9 @@ export default function Trocas() {
                         <span className="text-xs font-semibold text-brasil-blue">Repetida(s): {figurinha.quantidade - 1}</span>
                       </div>
                       <div className="flex justify-between items-center mt-0.5 w-full px-2">
-                        {jogadoresEmPropostaPendente.has(figurinha.jogador.id) ? (
+                        {normalize(figurinha.raridade) === 'lendario' ? (
+                          <span className="text-xs text-gray-500 text-center italic w-full">Figurinha lendária não pode ser trocada</span>
+                        ) : jogadoresEmPropostaPendente.has(figurinha.jogador.id) ? (
                           <div className="w-full bg-gray-100 text-gray-500 py-1 px-1 rounded text-xs h-9 min-h-0 flex items-center justify-center gap-1 cursor-not-allowed">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -659,7 +661,7 @@ export default function Trocas() {
                           </div>
                         ) : (
                           <>
-                            {!figurinhasEmTroca.includes(figurinha.id) && normalize(figurinha.raridade) !== 'lendário' && (
+                            {!figurinhasEmTroca.includes(figurinha.id) && (
                               <button
                                 onClick={() => adicionarTroca(figurinha)}
                                 className="w-full bg-brasil-blue hover:bg-brasil-blue/80 text-brasil-yellow py-1 px-1 rounded text-xs h-9 min-h-0 transition-colors duration-300 flex items-center justify-center gap-1"
@@ -688,9 +690,6 @@ export default function Trocas() {
                                 ) : null}
                                 Remover
                               </button>
-                            )}
-                            {normalize(figurinha.raridade) === 'lendário' && (
-                              <span className="text-xs text-gray-500 text-center italic">Figurinha lendária não pode ser trocada</span>
                             )}
                           </>
                         )}
