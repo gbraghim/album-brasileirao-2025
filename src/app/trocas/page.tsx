@@ -846,7 +846,28 @@ export default function Trocas() {
                     {/* Status e ação */}
                     <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
                       <span className="text-sm font-semibold text-brasil-blue">Status: {troca.status === 'PENDENTE' ? 'Pendente' : troca.status === 'RECUSADA' ? 'Recusada' : 'Aceita'}</span>
-                      
+                      {troca.status === 'PENDENTE' && (
+                        <button
+                          className="ml-2 px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-semibold transition-colors"
+                          onClick={async () => {
+                            try {
+                              const res = await fetch(`/api/trocas/cancelar`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ trocaId: troca.id })
+                              });
+                              if (!res.ok) throw new Error('Erro ao cancelar proposta');
+                              // Atualiza a lista de trocas após cancelar
+                              await fetchTrocas();
+                            } catch (err) {
+                              setError('Erro ao cancelar proposta');
+                              setShowErrorModal(true);
+                            }
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

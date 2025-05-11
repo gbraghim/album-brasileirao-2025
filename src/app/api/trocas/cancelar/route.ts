@@ -1,57 +1,43 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { TrocaStatus } from '@prisma/client';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { trocaId } = await request.json();
 
-    const usuario = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!usuario) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
-    }
-
-    // Buscar a troca
+    // Busca a troca
     const troca = await prisma.troca.findUnique({
-      where: { id: trocaId }
+      where: { id: trocaId },
     });
 
     if (!troca) {
       return NextResponse.json({ error: 'Troca não encontrada' }, { status: 404 });
     }
 
-    // Verificar se o usuário é o dono da troca
-    if (troca.usuarioEnviaId !== usuario.id) {
-      return NextResponse.json({ error: 'Você não tem permissão para cancelar esta troca' }, { status: 403 });
+    // Permite cancelar se for o usuário que enviou a proposta (usuarioRecebeId)
+    if (troca.usuarioRecebeId !== session.user.id) {
+      return NextResponse.json({ error: 'Você não tem permissão para cancelar esta proposta' }, { status: 403 });
     }
 
-    // Verificar se a troca pode ser cancelada (status PENDENTE)
-    if (troca.status !== 'PENDENTE') {
-      return NextResponse.json({ error: 'Esta troca não pode ser cancelada' }, { status: 400 });
+    if (troca.status !== TrocaStatus.PENDENTE) {
+      return NextResponse.json({ error: 'A proposta não está mais pendente' }, { status: 400 });
     }
 
-    // Cancelar a troca
-    const trocaCancelada = await prisma.troca.update({
+    await prisma.troca.update({
       where: { id: trocaId },
-      data: { status: 'CANCELADA' }
+      data: { status: TrocaStatus.CANCELADA },
     });
 
-    return NextResponse.json({ message: 'Troca cancelada com sucesso' });
+    return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Erro ao cancelar troca:', error);
-    return NextResponse.json(
-      { error: 'Erro ao cancelar troca' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao cancelar proposta' }, { status: 500 });
   }
 } 
