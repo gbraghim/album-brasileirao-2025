@@ -7,7 +7,7 @@ import { AuthProvider } from './providers';
 import Footer from '@/components/Footer';
 import { Toaster } from 'react-hot-toast';
 import BotaoCompartilharWhatsApp from '@/components/BotaoCompartilharWhatsApp';
-
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,13 +32,23 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        {/* Removido Google AdSense Script */}
+        <Script id="clear-cache" strategy="beforeInteractive">
+          {`
+            if (window.caches && !localStorage.getItem('cache_limpo')) {
+              caches.keys().then(function(names) {
+                for (let name of names) {
+                  caches.delete(name);
+                }
+                localStorage.setItem('cache_limpo', 'true');
+              });
+            }
+          `}
+        </Script>
       </head>
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500`}>
         <BotaoCompartilharWhatsApp />
         <AuthProvider>
           <main className="relative min-h-screen flex flex-col">
-       
             {children}
             <Footer />
           </main>

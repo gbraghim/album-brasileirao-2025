@@ -324,26 +324,22 @@ export default function Dashboard() {
                     </div>
                     <span className="text-xs text-gray-500 mb-1">{grupo.posicao}º lugar</span>
                     <div className="flex flex-col items-center mb-1">
-                      {grupo.usuarios.map((item: RankingItem) => (
-                        <div key={item.email} className="flex flex-col items-center mb-1">
-                          <span
-                            className="text-base md:text-lg font-extrabold text-brasil-blue text-center truncate overflow-hidden whitespace-nowrap max-w-[140px]"
-                            title={item.nome}
-                          >
-                            {item.nome}
-                          </span>
-                          <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">
-                            {item.email === session?.user?.email
-                              ? totalFigurinhasExibido
-                              : item.totalFigurinhas
-                            } figurinhas
-                          </span>
-                        </div>
-                      ))}
+                      <span
+                        className="text-base md:text-lg font-extrabold text-brasil-blue text-center truncate overflow-hidden whitespace-nowrap max-w-[140px]"
+                        title={grupo.usuarios.map((item: RankingItem) => item.nome).join(', ')}
+                      >
+                        {grupo.usuarios.map((item: RankingItem) => item.nome).join(', ')}
+                      </span>
+                      <span className="text-sm md:text-base font-semibold text-brasil-green mt-1">
+                        {grupo.usuarios.some((item: RankingItem) => item.email === session?.user?.email)
+                          ? totalFigurinhasExibido
+                          : grupo.usuarios[0].totalFigurinhas
+                        } figurinhas
+                      </span>
                     </div>
                   </div>
                 ))}
-                </div>
+              </div>
               {/* Demais posições */}
               <div className="space-y-2 md:space-y-3">
                 {gruposRanking.slice(3, 10).map((grupo) => (
@@ -364,8 +360,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))}
-                  </div>
-                </>
+              </div>
+            </>
           )}
         </div>
       </div>
