@@ -29,14 +29,6 @@ export default function ProtectedNav() {
               Times
             </Link>
             <Link 
-              href="/repetidas" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                pathname === '/repetidas' ? 'bg-blue-700' : ''
-              }`}
-            >
-              Repetidas
-            </Link>
-            <Link 
               href="/trocas" 
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 pathname === '/trocas' ? 'bg-blue-700' : ''

@@ -81,6 +81,14 @@ export default function PacotesPage() {
         setError('Erro ao carregar produtos');
       });
 
+    // Carregar pacotes extras/premium disponíveis para compra
+    fetch('/api/pacotes-preco')
+      .then(res => res.json())
+      .then(data => setPacotesPremium(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('Erro ao carregar pacotes extras:', err);
+      });
+
     const success = searchParams?.get('success');
     const jogadorId = searchParams?.get('jogadorId');
 
@@ -106,10 +114,10 @@ export default function PacotesPage() {
 
   const carregarPacotes = async () => {
     try {
-      const response = await fetch('/api/pacotes');
+      const response = await fetch('/api/pacotes', { headers: { 'Cache-Control': 'no-store' }, cache: 'no-store' });
       if (!response.ok) throw new Error('Erro ao carregar pacotes');
       const data = await response.json();
-      setPacotes(data);
+      setPacotes(Array.isArray(data) ? data.filter(p => p.aberto === false) : []);
     } catch (error) {
       console.error('Erro ao carregar pacotes:', error);
       setError('Erro ao carregar pacotes');
@@ -129,6 +137,7 @@ export default function PacotesPage() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session?.user?.email}`,
+          'Cache-Control': 'no-store',
         },
         body: JSON.stringify({ pacoteId }),
       });
@@ -148,7 +157,8 @@ export default function PacotesPage() {
       }
       const data = await response.json();
       setFigurinhasAbertas(data.figurinhas);
-      carregarPacotes();
+      setPacotes([]);
+      await carregarPacotes();
     } catch (err) {
       console.error('Erro ao abrir pacote:', err);
       setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
@@ -226,14 +236,21 @@ export default function PacotesPage() {
   };
 
   // Separar pacotes por tipo
-  const pacotesDiarios = pacotes.filter(p => p.tipo === 'DIARIO');
-  const pacotesIniciais = pacotes.filter(p => p.tipo === 'INICIAL');
-  const pacotesPremiumUser = pacotes.filter(p => p.tipo === 'COMPRADO');
+  const pacotesDiarios = pacotes.filter(p => p.tipo?.toUpperCase() === 'DIARIO');
+  const pacotesIniciais = pacotes.filter(p => p.tipo?.toUpperCase() === 'INICIAL');
+  const pacotesPremiumUser = pacotes.filter(p => p.tipo?.toUpperCase() === 'COMPRADO');
 
-  const semPacotesDisponiveis =
+  // Filtro seguro para pacotes extras disponíveis para compra
+  // Considera apenas produtos que têm quantidade definida e não têm raridade (ou seja, não são figurinhas individuais)
+  const pacotesExtras = pacotesPremium.filter(
+    (p: any) => p.ativo && p.quantidade && (!p.raridade || p.raridade === null)
+  );
+
+  // Verifica se o usuário não tem nenhum pacote dos tipos Diários, Extras (Premium) ou Boas-vindas
+  const semNenhumPacote =
     pacotesDiarios.length === 0 &&
-    pacotesIniciais.length === 0 &&
-    pacotesPremiumUser.length === 0;
+    pacotesPremiumUser.length === 0 &&
+    pacotesIniciais.length === 0;
 
   // Ao fechar o modal, garantir que ele não volte a aparecer
   const handleCloseWelcomeModal = () => {
@@ -278,6 +295,15 @@ export default function PacotesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <main>
+        {/* Aviso para quando não há pacotes diários */}
+        {pacotesDiarios.length === 0 && (
+          <div className="w-full flex justify-center mt-6 mb-8">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow max-w-2xl w-full text-yellow-800 text-center text-base font-semibold">
+              Você já abriu todos os pacotes gratuitos do dia!<br />
+              Para continuar colecionando figurinhas hoje, faça trocas com outros usuários, compre jogadores desejados ou adquira pacotes extras.
+            </div>
+          </div>
+        )}
         <Suspense fallback={<div className="flex justify-center items-center h-16"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div></div>}>
         </Suspense>
 
@@ -299,197 +325,222 @@ export default function PacotesPage() {
         </Modal>
 
         {/* Seção Comprar Pacotes Premium no topo se não houver pacotes disponíveis */}
-        {semPacotesDisponiveis && (
-          <div className={sectionBlock}>
-            <h2 className={sectionTitle}>Comprar Pacotes</h2>
-              <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
-                {pacotesPremium.map((pacote) => {
-                  const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
-                  const isTriplo = pacote.quantidade === 3;
-                  return (
-                    <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
-                      <div className="mb-4 flex justify-center items-center">
-                        {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
-                        {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
-                        {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
-                      </div>
-                      <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
-                      <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
-                      <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
-                      {isTriplo ? (
-                        <div className="text-brasil-green font-bold text-sm mb-2 text-center">
-                          Preço unitário: R$ {precoUnitario.toFixed(2)}
-                          <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
+        {/* REMOVIDO: <div className={sectionBlock}> ... </div> referente a 'Comprar Pacotes' */}
+
+        {/* Se o usuário não tem nenhum pacote, exibe as seções de compra no topo */}
+        {semNenhumPacote && (
+          <>
+            {/* Comprar Jogadores Desejados */}
+            <div className={sectionBlockAlt}>
+              <h2 className={sectionTitle}>Comprar Jogadores Desejados</h2>
+              <div className="flex flex-col items-center w-full">
+                <p className="bg-brasil-green/10 border-2 border-brasil-green text-brasil-green text-base md:text-lg font-bold rounded-xl px-8 py-5 shadow-lg max-w-3xl w-full text-center mb-8 mx-auto">
+                  Colecione o jogador que você deseja sem depender da sorte, cole-o diretamente no seu álbum!
+                </p>
+                <ProdutosFigurinha 
+                  produtos={
+                    [...produtosFigurinha].sort((a, b) => {
+                      const ordem: Record<string, number> = { 'Lendário': 0, 'lendário': 0, 'lendario': 0, 'Ouro': 1, 'ouro': 1, 'Prata': 2, 'prata': 2 };
+                      const raridadeA = String(a.raridade).toLowerCase();
+                      const raridadeB = String(b.raridade).toLowerCase();
+                      return (ordem[raridadeA] ?? 3) - (ordem[raridadeB] ?? 3);
+                    })
+                  }
+                  compraEmProgresso={compraEmProgresso}
+                />
+              </div>
+            </div>
+            {/* Comprar Pacotes Extras */}
+            <div className={sectionBlock}>
+              <h2 className={sectionTitle}>Comprar Pacotes Extras</h2>
+                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                  {pacotesExtras.map((pacote) => {
+                    const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
+                    const isTriplo = pacote.quantidade === 3;
+                    return (
+                      <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
+                        <div className="mb-4 flex justify-center items-center">
+                          {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
                         </div>
-                      ) : (
-                        <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
-                      )}
-                      <div className="flex-grow" />
-                      <button
-                        onClick={() => comprarPacote(pacote.id)}
-                        disabled={loading}
-                        className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
-                      >
-                        Comprar
-                      </button>
-                    </li>
-                  );
-                })}
+                        <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
+                        <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
+                        <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
+                        {isTriplo ? (
+                          <div className="text-brasil-green text-sm mb-2 text-center">
+                            <span>Preço unitário do pacote: R$ {precoUnitario.toFixed(2)}</span><br />
+                            <span className="font-bold">Preço por figurinha: R$ {(precoUnitario / 4).toFixed(2)}</span>
+                            <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
+                          </div>
+                        ) : (
+                          <div className="text-black text-sm mb-4 text-center">
+                            <span>Preço unitário do pacote: R$ {precoUnitario.toFixed(2)}</span><br />
+                            <span className="font-bold">Preço por figurinha: R$ {(precoUnitario / 4).toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex-grow" />
+                    <button
+                      onClick={() => comprarPacote(pacote.id)}
+                      disabled={loading}
+                          className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
+                    >
+                      Comprar
+                    </button>
+                  </li>
+                    );
+                  })}
               </ul>
-          </div>
+            </div>
+          </>
         )}
 
-        {/* Seção Pacotes Diários */}
-        <div className={sectionBlockAlt}>
-          <h2 className={sectionTitle}>Pacotes Diários</h2>
-          {pacotesDiarios.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
-              {pacotesDiarios.map((pacote) => (
-                <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all bg-white-80 duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
-                  <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg bg-white-80 overflow-hidden">
-                    <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
-                    <div className="absolute inset-0 flex items-center  justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                      <button
-                        disabled={abrindoPacote || showAnimation}
-                        className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                      >
-                        Abrir Pacote
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : <p className="text-brasil-blue text-center">Você não tem pacotes diários disponíveis.</p>}
-        </div>
-        {sectionDivider}
-
-        {/* Seção Pacotes de Boas-vindas */}
-        {pacotesIniciais.length > 0 && (
-          <div className={sectionBlock}>
-            <h2 className={sectionTitle}>Pacotes de Boas-vindas</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-              {pacotesIniciais.map((pacote) => (
-                <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
-                  <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                    <Image src="/pacoteTransparente.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                      <button
-                        disabled={abrindoPacote || showAnimation}
-                        className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                      >
-                        Abrir Pacote
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {sectionDivider}
-
-        {/* Seção Pacotes Premium */}
-        <div className={sectionBlockAlt}>
-          <h2 className={sectionTitle}>Pacotes Extras</h2>
-          {pacotesPremiumUser.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-              {pacotesPremiumUser.map((pacote) => (
-                <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
-                  <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                    <Image src="/IndividualPremium.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                      <button
-                        disabled={abrindoPacote || showAnimation}
-                        className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                      >
-                        Abrir Pacote
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : <p className="text-brasil-blue text-center">Você não tem pacotes extras disponíveis.</p>}
-        </div>
-        {sectionDivider}
-
-        {/* Seção Comprar Pacotes Premium repaginada */}
-        {!semPacotesDisponiveis && (
-          <div className={sectionBlock}>
-            <h2 className={sectionTitle}>Comprar Pacotes Extras</h2>
-              <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
-                {pacotesPremium.map((pacote) => {
-                  const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
-                  const isTriplo = pacote.quantidade === 3;
-                  return (
-                    <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
-                      <div className="mb-4 flex justify-center items-center">
-                        {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
-                        {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
-                        {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
+        {/* Pacotes Diários */}
+        {pacotesDiarios.length > 0 && (
+          <>
+            <div className={sectionBlockAlt}>
+              <h2 className={sectionTitle}>Pacotes Diários</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
+                {pacotesDiarios.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all bg-white-80 duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg bg-white-80 overflow-hidden">
+                      <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
+                      <div className="absolute inset-0 flex items-center  justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
                       </div>
-                      <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
-                      <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
-                      <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
-                      {isTriplo ? (
-                        <div className="text-brasil-green font-bold text-sm mb-2 text-center">
-                          Preço unitário: R$ {precoUnitario.toFixed(2)}
-                          <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
-                        </div>
-                      ) : (
-                        <div className="text-black font-bold text-sm mb-4 text-center">Preço unitário: R$ {precoUnitario.toFixed(2)}</div>
-                      )}
-                      <div className="flex-grow" />
-                  <button
-                    onClick={() => comprarPacote(pacote.id)}
-                    disabled={loading}
-                        className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
-                  >
-                    Comprar
-                  </button>
-                </li>
-                  );
-                })}
-            </ul>
-        </div>
-        )}
-        {sectionDivider}
-
-        {/* Seção Comprar Jogadores Desejados */}
-        <div className={sectionBlockAlt}>
-          <h2 className={sectionTitle}>Comprar Jogadores Desejados</h2>
-          <div className="flex justify-center mb-8">
-            <p className="bg-brasil-green/10 border-2 border-brasil-green text-brasil-green text-xl md:text-2xl font-bold rounded-xl px-8 py-5 shadow-lg max-w-2xl text-center">
-              Colecione o jogador que você deseja sem depender da sorte, cole-o diretamente no seu álbum!
-            </p>
-          </div>
-          
-          {erroCompra && (
-            <div className="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-center">
-              <p className="font-semibold">{erroCompra}</p>
-              <button 
-                onClick={() => setErroCompra(null)}
-                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-              >
-                Fechar
-              </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
+            {(pacotesPremiumUser.length > 0 || pacotesIniciais.length > 0 || !semNenhumPacote) && sectionDivider}
+          </>
+        )}
 
-          <ProdutosFigurinha 
-            produtos={
-              [...produtosFigurinha].sort((a, b) => {
-                const ordem: Record<string, number> = { 'Lendário': 0, 'lendário': 0, 'lendario': 0, 'Ouro': 1, 'ouro': 1, 'Prata': 2, 'prata': 2 };
-                const raridadeA = String(a.raridade).toLowerCase();
-                const raridadeB = String(b.raridade).toLowerCase();
-                return (ordem[raridadeA] ?? 3) - (ordem[raridadeB] ?? 3);
-              })
-            }
-            compraEmProgresso={compraEmProgresso}
-          />
-        </div>
-        {sectionDivider}
+        {/* Pacotes Extras (Premium) */}
+        {pacotesPremiumUser.length > 0 && (
+          <>
+            <div className={sectionBlockAlt}>
+              <h2 className={sectionTitle}>Pacotes Extras</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
+                {pacotesPremiumUser.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                      <Image src="/IndividualPremium.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {(pacotesIniciais.length > 0 || !semNenhumPacote) && sectionDivider}
+          </>
+        )}
+
+        {/* Pacotes de Boas-vindas */}
+        {pacotesIniciais.length > 0 && (
+          <>
+            <div className={sectionBlock}>
+              <h2 className={sectionTitle}>Pacotes de Boas-vindas</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+                {pacotesIniciais.map((pacote) => (
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                    <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                      <Image src="/pacoteTransparente.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                        <button
+                          disabled={abrindoPacote || showAnimation}
+                          className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                        >
+                          Abrir Pacote
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {!semNenhumPacote && sectionDivider}
+          </>
+        )}
+
+        {/* Comprar Jogadores Desejados */}
+        {!semNenhumPacote && (
+          <>
+            <div className={sectionBlockAlt}>
+              <h2 className={sectionTitle}>Comprar Jogadores Desejados</h2>
+              <div className="flex flex-col items-center w-full">
+                <p className="bg-brasil-green/10 border-2 border-brasil-green text-brasil-green text-base md:text-lg font-bold rounded-xl px-8 py-5 shadow-lg max-w-3xl w-full text-center mb-8 mx-auto">
+                  Colecione o jogador que você deseja sem depender da sorte, cole-o diretamente no seu álbum!
+                </p>
+                <ProdutosFigurinha 
+                  produtos={
+                    [...produtosFigurinha].sort((a, b) => {
+                      const ordem: Record<string, number> = { 'Lendário': 0, 'lendário': 0, 'lendario': 0, 'Ouro': 1, 'ouro': 1, 'Prata': 2, 'prata': 2 };
+                      const raridadeA = String(a.raridade).toLowerCase();
+                      const raridadeB = String(b.raridade).toLowerCase();
+                      return (ordem[raridadeA] ?? 3) - (ordem[raridadeB] ?? 3);
+                    })
+                  }
+                  compraEmProgresso={compraEmProgresso}
+                />
+              </div>
+            </div>
+            <div className={sectionBlock}>
+              <h2 className={sectionTitle}>Comprar Pacotes Extras</h2>
+                <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                  {pacotesExtras.map((pacote) => {
+                    const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
+                    const isTriplo = pacote.quantidade === 3;
+                    return (
+                      <li key={pacote.id} className={`flex-1 border-2 ${isTriplo ? 'border-yellow-500' : 'border-brasil-blue'} rounded-xl p-6 bg-white/90 shadow-lg flex flex-col items-center hover:shadow-2xl transition-shadow max-w-xs mx-auto min-w-[270px] min-h-[420px] relative ${isTriplo ? 'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-yellow-500/50 before:animate-pulse before:pointer-events-none' : ''}`}>
+                        <div className="mb-4 flex justify-center items-center">
+                          {pacote.quantidade === 1 && <Image src="/IndividualPremium.png" alt="1 pacote" width={120} height={120} />}
+                          {pacote.quantidade === 2 && <Image src="/DuploPremium.png" alt="2 pacotes" width={120} height={120} />}
+                          {pacote.quantidade === 3 && <Image src="/TriploPremium.png" alt="3 pacotes" width={120} height={120} />}
+                        </div>
+                        <div className="font-semibold text-lg mb-1 text-brasil-blue text-center">{pacote.nome}</div>
+                        <div className="text-gray-600 mb-2 text-center">{pacote.descricao}</div>
+                        <div className="text-brasil-blue font-bold text-xl mb-2 text-center">R$ {(pacote.valorCentavos / 100).toFixed(2)}</div>
+                        {isTriplo ? (
+                          <div className="text-brasil-green text-sm mb-2 text-center">
+                            <span>Preço unitário do pacote: R$ {precoUnitario.toFixed(2)}</span><br />
+                            <span className="font-bold">Preço por figurinha: R$ {(precoUnitario / 4).toFixed(2)}</span>
+                            <div className="mt-1 inline-block bg-brasil-green/10 text-brasil-green px-2 py-1 rounded text-xs font-bold ml-2">Oferta mais vantajosa!</div>
+                          </div>
+                        ) : (
+                          <div className="text-black text-sm mb-4 text-center">
+                            <span>Preço unitário do pacote: R$ {precoUnitario.toFixed(2)}</span><br />
+                            <span className="font-bold">Preço por figurinha: R$ {(precoUnitario / 4).toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex-grow" />
+                    <button
+                      onClick={() => comprarPacote(pacote.id)}
+                      disabled={loading}
+                          className={`${isTriplo ? 'bg-gradient-to-r from-yellow-500 to-brasil-green hover:from-brasil-green hover:to-yellow-500' : 'bg-gradient-to-r from-brasil-yellow to-brasil-green hover:from-brasil-green hover:to-brasil-yellow'} text-brasil-blue px-8 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg w-full mt-4`}
+                    >
+                      Comprar
+                    </button>
+                  </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </>
+        )}
 
         <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
           <PacoteAnimation

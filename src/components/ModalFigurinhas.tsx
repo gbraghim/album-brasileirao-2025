@@ -200,7 +200,11 @@ export default function ModalFigurinhas({
                       const isOuro = figurinha.raridade === 'Ouro';
                       return (
                         <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-44 h-72 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
+                          <div className={`relative w-44 h-60 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
+                            {/* Label Nova/Repetida */}
+                            <div className={`absolute top-2 left-2 z-30 px-2 py-0.5 rounded text-xs font-bold shadow ${userFigurinhas.has(figurinha.jogador.id) ? 'bg-gray-300 text-gray-700' : 'bg-brasil-green text-white'}`}>
+                              {userFigurinhas.has(figurinha.jogador.id) ? 'Repetida' : 'Nova'}
+                            </div>
                             {isLendaria && (
                               <div className="absolute inset-0 pointer-events-none z-20 animate-pulse-lendaria">
                                 <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-glow-lendaria"></div>
@@ -211,7 +215,7 @@ export default function ModalFigurinhas({
                                 <div className="absolute inset-0 rounded-lg border-4 border-yellow-400 animate-glow-ouro"></div>
                               </div>
                             )}
-                            <div className="relative w-full h-52 z-10">
+                            <div className="relative w-full h-44 z-10">
                               <Image
                                 src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || caminhos[0])}
                                 alt={figurinha.jogador.nome}
@@ -233,18 +237,21 @@ export default function ModalFigurinhas({
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-center z-10">
+                            <div className="w-full bg-white/90 p-2 text-center z-10 flex flex-col items-center justify-center" style={{minHeight: '60px'}}>
                               <span className="text-sm font-bold text-black text-center leading-tight break-words">{figurinha.jogador.nome}</span>
-                              {figurinha.jogador.time?.escudo && (
-                                <Image
-                                  src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
-                                  alt={`Escudo do ${figurinha.jogador.time.nome}`}
-                                  width={15}
-                                  height={15}
-                                  className="mx-auto mb-0.5"
-                                />
-                              )}
-                              <span className="text-xs text-center text-brasil-blue mt-0.5 font-semibold">{figurinha.jogador.time?.nome}</span>
+                              {/* Escudo e nome do time lado a lado */}
+                              <div className="flex items-center justify-center gap-1 mt-1">
+                                {figurinha.jogador.time?.escudo && (
+                                  <Image
+                                    src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
+                                    alt={`Escudo do ${figurinha.jogador.time.nome}`}
+                                    width={15}
+                                    height={15}
+                                    className="mb-0.5"
+                                  />
+                                )}
+                                <span className="text-xs text-center text-brasil-blue font-semibold">{figurinha.jogador.time?.nome}</span>
+                              </div>
                             </div>
                           </div>
                         </div>

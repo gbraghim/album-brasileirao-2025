@@ -24,6 +24,19 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
   const [modalAberto, setModalAberto] = useState(false);
   const [raridadeSelecionada, setRaridadeSelecionada] = useState('');
 
+  const getImagemRaridade = (raridade: string) => {
+    switch (raridade.toLowerCase()) {
+      case 'lendário':
+        return '/lendario.jpg';
+      case 'ouro':
+        return '/ouro.jpg';
+      case 'prata':
+        return '/prata.jpg';
+      default:
+        return '/placeholder.jpg';
+    }
+  };
+
   const handleComprar = async (jogadorId: string) => {
     try {
       const response = await fetch('/api/comprar-figurinha', {
@@ -49,43 +62,44 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {produtos.map((produto) => (
-        <div
-          key={produto.id}
-          className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-brasil-blue/20 hover:border-brasil-blue/40 transition-all duration-300"
-        >
-          <div className="relative">
-            {produto.imagem && (
+    <div className="w-full flex flex-wrap justify-center gap-16">
+      {produtos.map((produto) => {
+        let borderColor = 'border-gray-200';
+        if (produto.raridade.toLowerCase() === 'lendário') borderColor = 'border-purple-600';
+        if (produto.raridade.toLowerCase() === 'ouro') borderColor = 'border-yellow-400';
+        if (produto.raridade.toLowerCase() === 'prata') borderColor = 'border-gray-400';
+        return (
+          <div
+            key={produto.id}
+            className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 ${borderColor} hover:shadow-2xl transition-all duration-300 flex flex-col items-center max-w-[210px] w-full min-w-[180px] p-0`}
+            style={{ minHeight: 320 }}
+          >
+            <div className="relative w-full flex justify-center items-center bg-gradient-to-b from-white to-blue-50" style={{height: '160px', marginTop: '18px'}}>
               <Image
-                src={produto.imagem}
+                src={getImagemRaridade(produto.raridade)}
                 alt={produto.nome}
-                width={400}
-                height={400}
-                className="w-full h-48 object-cover"
+                fill
+                className="object-contain bg-white"
+                priority
+                style={{objectPosition: 'center'}}
               />
-            )}
-            <div className="absolute top-2 right-2 bg-brasil-blue text-white px-3 py-1 rounded-full text-sm font-bold">
-              {produto.raridade}
-            </div>
-          </div>
 
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-brasil-blue mb-2">
-              {produto.nome}
-            </h3>
-            <p className="text-gray-600 mb-4">{produto.descricao}</p>
-            <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-brasil-green">
+            </div>
+            <div className="flex flex-col flex-1 w-full px-3 py-2 items-center">
+              <h3 className="text-base font-bold text-brasil-blue mb-0 text-center truncate w-full">
+                {produto.nome}
+              </h3>
+              <span className="text-xl font-bold text-brasil-green mt-0 mb-1 block text-center">
                 R$ {(produto.valor_centavos / 100).toFixed(2)}
               </span>
+              <p className="text-gray-600 text-xs mb-1 text-center min-h-[18px]">{produto.descricao}</p>
               <button
                 onClick={() => {
                   setRaridadeSelecionada(produto.raridade);
                   setModalAberto(true);
                 }}
                 disabled={compraEmProgresso === produto.id}
-                className={`bg-brasil-green text-white px-6 py-2 rounded-lg hover:bg-brasil-green/90 transition-colors ${
+                className={`bg-brasil-green text-white px-4 py-1.5 rounded-lg hover:bg-brasil-green/90 transition-colors font-semibold mt-1 mb-1 w-[120px] mx-auto text-sm ${
                   compraEmProgresso === produto.id ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -93,9 +107,8 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
               </button>
             </div>
           </div>
-        </div>
-      ))}
-
+        );
+      })}
       <ModalComprarFigurinha
         isOpen={modalAberto}
         onClose={() => setModalAberto(false)}

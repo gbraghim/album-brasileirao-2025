@@ -118,49 +118,49 @@ export async function POST(req: Request) {
       } else if (tipo === 'pacote' && session.metadata?.pacoteId) {
         // Processar compra de pacote
         console.log('🔍 Buscando pacote no banco de dados:', session.metadata.pacoteId);
-        const pacote = await prisma.pacotePreco.findUnique({
+      const pacote = await prisma.pacotePreco.findUnique({
           where: { id: session.metadata.pacoteId }
-        });
+      });
 
-        if (!pacote) {
+      if (!pacote) {
           console.error('❌ Pacote não encontrado:', session.metadata.pacoteId);
-          return NextResponse.json({ error: 'Pacote não encontrado' }, { status: 404 });
-        }
+        return NextResponse.json({ error: 'Pacote não encontrado' }, { status: 404 });
+      }
 
-        const { quantidade } = pacote;
-        console.log('📦 Pacote encontrado:', { quantidade });
+      const { quantidade } = pacote;
+      console.log('📦 Pacote encontrado:', { quantidade });
 
-        // Criar os pacotes para o usuário em uma transação
-        console.log('➕ Criando pacotes para o usuário');
-        await prisma.$transaction(async (tx) => {
-          // Criar os pacotes
-          const pacotesPromises = Array(quantidade).fill(null).map(() => 
-            tx.pacote.create({
-              data: {
-                userId,
-                aberto: false,
-                tipo: 'COMPRADO'
-              }
-            })
-          );
-
-          await Promise.all(pacotesPromises);
-          console.log('✅ Pacotes criados com sucesso');
-
-          // Criar notificação para o usuário
-          console.log('📢 Criando notificação para o usuário');
-          await tx.notificacao.create({
+      // Criar os pacotes para o usuário em uma transação
+      console.log('➕ Criando pacotes para o usuário');
+      await prisma.$transaction(async (tx) => {
+        // Criar os pacotes
+        const pacotesPromises = Array(quantidade).fill(null).map(() => 
+          tx.pacote.create({
             data: {
-              usuarioId: userId,
-              mensagem: `${quantidade} pacote${quantidade > 1 ? 's' : ''} ${quantidade > 1 ? 'foram adicionados' : 'foi adicionado'} à sua conta!`,
-              tipo: 'TROCA_PROPOSTA',
-              tipoNovo: 'PACOTE_ABERTO'
+              userId,
+              aberto: false,
+              tipo: 'COMPRADO'
             }
-          });
-          console.log('✅ Notificação criada com sucesso');
-        });
+          })
+        );
 
-        return NextResponse.json({ received: true });
+        await Promise.all(pacotesPromises);
+        console.log('✅ Pacotes criados com sucesso');
+
+        // Criar notificação para o usuário
+        console.log('📢 Criando notificação para o usuário');
+        await tx.notificacao.create({
+          data: {
+            usuarioId: userId,
+            mensagem: `${quantidade} pacote${quantidade > 1 ? 's' : ''} ${quantidade > 1 ? 'foram adicionados' : 'foi adicionado'} à sua conta!`,
+            tipo: 'TROCA_PROPOSTA',
+            tipoNovo: 'PACOTE_ABERTO'
+          }
+        });
+        console.log('✅ Notificação criada com sucesso');
+      });
+
+      return NextResponse.json({ received: true });
       } else {
         console.error('❌ Tipo de compra inválido ou IDs ausentes:', { tipo, jogadorId, pacoteId: session.metadata?.pacoteId });
         return NextResponse.json(

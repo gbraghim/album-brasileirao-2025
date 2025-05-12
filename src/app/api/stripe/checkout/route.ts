@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         userId,
         pacoteId,
+        tipo: 'pacote',
       },
     });
     console.log('[STRIPE][SESSÃO CRIADA]', session.url);

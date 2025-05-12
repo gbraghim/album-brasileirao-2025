@@ -110,7 +110,7 @@ export default function ModalComprarFigurinha({
                         className="object-contain"
                       />
                     </div>
-                    <span className="text-xs sm:text-sm text-center block line-clamp-2">{time.nome}</span>
+                    <span className="text-xs sm:text-sm text-center block line-clamp-2 text-black">{time.nome}</span>
                   </button>
                 ))}
               </div>
@@ -127,7 +127,7 @@ export default function ModalComprarFigurinha({
                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brasil-blue"></div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                     {jogadores.map((jogador) => (
                       <button
                         key={jogador.id}
@@ -147,9 +147,7 @@ export default function ModalComprarFigurinha({
                           />
                         </div>
                         <div className="text-center">
-                          <p className="font-medium text-sm sm:text-base line-clamp-1">{jogador.nome}</p>
-                          <p className="text-xs sm:text-sm text-gray-500">{jogador.posicao}</p>
-                          <p className="text-xs sm:text-sm text-gray-500">#{jogador.numero}</p>
+                          <p className="font-medium text-sm sm:text-base text-black line-clamp-1">{jogador.nome}</p>
                         </div>
                       </button>
                     ))}

@@ -14,8 +14,8 @@ export async function GET(request: Request) {
     // Se não houver filtros, retorna todos os jogadores
     if (!timeId && !raridade) {
       console.log('Buscando todos os jogadores...');
-      try {
-        const jogadores = await prisma.jogador.findMany({
+  try {
+    const jogadores = await prisma.jogador.findMany({
           select: {
             id: true,
             nome: true,
@@ -62,11 +62,11 @@ export async function GET(request: Request) {
               nome: true
             }
           }
-        }
-      });
+      }
+    });
 
       console.log(`Encontrados ${jogadores.length} jogadores com os filtros aplicados`);
-      return NextResponse.json(jogadores);
+    return NextResponse.json(jogadores);
     } catch (dbError) {
       console.error('Erro ao buscar jogadores filtrados no banco:', dbError);
       throw dbError;

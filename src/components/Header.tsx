@@ -19,7 +19,6 @@ export default function Header() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/pacotes', label: 'Pacotes' },
     { href: '/meu-album', label: 'Meu Álbum' },
-    { href: '/repetidas', label: 'Repetidas' },
     { href: '/trocas', label: 'Trocas' },
     { href: '/feed', label: 'Feed' },
     { href: '/perfil', label: 'Perfil' }
