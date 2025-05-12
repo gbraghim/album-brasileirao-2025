@@ -1,25 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-type RouteParams = {
-  params: Promise<{
-    id: string;
-  }>
-}
-
-export async function PATCH(request: Request, props: RouteParams) {
+export async function PATCH(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     const session = await getServerSession(authOptions);
-    const params = await props.params;
 
     if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const notificacao = await prisma.notificacao.findUnique({
-      where: { id: params.id }
+      where: { id: context.params.id }
     });
 
     if (!notificacao) {
@@ -31,7 +27,7 @@ export async function PATCH(request: Request, props: RouteParams) {
     }
 
     const notificacaoAtualizada = await prisma.notificacao.update({
-      where: { id: params.id },
+      where: { id: context.params.id },
       data: { lida: true }
     });
 
