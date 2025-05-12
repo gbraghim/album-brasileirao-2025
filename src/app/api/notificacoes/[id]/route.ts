@@ -3,13 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-type Props = {
-  params: { id: string }
-}
-
 export async function PATCH(
   request: NextRequest,
-  { params }: Props
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
