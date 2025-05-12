@@ -2,15 +2,23 @@
 
 import { useEffect, useState, Suspense, lazy } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Pacote as PacoteType } from '@/types/pacote';
-
-interface Pacote extends PacoteType {
-  // Adicione propriedades adicionais específicas desta página, se necessário
-}
+import ProdutosFigurinha from '@/components/ProdutosFigurinha';
+import ModalConfirmacaoCompra from '@/components/ModalConfirmacaoCompra';
+import { prisma } from '@/lib/prisma';
 
 interface Jogador {
+  id: string;
+  nome: string;
+  raridade: string;
+  time: {
+    nome: string;
+  };
+}
+
+interface Pacote extends Omit<PacoteType, 'figurinhas'> {
   id: string;
   figurinhas?: Array<{ id: string }>;
 }
@@ -33,9 +41,10 @@ const Modal = lazy(() => import('@/components/Modal'));
 const Header = lazy(() => import('@/components/Header'));
 const Footer = lazy(() => import('@/components/Footer'));
 
-export default function Pacotes() {
+export default function PacotesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pacotes, setPacotes] = useState<Pacote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,86 +56,63 @@ export default function Pacotes() {
   const [pacotesPremium, setPacotesPremium] = useState<PacotePremium[]>([]);
   const [abrindoPacote, setAbrindoPacote] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [produtosFigurinha, setProdutosFigurinha] = useState<any[]>([]);
+  const [compraEmProgresso, setCompraEmProgresso] = useState<string | null>(null);
+  const [erroCompra, setErroCompra] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [jogador, setJogador] = useState<Jogador | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
-    } else if (status === 'authenticated') {
-      carregarPacotes();
-      carregarFigurinhasUsuario();
-      // Exibir modal de boas-vindas apenas na primeira visita
-      if (typeof window !== 'undefined' && session?.user?.email) {
-        const key = `welcomeModalShown_${session.user.email}`;
-        if (!localStorage.getItem(key)) {
-          setShowWelcomeModal(true);
-          localStorage.setItem(key, 'true');
-        } else {
-          setShowWelcomeModal(false);
-        }
-      }
+      return;
     }
-    // Carregar pacotes premium
-    fetch('/api/pacotes-preco')
-      .then(res => res.json())
-      .then(data => setPacotesPremium(data));
-  }, [status, router, session?.user?.email]);
 
-  const carregarFigurinhasUsuario = async () => {
-    try {
-      const response = await fetch('/api/meu-album', {
-        headers: {
-          'Authorization': `Bearer ${session?.user?.email}`,
-        },
+    if (session?.user?.email) {
+      carregarPacotes();
+    }
+
+    // Carregar produtos de figurinha
+    fetch('/api/produtos-figurinha')
+      .then(res => res.json())
+      .then(data => setProdutosFigurinha(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('Erro ao carregar produtos:', err);
+        setError('Erro ao carregar produtos');
       });
 
-      if (response.ok) {
-        const data = await response.json() as AlbumResponse;
-        const figurinhasIds = new Set<string>();
-        
-        data.jogadores.forEach(jogador => {
-          jogador.figurinhas?.forEach(figurinha => {
-            figurinhasIds.add(figurinha.id);
-          });
+    const success = searchParams?.get('success');
+    const jogadorId = searchParams?.get('jogadorId');
+
+    if (success === 'true' && jogadorId) {
+      // Buscar dados do jogador
+      fetch(`/api/jogadores/${jogadorId}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Erro ao buscar dados do jogador');
+          }
+          return res.json();
+        })
+        .then(data => {
+          setJogador(data);
+          setShowModal(true);
+        })
+        .catch(err => {
+          console.error('Erro ao buscar dados do jogador:', err);
+          setError('Erro ao buscar dados do jogador');
         });
-        
-        setUserFigurinhas(figurinhasIds);
-      }
-    } catch (err) {
-      console.error('Erro ao carregar figurinhas do usuário:', err);
     }
-  };
+  }, [status, router, session?.user?.email, searchParams]);
 
   const carregarPacotes = async () => {
     try {
-      if (!session?.user?.email) {
-        setError('Usuário não autenticado');
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch('/api/pacotes', {
-        headers: {
-          'Authorization': `Bearer ${session.user.email}`,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.message || 'Erro ao carregar pacotes';
-        setError(errorMessage);
-        return;
-      }
-
+      const response = await fetch('/api/pacotes');
+      if (!response.ok) throw new Error('Erro ao carregar pacotes');
       const data = await response.json();
-      setPacotes(data.filter((pacote: any) => !pacote.aberto));
-    } catch (err) {
-      console.error('Erro ao carregar pacotes:', err);
-      setError('Ocorreu um erro ao carregar os pacotes. Tente novamente mais tarde.');
+      setPacotes(data);
+    } catch (error) {
+      console.error('Erro ao carregar pacotes:', error);
+      setError('Erro ao carregar pacotes');
     } finally {
       setLoading(false);
     }
@@ -180,7 +166,6 @@ export default function Pacotes() {
 
   const handleFecharModal = () => {
     setModalAberto(false);
-    carregarFigurinhasUsuario();
   };
 
   const handleAbrirOutroPacote = async () => {
@@ -195,19 +180,49 @@ export default function Pacotes() {
       alert('Faça login para comprar pacotes!');
       return;
     }
+
+    setCompraEmProgresso(pacoteId);
+    setErroCompra(null);
     setLoading(true);
+
+    let tentativas = 0;
+    const maxTentativas = 3;
+
+    while (tentativas < maxTentativas) {
+      try {
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pacoteId, userId: session.user.id }),
     });
+
+        if (!res.ok) {
+          throw new Error(`Erro na requisição: ${res.status}`);
+        }
+
     const data = await res.json();
-    setLoading(false);
+        
     if (data.url) {
       window.location.href = data.url;
+          return;
+        } else {
+          throw new Error('URL de checkout não recebida');
+        }
+      } catch (err) {
+        console.error(`Tentativa ${tentativas + 1} falhou:`, err);
+        tentativas++;
+        
+        if (tentativas === maxTentativas) {
+          setErroCompra('Não foi possível conectar ao serviço de pagamento. Por favor, tente novamente em alguns instantes.');
     } else {
-      alert('Erro ao iniciar pagamento');
+          // Espera 2 segundos antes de tentar novamente
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
     }
+
+    setLoading(false);
+    setCompraEmProgresso(null);
   };
 
   // Separar pacotes por tipo
@@ -229,10 +244,16 @@ export default function Pacotes() {
     }
   };
 
+  // Adicionar classes utilitárias para blocos de seção
+  const sectionBlock = "rounded-2xl shadow-xl bg-white/90 border border-brasil-blue/10 mb-12 py-8 px-4 md:px-10";
+  const sectionBlockAlt = "rounded-2xl shadow-xl bg-blue-50 border border-brasil-blue/10 mb-12 py-8 px-4 md:px-10";
+  const sectionTitle = "text-3xl font-extrabold text-brasil-blue mb-6 text-center tracking-tight";
+  const sectionDivider = <div className="w-full h-0.5 bg-brasil-blue/10 my-10 rounded-full" />;
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brasil-blue"></div>
       </div>
     );
   }
@@ -279,9 +300,8 @@ export default function Pacotes() {
 
         {/* Seção Comprar Pacotes Premium no topo se não houver pacotes disponíveis */}
         {semPacotesDisponiveis && (
-          <div className="mt-0 mb-8 p-4 md:p-6  rounded-lg  mx-4 md:mx-6">
-            <div className="text-center">
-              <h2 id="comprar" className="text-xl md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
+          <div className={sectionBlock}>
+            <h2 className={sectionTitle}>Comprar Pacotes</h2>
               <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
                 {pacotesPremium.map((pacote) => {
                   const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
@@ -316,15 +336,12 @@ export default function Pacotes() {
                   );
                 })}
               </ul>
-            </div>
           </div>
         )}
 
-        <h1 className="text-2xl text-center md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue px-4 md:px-6">Meus Pacotes</h1>
-
         {/* Seção Pacotes Diários */}
-        <div className="mb-12">
-          <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes Diários</h2>
+        <div className={sectionBlockAlt}>
+          <h2 className={sectionTitle}>Pacotes Diários</h2>
           {pacotesDiarios.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
               {pacotesDiarios.map((pacote) => (
@@ -345,11 +362,12 @@ export default function Pacotes() {
             </div>
           ) : <p className="text-brasil-blue text-center">Você não tem pacotes diários disponíveis.</p>}
         </div>
+        {sectionDivider}
 
         {/* Seção Pacotes de Boas-vindas */}
         {pacotesIniciais.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes de Boas-vindas</h2>
+          <div className={sectionBlock}>
+            <h2 className={sectionTitle}>Pacotes de Boas-vindas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
               {pacotesIniciais.map((pacote) => (
                 <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
@@ -369,10 +387,11 @@ export default function Pacotes() {
             </div>
           </div>
         )}
+        {sectionDivider}
 
         {/* Seção Pacotes Premium */}
-        <div className="mb-8">
-          <h2 className="text-2xl text-center font-bold text-brasil-blue mb-2">Pacotes Premium</h2>
+        <div className={sectionBlockAlt}>
+          <h2 className={sectionTitle}>Pacotes Extras</h2>
           {pacotesPremiumUser.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
               {pacotesPremiumUser.map((pacote) => (
@@ -391,14 +410,14 @@ export default function Pacotes() {
                 </div>
               ))}
             </div>
-          ) : <p className="text-brasil-blue text-center">Você não tem pacotes premium disponíveis.</p>}
+          ) : <p className="text-brasil-blue text-center">Você não tem pacotes extras disponíveis.</p>}
         </div>
+        {sectionDivider}
 
         {/* Seção Comprar Pacotes Premium repaginada */}
         {!semPacotesDisponiveis && (
-        <div className="mt-8 p-4 md:p-6  rounded-lg shadow-sm mx-4 md:mx-6">
-          <div className="text-center">
-              <h2 id="comprar" className="text-2xl text-center md:text-2xl font-bold text-brasil-blue mb-4">Comprar Pacotes</h2>
+          <div className={sectionBlock}>
+            <h2 className={sectionTitle}>Comprar Pacotes Extras</h2>
               <ul className="flex flex-col md:flex-row gap-6 justify-center items-center">
                 {pacotesPremium.map((pacote) => {
                   const precoUnitario = pacote.valorCentavos / pacote.quantidade / 100;
@@ -433,9 +452,44 @@ export default function Pacotes() {
                   );
                 })}
             </ul>
-          </div>
         </div>
         )}
+        {sectionDivider}
+
+        {/* Seção Comprar Jogadores Desejados */}
+        <div className={sectionBlockAlt}>
+          <h2 className={sectionTitle}>Comprar Jogadores Desejados</h2>
+          <div className="flex justify-center mb-8">
+            <p className="bg-brasil-green/10 border-2 border-brasil-green text-brasil-green text-xl md:text-2xl font-bold rounded-xl px-8 py-5 shadow-lg max-w-2xl text-center">
+              Colecione o jogador que você deseja sem depender da sorte, cole-o diretamente no seu álbum!
+            </p>
+          </div>
+          
+          {erroCompra && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-center">
+              <p className="font-semibold">{erroCompra}</p>
+              <button 
+                onClick={() => setErroCompra(null)}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Fechar
+              </button>
+            </div>
+          )}
+
+          <ProdutosFigurinha 
+            produtos={
+              [...produtosFigurinha].sort((a, b) => {
+                const ordem: Record<string, number> = { 'Lendário': 0, 'lendário': 0, 'lendario': 0, 'Ouro': 1, 'ouro': 1, 'Prata': 2, 'prata': 2 };
+                const raridadeA = String(a.raridade).toLowerCase();
+                const raridadeB = String(b.raridade).toLowerCase();
+                return (ordem[raridadeA] ?? 3) - (ordem[raridadeB] ?? 3);
+              })
+            }
+            compraEmProgresso={compraEmProgresso}
+          />
+        </div>
+        {sectionDivider}
 
         <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
           <PacoteAnimation
@@ -454,6 +508,14 @@ export default function Pacotes() {
             temMaisPacotes={pacotes.length > 0}
           />
         </Suspense>
+
+        {jogador && (
+          <ModalConfirmacaoCompra
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            jogador={jogador}
+          />
+        )}
 
         <Suspense fallback={null}>
         </Suspense>

@@ -11,10 +11,7 @@ export default function Footer() {
             <p className="text-sm text-gray-400">Colecione, troque e complete seu álbum!</p>
           </div>
 
-          {/* Logo centralizado */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:transform-none flex justify-center items-center z-20">
-            <Image src="/logo.png" alt="Logo Álbum Brasileirão" width={90} height={90} className="drop-shadow-lg rounded-full bg-white/80 p-2" />
-          </div>
+
 
           <div className="flex space-x-6 z-10">
 

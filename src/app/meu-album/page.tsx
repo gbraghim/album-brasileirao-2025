@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import FigurinhaCard from '@/components/FigurinhaCard';
+import ProdutosFigurinha from '@/components/ProdutosFigurinha';
 
 const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
@@ -88,6 +89,8 @@ function MeuAlbumContent() {
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [escudoErrors, setEscudoErrors] = useState<Record<string, boolean>>({});
   const [figurinhasEmTroca, setFigurinhasEmTroca] = useState<string[]>([]);
+  const [produtos, setProdutos] = useState<any[]>([]);
+  const [showProdutos, setShowProdutos] = useState(false);
 
   const handleImageError = (jogadorId: string, time: string, nome: string) => {
     const caminhos = formatarCaminhoImagem(time, nome);
@@ -131,6 +134,7 @@ function MeuAlbumContent() {
       fetchTodosJogadores();
       fetchTotalJogadoresTime();
       fetchFigurinhasEmTroca();
+      fetchProdutos();
 
       // Adiciona o ouvinte de evento para atualizar o estado quando uma troca é removida
       const handleTrocaRemovida = (event: CustomEvent<{ figurinhaId: string }>) => {
@@ -256,6 +260,19 @@ function MeuAlbumContent() {
     }
   };
 
+  const fetchProdutos = async () => {
+    try {
+      const response = await fetch('/api/produtos-figurinha');
+      if (!response.ok) {
+        throw new Error('Erro ao carregar produtos');
+      }
+      const data = await response.json();
+      setProdutos(data);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+    }
+  };
+
   const jogadoresDoTime = timeSelecionado ? todosJogadores
     .filter((jogador) => jogador.time.id === timeSelecionado.id)
     .sort((a, b) => {
@@ -317,122 +334,140 @@ function MeuAlbumContent() {
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-brasil-blue mb-6">Meu Álbum</h1>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-          {/* Lista de Times */}
-          <div className="w-full md:w-1/4 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-            <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-brasil-blue">Times</h2>
-            <div className="space-y-2 md:space-y-3">
-              {timesOrdenados.map((time) => {
-                const jogadoresColetados = jogadores.filter(
-                  (jogador) => jogador.time.id === time.id
-                ).length;
-                const totalJogadores = totalJogadoresTime[time.id] || 0;
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-brasil-blue">Meu Álbum</h1>
+          <button
+            onClick={() => setShowProdutos(!showProdutos)}
+            className="bg-brasil-green text-white px-4 py-2 rounded-lg hover:bg-brasil-green/90 transition-colors"
+          >
+            {showProdutos ? 'Ver Álbum' : 'Comprar Jogadores Desejados'}
+          </button>
+        </div>
 
-                return (
-                  <button
-                    key={time.id}
-                    onClick={() => {
-                      setTimeSelecionado(time);
-                      atualizarTimeURL(time);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-300 ${
-                      timeSelecionado?.id === time.id
-                        ? 'bg-brasil-green text-white'
-                        : 'hover:bg-brasil-green/10'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                      <div className="relative w-8 h-8 md:w-10 md:h-10">
-                        <Image
-                          src={escudoErrors[time.id] ? '/public/placeholder.jpg' : getS3EscudoUrl(time.escudo)}
-                          alt={time.nome}
-                          fill
-                          sizes="(max-width: 640px) 2rem, 2.5rem"
-                          className="object-contain"
-                          onError={() => handleEscudoError(time.id)}
-                        />
-                      </div>
-                      <span className={`font-medium ${
-                        timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
-                      } text-left block`}>
-                        {time.nome}
-                      </span>
-                    </div>
-                    <span className={`text-sm ${
-                      timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
-                    }`}>
-                      {jogadoresColetados}/{totalJogadores}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+        {showProdutos ? (
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+            <h2 className="text-xl font-bold text-brasil-blue mb-6">
+              Comprar Jogadores Desejados
+            </h2>
+            <ProdutosFigurinha produtos={produtos} />
           </div>
+        ) : (
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+            {/* Lista de Times */}
+            <div className="w-full md:w-1/4 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-brasil-blue">Times</h2>
+              <div className="space-y-2 md:space-y-3">
+                {timesOrdenados.map((time) => {
+                  const jogadoresColetados = jogadores.filter(
+                    (jogador) => jogador.time.id === time.id
+                  ).length;
+                  const totalJogadores = totalJogadoresTime[time.id] || 0;
 
-          {/* Grid de Jogadores */}
-          <div className="w-full md:w-3/4">
-            {timeSelecionado && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-                <div className="flex flex-col items-center justify-center mb-4">
-                  <div className="flex justify-between w-full items-center" style={{ position: 'relative' }}>
-                    <select
-                      value={timeSelecionado?.id || ''}
-                      onChange={(e) => {
-                        const time = TIMES_SERIE_A.find(t => t.id === e.target.value);
-                        if (time) {
-                          setTimeSelecionado(time);
-                          atualizarTimeURL(time);
-                        }
+                  return (
+                    <button
+                      key={time.id}
+                      onClick={() => {
+                        setTimeSelecionado(time);
+                        atualizarTimeURL(time);
                       }}
-                      className="text-lg font-semibold text-brasil-blue px-3 py-1 rounded-md bg-white/30 border border-brasil-blue/10 focus:ring-1 focus:ring-brasil-blue/20 focus:outline-none cursor-pointer appearance-none pr-10 hover:bg-white/50 transition-all"
+                      className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-300 ${
+                        timeSelecionado?.id === time.id
+                          ? 'bg-brasil-green text-white'
+                          : 'hover:bg-brasil-green/10'
+                      }`}
                     >
-                      {TIMES_SERIE_A.map((time) => (
-                        <option key={time.id} value={time.id} className="bg-white text-brasil-blue text-base">
-                          {time.nome}
-                        </option>
-                      ))}
-                    </select>
-                    <svg
-                      style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
-                      width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M6 8L10 12L14 8" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                </div>
-
-                <div className="text-center mb-4">
-                  <p className="text-brasil-blue/80 text-sm md:text-base">
-                    <Link href="/pacotes" className="text-brasil-blue font-semibold hover:underline">
-                      Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
-                    </Link>
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-3 md:grid-cols-5 gap-6 p-2 md:p-4">
-                  {jogadoresDoTime.map((jogador) => {
-                    const jogadorColetado = jogadores.some(j => j.id === jogador.id);
-                    const currentIndex = currentImageIndex[jogador.id] || 0;
-                    return (
-                      <div key={jogador.id} className="relative">
-                        <div className={` ${jogadorColetado}`}>
-                          <FigurinhaCard
-                            jogador={jogador}
-                            jogadorColetado={jogadorColetado}
-                            currentImageIndex={currentIndex}
-                            onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
-                            onAdicionarRepetida={() => {}}
+                      <div className="flex items-center space-x-2 md:space-x-3">
+                        <div className="relative w-8 h-8 md:w-10 md:h-10">
+                          <Image
+                            src={escudoErrors[time.id] ? '/public/placeholder.jpg' : getS3EscudoUrl(time.escudo)}
+                            alt={time.nome}
+                            fill
+                            sizes="(max-width: 640px) 2rem, 2.5rem"
+                            className="object-contain"
+                            onError={() => handleEscudoError(time.id)}
                           />
                         </div>
+                        <span className={`font-medium ${
+                          timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
+                        } text-left block`}>
+                          {time.nome}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <span className={`text-sm ${
+                        timeSelecionado?.id === time.id ? 'text-white' : 'text-brasil-blue'
+                      }`}>
+                        {jogadoresColetados}/{totalJogadores}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
+
+            {/* Grid de Jogadores */}
+            <div className="w-full md:w-3/4">
+              {timeSelecionado && (
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
+                  <div className="flex flex-col items-center justify-center mb-4">
+                    <div className="flex justify-between w-full items-center" style={{ position: 'relative' }}>
+                      <select
+                        value={timeSelecionado?.id || ''}
+                        onChange={(e) => {
+                          const time = TIMES_SERIE_A.find(t => t.id === e.target.value);
+                          if (time) {
+                            setTimeSelecionado(time);
+                            atualizarTimeURL(time);
+                          }
+                        }}
+                        className="text-lg font-semibold text-brasil-blue px-3 py-1 rounded-md bg-white/30 border border-brasil-blue/10 focus:ring-1 focus:ring-brasil-blue/20 focus:outline-none cursor-pointer appearance-none pr-10 hover:bg-white/50 transition-all"
+                      >
+                        {TIMES_SERIE_A.map((time) => (
+                          <option key={time.id} value={time.id} className="bg-white text-brasil-blue text-base">
+                            {time.nome}
+                          </option>
+                        ))}
+                      </select>
+                      <svg
+                        style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+                        width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M6 8L10 12L14 8" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-4">
+                    <p className="text-brasil-blue/80 text-sm md:text-base">
+                      <Link href="/pacotes" className="text-brasil-blue font-semibold hover:underline">
+                        Adquira mais pacotes, colecione mais figurinhas e complete seu álbum!
+                      </Link>
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-6 p-2 md:p-4">
+                    {jogadoresDoTime.map((jogador) => {
+                      const jogadorColetado = jogadores.some(j => j.id === jogador.id);
+                      const currentIndex = currentImageIndex[jogador.id] || 0;
+                      return (
+                        <div key={jogador.id} className="relative">
+                          <div className={` ${jogadorColetado}`}>
+                            <FigurinhaCard
+                              jogador={jogador}
+                              jogadorColetado={jogadorColetado}
+                              currentImageIndex={currentIndex}
+                              onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
+                              onAdicionarRepetida={() => {}}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

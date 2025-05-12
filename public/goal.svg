@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M2 4h20v12H2V4z" fill="none" stroke="white" stroke-width="2"/>
-  <path d="M2 4v12m20-12v12M2 4h20M2 16h20" stroke="white" stroke-width="2"/>
-  <path d="M4 6h2m-2 2h2m-2 2h2m-2 2h2m-2 2h2m12-10h2m-2 2h2m-2 2h2m-2 2h2m-2 2h2" stroke="white" stroke-width="1"/>
-  <path d="M8 4v12m8-12v12" stroke="white" stroke-width="1" stroke-dasharray="2 2"/>
-</svg> 

@@ -86,8 +86,8 @@ model Jogador {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   foto          String?
-  idade         Int?
   raridade      String?     @default("Prata")
+  idade         Int?
   figurinhas    Figurinha[]
   time          Time        @relation(fields: [timeId], references: [id])
 
@@ -186,6 +186,19 @@ model Notificacao {
   @@index([trocaId])
 }
 
+model PacotePreco {
+  id              String   @id @default(uuid())
+  nome            String
+  descricao       String
+  stripeProductId String   @unique
+  stripePriceId   String   @unique
+  quantidade      Int
+  valorCentavos   Int
+  ativo           Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 enum TrocaStatus {
   PENDENTE
   ACEITA
@@ -201,6 +214,7 @@ enum TipoNotificacao {
   PACOTE_ABERTO
   FIGURINHA_NOVA
   TROCA_RECEBIDA
+  COMPRA
 }
 
 enum NotificacaoTipo {
@@ -209,23 +223,36 @@ enum NotificacaoTipo {
   TROCA_RECUSADA
   TROCA_CANCELADA
   TROCA_RECEBIDA
-}
-
-model PacotePreco {
-  id              String   @id @default(uuid())
-  nome            String
-  descricao       String
-  stripeProductId String   @unique
-  stripePriceId   String   @unique
-  quantidade      Int
-  valorCentavos   Int
-  ativo           Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  COMPRA
+  FIGURINHA_NOVA
 }
 
 enum TipoPacote {
   COMPRADO
   DIARIO
   INICIAL
+}
+
+
+model produto_figurinha {
+  id                String   @id @default(uuid())
+  nome              String
+  raridade          String
+  stripe_product_id String   @unique
+  stripe_price_id   String   @unique
+  valor_centavos    Int
+  ativo             Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+}
+
+model compra_figurinha {
+  id         String   @id @default(uuid())
+  user_id    String
+  produto_id String
+  status     String   @default("AGUARDANDO_ESCOLHA")
+  jogador_id String?
+  time_id    String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

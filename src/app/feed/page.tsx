@@ -98,7 +98,7 @@ export default function FeedPage() {
               />
               <span className="text-purple-600 text-3xl drop-shadow-lg z-10">👑</span>
               <div className="relative z-10">
-                <span className="font-bold text-purple-700 text-lg">{evento.usuario}</span> <span className="text-brasil-blue">acaba de obter uma figurinha</span> <span className="font-bold text-purple-700">Lendário</span><span className="font-semibold text-brasil-blue">: {evento.jogador}</span> <span className="text-brasil-blue">do</span> <span className="font-semibold text-brasil-blue">{evento.time}!</span>
+                <span className="font-bold text-purple-700 text-lg">{evento.usuario}</span> <span className="text-brasil-blue">acaba de obter uma figurinha</span> <span className="font-bold text-purple-700">Lendária</span><span className="font-semibold text-brasil-blue">: {evento.jogador}</span> <span className="text-brasil-blue">do</span> <span className="font-semibold text-brasil-blue">{evento.time}!</span>
                 <span className="block text-xs text-brasil-blue mt-1">{horaData}</span>
               </div>
             </div>
