@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
@@ -12,7 +11,14 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 export async function POST(request: Request) {
   try {
     const body = await request.text();
-    const signature = headers().get('stripe-signature')!;
+    const signature = request.headers.get('stripe-signature');
+
+    if (!signature) {
+      return NextResponse.json(
+        { error: 'Assinatura não encontrada' },
+        { status: 400 }
+      );
+    }
 
     let event: Stripe.Event;
 
