@@ -26,14 +26,26 @@ export function formatarNomeArquivo(nome: string): string[] {
   return Array.from(variantes);
 }
 
-export function formatarCaminhoImagem(time: string, nome: string): string {
+export function formatarCaminhoImagem(time: string, nome: string): string[] {
+  const caminhos: string[] = [];
+  
   // Remove espaços extras e normaliza espaços
   const nomeNormalizado = nome.trim().replace(/\s+/g, ' ');
-  // Separa em palavras, coloca a primeira letra de cada palavra em maiúsculo e o resto em minúsculo, depois junta tudo
-  const nomeFormatado = nomeNormalizado
-    .split(' ')
-    .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
-    .join('');
+  
+  // Gera diferentes variações do nome
+  const variacoesNome = [
+    // Nome completo com primeira letra maiúscula
+    nomeNormalizado
+      .split(' ')
+      .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
+      .join(''),
+    // Nome completo sem espaços
+    nomeNormalizado.replace(/\s+/g, ''),
+    // Nome completo em minúsculas sem espaços
+    nomeNormalizado.toLowerCase().replace(/\s+/g, ''),
+    // Nome completo sem acentos
+    removerAcentos(nomeNormalizado).replace(/\s+/g, '')
+  ];
 
   // Trata nomes especiais dos times
   let pastaTime = time;
@@ -43,8 +55,12 @@ export function formatarCaminhoImagem(time: string, nome: string): string {
     pastaTime = 'AtléticoMineiro';
   }
 
-  // Gera apenas o caminho correto
-  return `/players/${pastaTime}/${nomeFormatado}.jpg`;
+  // Gera caminhos para cada variação do nome
+  for (const variacao of variacoesNome) {
+    caminhos.push(`/players/${pastaTime}/${variacao}.jpg`);
+  }
+
+  return caminhos;
 }
 
 export function getS3EscudoUrl(escudo: string) {

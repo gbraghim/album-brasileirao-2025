@@ -44,21 +44,36 @@ export async function getTabelaComCache() {
 }
 
 export async function getCachedImage(url: string): Promise<string> {
-  const cached = imageCache.get(url)
-  if (cached && Date.now() - cached.timestamp < IMAGE_CACHE_DURATION) {
-    // Cache hit
-    return cached.data
+  try {
+    const cached = imageCache.get(url)
+    if (cached && Date.now() - cached.timestamp < IMAGE_CACHE_DURATION) {
+      console.log(`Cache hit para imagem: ${url}`)
+      return cached.data
+    }
+
+    console.log(`Tentando buscar imagem: ${url}`)
+    const response = await fetch(url)
+    if (!response.ok) {
+      console.error(`Erro ao buscar imagem ${url}: ${response.status} ${response.statusText}`)
+      throw new Error(`Erro ao buscar imagem: ${response.status} ${response.statusText}`)
+    }
+
+    const blob = await response.blob()
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result as string)
+      reader.onerror = (error) => {
+        console.error(`Erro ao converter imagem para base64: ${error}`)
+        reject(error)
+      }
+      reader.readAsDataURL(blob)
+    })
+
+    imageCache.set(url, { data: base64, timestamp: Date.now() })
+    console.log(`Imagem carregada com sucesso: ${url}`)
+    return base64
+  } catch (error) {
+    console.error(`Erro ao processar imagem ${url}:`, error)
+    throw error
   }
-  // Buscar imagem e converter para base64
-  const response = await fetch(url)
-  if (!response.ok) throw new Error('Erro ao buscar imagem do S3')
-  const blob = await response.blob()
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(blob)
-  })
-  imageCache.set(url, { data: base64, timestamp: Date.now() })
-  return base64
 } 

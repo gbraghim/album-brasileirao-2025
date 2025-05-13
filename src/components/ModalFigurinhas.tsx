@@ -103,13 +103,14 @@ export default function ModalFigurinhas({
     const currentIndex = currentImageIndex[jogadorId] || 0;
     
     if (currentIndex < caminhos.length - 1) {
-      console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
+      const nextPath = caminhos[currentIndex + 1];
+      console.log(`Tentando próximo formato para ${nome} do ${time}: ${nextPath}`);
       setCurrentImageIndex(prev => ({
         ...prev,
         [jogadorId]: currentIndex + 1
       }));
     } else {
-      console.error(`Todos os formatos falharam para ${nome} do ${time}`);
+      console.error(`Todos os formatos falharam para ${nome} do ${time}. Caminhos tentados:`, caminhos);
       setImageErrors(prev => ({
         ...prev,
         [jogadorId]: true
@@ -123,6 +124,10 @@ export default function ModalFigurinhas({
       ...prev,
       [jogadorId]: true
     }));
+    setImageErrors(prev => ({
+      ...prev,
+      [jogadorId]: false
+    }));
   };
 
   useEffect(() => {
@@ -131,8 +136,12 @@ export default function ModalFigurinhas({
       for (const figurinha of figurinhas) {
         const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
         try {
-          updates[figurinha.jogador.id] = await getCachedImage(caminhos[0]);
-        } catch {}
+          const cachedSrc = await getCachedImage(caminhos[0]);
+          updates[figurinha.jogador.id] = cachedSrc;
+          console.log(`Cache de imagem bem sucedido para ${figurinha.jogador.nome}`);
+        } catch (error) {
+          console.error(`Erro ao fazer cache da imagem para ${figurinha.jogador.nome}:`, error);
+        }
       }
       setCachedSrcs(updates);
     }
