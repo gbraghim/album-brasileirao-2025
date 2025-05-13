@@ -101,28 +101,29 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!produto.stripe_price_id) {
+      console.error('stripe_price_id não encontrado para o produto:', produto);
+      return NextResponse.json(
+        { error: 'Preço do produto não configurado' },
+        { status: 500 }
+      );
+    }
+
     console.log('Criando sessão de checkout...');
     console.log('Dados da sessão:', {
       jogadorNome: jogador.nome,
       timeNome: jogador.time.nome,
-      valorCentavos: produto.valor_centavos,
+      stripePriceId: produto.stripe_price_id,
       successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?success=true&jogadorId=${jogadorId}`,
       cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?canceled=true`
     });
 
-    // Criar sessão de checkout
+    // Criar sessão de checkout usando o stripe_price_id
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'brl',
-            product_data: {
-              name: `Figurinha ${jogador.nome} - ${jogador.time.nome}`,
-              description: `Figurinha ${raridade} do jogador ${jogador.nome}`,
-            },
-            unit_amount: produto.valor_centavos,
-          },
+          price: produto.stripe_price_id,
           quantity: 1,
         },
       ],
