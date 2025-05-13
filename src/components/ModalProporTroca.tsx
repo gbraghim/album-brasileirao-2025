@@ -38,8 +38,10 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
     const caminhos = formatarCaminhoImagem(time, nome);
     const currentIndex = currentImageIndex[figurinhaId] || 0;
     if (currentIndex < caminhos.length - 1) {
+      console.log(`Tentando próximo formato para ${nome} do ${time}: ${caminhos[currentIndex + 1]}`);
       setCurrentImageIndex(prev => ({ ...prev, [figurinhaId]: currentIndex + 1 }));
     } else {
+      console.error(`Todos os formatos falharam para ${nome} do ${time}. Caminhos tentados:`, caminhos);
       setImageErrors(prev => ({ ...prev, [figurinhaId]: true }));
     }
   };
@@ -50,8 +52,12 @@ export default function ModalProporTroca({ isOpen, onClose, troca, onProporTroca
       if (troca) {
         const caminhos = formatarCaminhoImagem(troca.figurinhaOferta.jogador.time.nome, troca.figurinhaOferta.jogador.nome);
         try {
-          updates[troca.figurinhaOferta.jogador.id] = await getCachedImage(caminhos[0]);
-        } catch {}
+          const cachedSrc = await getCachedImage(caminhos[0]);
+          updates[troca.figurinhaOferta.jogador.id] = cachedSrc;
+          console.log(`Cache de imagem bem sucedido para ${troca.figurinhaOferta.jogador.nome}`);
+        } catch (error) {
+          console.error(`Erro ao fazer cache da imagem para ${troca.figurinhaOferta.jogador.nome}:`, error);
+        }
       }
       setCachedSrcs(updates);
     }

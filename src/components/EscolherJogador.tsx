@@ -133,10 +133,14 @@ export default function EscolherJogador({
           >
             <div className="relative w-full aspect-[3/4] mb-2">
               <Image
-                src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)}
+                src={formatarCaminhoImagem(jogador.time.nome, jogador.nome)[0]}
                 alt={jogador.nome}
                 fill
                 className="object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder.jpg';
+                }}
               />
             </div>
             <div className="text-center">
