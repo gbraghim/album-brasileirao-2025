@@ -104,6 +104,17 @@ export async function POST(req: Request) {
                 nomeTime: jogador.time.nome,
               },
             });
+
+            // Criar notificação para o usuário
+            await tx.notificacao.create({
+              data: {
+                usuarioId: userId,
+                tipo: 'TROCA_RECEBIDA',
+                tipoNovo: 'FIGURINHA_NOVA',
+                mensagem: `🎉 Parabéns! Você acabou de adquirir a figurinha do ${jogador.nome}! Ela já está no seu álbum!`,
+                lida: false,
+              },
+            });
           });
 
           console.log('✅ Figurinha adicionada com sucesso');

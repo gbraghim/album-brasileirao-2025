@@ -110,16 +110,6 @@ export async function POST(request: Request) {
         },
       });
 
-      await prisma.notificacao.create({
-        data: {
-          usuarioId: session.user.id,
-          tipo: 'TROCA_RECEBIDA',
-          tipoNovo: 'FIGURINHA_NOVA',
-          mensagem: `🎉 Parabéns! Você acabou de adquirir a figurinha do ${jogador.nome}! Ela já está no seu álbum!`,
-          lida: false,
-        },
-      });
-
       return NextResponse.json({ url: checkoutSession.url });
     } catch (stripeError) {
       if (stripeError instanceof Stripe.errors.StripeError) {
