@@ -24,10 +24,7 @@ export async function POST(request: Request) {
     }
 
     const compra = await prisma.compra_figurinha.findUnique({
-      where: { id: compraId },
-      include: {
-        produto: true
-      }
+      where: { id: compraId }
     });
 
     if (!compra) {
@@ -52,7 +49,10 @@ export async function POST(request: Request) {
     }
 
     const jogador = await prisma.jogador.findUnique({
-      where: { id: jogadorId }
+      where: { id: jogadorId },
+      include: {
+        time: true
+      }
     });
 
     if (!jogador) {
@@ -77,12 +77,14 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         figurinhaId: jogadorId,
-        quantidade: 1
+        quantidade: 1,
+        nomeJogador: jogador.nome,
+        nomeTime: jogador.time.nome
       }
     });
 
     // Atualiza o contador de figurinhas do usuário
-    const raridade = compra.produto.raridade.toLowerCase();
+    const raridade = jogador.raridade?.toLowerCase() || 'prata';
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
