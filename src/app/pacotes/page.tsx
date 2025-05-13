@@ -118,10 +118,16 @@ function PacotesContent() {
 
   const carregarPacotes = async () => {
     try {
-      const response = await fetch('/api/pacotes', { headers: { 'Cache-Control': 'no-store' }, cache: 'no-store' });
+      const response = await fetch('/api/pacotes', { 
+        headers: { 
+          'Cache-Control': 'no-store',
+          'Authorization': `Bearer ${session?.user?.email}`
+        }, 
+        cache: 'no-store' 
+      });
       if (!response.ok) throw new Error('Erro ao carregar pacotes');
       const data = await response.json();
-      setPacotes(Array.isArray(data) ? data.filter(p => p.aberto === false) : []);
+      setPacotes(Array.isArray(data) ? data.filter(p => !p.aberto) : []);
     } catch (error) {
       console.error('Erro ao carregar pacotes:', error);
       setError('Erro ao carregar pacotes');
@@ -132,12 +138,15 @@ function PacotesContent() {
 
   const fetchPacotes = async () => {
     try {
-      const response = await fetch('/api/pacotes');
+      const response = await fetch('/api/pacotes', { 
+        headers: { 'Cache-Control': 'no-store' },
+        cache: 'no-store'
+      });
       if (!response.ok) {
         throw new Error('Erro ao carregar pacotes');
       }
       const data = await response.json();
-      setPacotes(data);
+      setPacotes(Array.isArray(data) ? data.filter(p => !p.aberto) : []);
     } catch (error) {
       console.error('Erro ao carregar pacotes:', error);
       toast.error('Erro ao carregar pacotes');
