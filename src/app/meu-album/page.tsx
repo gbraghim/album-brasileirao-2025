@@ -10,6 +10,8 @@ import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import FigurinhaCard from '@/components/FigurinhaCard';
 import ProdutosFigurinha from '@/components/ProdutosFigurinha';
 
+export const dynamic = 'force-dynamic';
+
 const TIMES_SERIE_A = [
   { id: '1', nome: 'Atlético Mineiro', escudo: '/escudos/atletico_mg.png' },
   { id: '2', nome: 'Bahia', escudo: '/escudos/bahia.png' },

@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Modal from '@/components/Modal';
@@ -16,6 +17,9 @@ import FigurinhaCard from '@/components/FigurinhaCard';
 import { getCachedImage } from '@/lib/cache';
 import { lazyLoadImage } from '@/lib/lazy-loading';
 import Loading from '@/components/loading';
+import Header from '@/components/Header';
+
+export const dynamic = 'force-dynamic';
 
 interface Troca {
   id: string;

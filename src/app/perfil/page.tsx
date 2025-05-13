@@ -1,8 +1,12 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Header from '@/components/Header';
 import { useEffect, useState, useRef } from 'react';
 import EditarAvatar from '@/components/EditarAvatar';
+
+export const dynamic = 'force-dynamic';
 
 type User = {
   id: string;

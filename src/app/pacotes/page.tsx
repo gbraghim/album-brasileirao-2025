@@ -9,6 +9,8 @@ import ProdutosFigurinha from '@/components/ProdutosFigurinha';
 import ModalConfirmacaoCompra from '@/components/ModalConfirmacaoCompra';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 interface Jogador {
   id: string;
   nome: string;
@@ -41,7 +43,7 @@ const Modal = lazy(() => import('@/components/Modal'));
 const Header = lazy(() => import('@/components/Header'));
 const Footer = lazy(() => import('@/components/Footer'));
 
-export default function PacotesPage() {
+function PacotesContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -572,5 +574,17 @@ export default function PacotesPage() {
         </Suspense>
       </main>
     </div>
+  );
+}
+
+export default function PacotesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      <PacotesContent />
+    </Suspense>
   );
 } 

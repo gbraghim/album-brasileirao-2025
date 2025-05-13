@@ -4,6 +4,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Header from '@/components/Header';
+
+export const dynamic = 'force-dynamic';
 
 const TIMES_SERIE_A = [
   { id: 'america-mg', nome: 'América-MG' },

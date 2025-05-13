@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dialog } from '@headlessui/react';
+import Header from '@/components/Header';
+
+export const dynamic = 'force-dynamic';
 
 export default function Login() {
   const { data: session } = useSession();

@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import ModalCadastroSucesso from '@/components/ModalCadastroSucesso';
+import Header from '@/components/Header';
+
+export const dynamic = 'force-dynamic';
 
 export default function RegisterPage() {
   const router = useRouter();

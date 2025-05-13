@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';
+import Header from '@/components/Header';
 
 interface Proposta {
   id: string;
@@ -24,6 +26,8 @@ interface Proposta {
     };
   };
 }
+
+export const dynamic = 'force-dynamic';
 
 export default function Propostas() {
   const { data: session } = useSession();

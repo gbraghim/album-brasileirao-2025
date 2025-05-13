@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense, lazy } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Header from '@/components/Header';
 
 interface Pacote {
   id: string;
@@ -23,6 +24,8 @@ interface Pacote {
 }
 
 const ModalFigurinhas = lazy(() => import('@/components/ModalFigurinhas'));
+
+export const dynamic = 'force-dynamic';
 
 export default function Pacotes() {
   const { data: session, status } = useSession();

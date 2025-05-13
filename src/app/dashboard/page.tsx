@@ -7,6 +7,9 @@ import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
 import Image from 'next/image';
+import Header from '@/components/Header';
+
+export const dynamic = 'force-dynamic';
 
 interface UserStats {
   totalFigurinhas: number;
