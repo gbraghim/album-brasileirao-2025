@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import EscolherJogador from '@/components/EscolherJogador';
 
-export default function EscolherJogadorPage() {
+export const dynamic = 'force-dynamic';
+
+function EscolherJogadorContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,28 +55,22 @@ export default function EscolherJogadorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-        <Header />
-        <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
+      <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
-        <Header />
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
-          <p className="text-red-500 mb-4">{error}</p>
-          <button
-            onClick={() => router.push('/meu-album')}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Voltar para o Álbum
-          </button>
-        </div>
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button
+          onClick={() => router.push('/meu-album')}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Voltar para o Álbum
+        </button>
       </div>
     );
   }
@@ -84,17 +80,29 @@ export default function EscolherJogadorPage() {
   }
 
   return (
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
+        <EscolherJogador
+          compraId={compra.id}
+          raridade={compra.produto.raridade}
+          onJogadorEscolhido={handleJogadorEscolhido}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function EscolherJogadorPage() {
+  return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-brasil-yellow/20">
-          <EscolherJogador
-            compraId={compra.id}
-            raridade={compra.produto.raridade}
-            onJogadorEscolhido={handleJogadorEscolhido}
-          />
+      <Suspense fallback={
+        <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      </div>
+      }>
+        <EscolherJogadorContent />
+      </Suspense>
     </div>
   );
 } 
