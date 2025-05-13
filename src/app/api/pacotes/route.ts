@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { verificarPacotesIniciais, verificarPacotesDiarios } from '@/lib/pacotes';
+import { Prisma } from '@prisma/client';
+
+const FIGURINHAS_POR_PACOTE = 4;
 
 export async function GET() {
   try {
@@ -71,54 +74,204 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    console.log('=== INÍCIO DO PROCESSO DE ABRIR PACOTE ===');
+    console.log('Iniciando abertura de pacote...');
+    
     const session = await getServerSession(authOptions);
+    console.log('Sessão obtida:', session ? 'Sim' : 'Não');
+
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      console.log('Usuário não autenticado');
+      return NextResponse.json(
+        { message: 'Não autorizado' },
+        { status: 401 }
+      );
     }
 
+    console.log('Buscando usuário...');
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      console.log('Usuário não encontrado');
+      return NextResponse.json(
+        { message: 'Usuário não encontrado' },
+        { status: 404 }
+      );
     }
 
-    // Buscar o pacote mais antigo não aberto
-    const pacote = await prisma.pacote.findFirst({
-      where: {
-        userId: user.id,
-        aberto: false as const
-      },
-      orderBy: {
-        createdAt: 'asc'
-      }
-    });
+    console.log('Usuário encontrado:', { id: user.id, email: user.email });
 
-    if (!pacote) {
-      return NextResponse.json({ error: 'Você não tem pacotes disponíveis' }, { status: 400 });
+    const body = await request.json();
+    console.log('Corpo da requisição:', body);
+
+    const { pacoteId } = body;
+
+    if (!pacoteId) {
+      console.log('ID do pacote não fornecido');
+      return NextResponse.json(
+        { message: 'ID do pacote é obrigatório' },
+        { status: 400 }
+      );
     }
 
-    // Marcar o pacote como aberto
-    const pacoteAberto = await prisma.pacote.update({
-      where: { id: pacote.id },
-      data: { aberto: true as const },
-      include: {
-        figurinhas: {
-          include: {
-            jogador: {
-              include: {
-                time: true
-              }
-            }
-          }
+    console.log('ID do pacote recebido:', pacoteId);
+
+    return await prisma.$transaction(async (tx) => {
+      console.log('Iniciando transação...');
+      
+      console.log('Verificando pacote...');
+      // Verificar se o pacote pertence ao usuário
+      const pacote = await tx.pacote.findFirst({
+        where: {
+          id: pacoteId,
+          userId: user.id,
+          aberto: false
         }
-      }
-    });
+      });
 
-    return NextResponse.json(pacoteAberto);
+      console.log('Resultado da busca do pacote:', pacote ? {
+        id: pacote.id,
+        userId: pacote.userId,
+        aberto: pacote.aberto,
+        tipo: pacote.tipo
+      } : 'Pacote não encontrado');
+
+      if (!pacote) {
+        console.log('Pacote não encontrado ou já aberto');
+        throw new Error('Pacote não encontrado ou já aberto');
+      }
+
+      console.log('Buscando jogadores...');
+      // Buscar todos os jogadores agrupados por raridade
+      const jogadores = await tx.jogador.findMany({
+        include: {
+          time: true
+        }
+      });
+
+      console.log(`Total de jogadores encontrados: ${jogadores.length}`);
+
+      if (jogadores.length === 0) {
+        console.log('Nenhum jogador encontrado');
+        throw new Error('Nenhum jogador encontrado');
+      }
+
+      // Agrupar jogadores por raridade
+      const jogadoresPorRaridade = {
+        'Lendário': jogadores.filter(j => j.raridade === 'Lendário'),
+        'Ouro': jogadores.filter(j => j.raridade === 'Ouro'),
+        'Prata': jogadores.filter(j => j.raridade === 'Prata')
+      };
+
+      console.log('Quantidade de jogadores por raridade:');
+      console.log('- Lendário:', jogadoresPorRaridade['Lendário'].length);
+      console.log('- Ouro:', jogadoresPorRaridade['Ouro'].length);
+      console.log('- Prata:', jogadoresPorRaridade['Prata'].length);
+
+      console.log('Selecionando jogadores aleatórios...');
+      const figurinhasCriadas = [];
+      const userFigurinhasParaAtualizar = [];
+
+      // Selecionar jogadores aleatórios baseado na raridade
+      for (let i = 0; i < FIGURINHAS_POR_PACOTE; i++) {
+        const random = Math.random();
+        let jogador;
+
+        if (random < 0.05 && jogadoresPorRaridade['Lendário'].length > 0) {
+          // 5% de chance de jogador lendário
+          const index = Math.floor(Math.random() * jogadoresPorRaridade['Lendário'].length);
+          jogador = jogadoresPorRaridade['Lendário'][index];
+          jogadoresPorRaridade['Lendário'].splice(index, 1);
+        } else if (random < 0.25 && jogadoresPorRaridade['Ouro'].length > 0) {
+          // 20% de chance de jogador ouro
+          const index = Math.floor(Math.random() * jogadoresPorRaridade['Ouro'].length);
+          jogador = jogadoresPorRaridade['Ouro'][index];
+          jogadoresPorRaridade['Ouro'].splice(index, 1);
+        } else {
+          // 75% de chance de jogador prata
+          const index = Math.floor(Math.random() * jogadoresPorRaridade['Prata'].length);
+          jogador = jogadoresPorRaridade['Prata'][index];
+          jogadoresPorRaridade['Prata'].splice(index, 1);
+        }
+
+        console.log(`Jogador selecionado: ${jogador.nome} (${jogador.raridade})`);
+
+        // Criar a figurinha
+        const figurinha = await tx.figurinha.create({
+          data: {
+            nome: jogador.nome,
+            numero: jogador.numero,
+            posicao: jogador.posicao,
+            nacionalidade: jogador.nacionalidade,
+            foto: jogador.foto,
+            timeId: jogador.timeId,
+            jogadorId: jogador.id,
+            pacoteId: pacote.id,
+            raridade: jogador.raridade
+          }
+        });
+
+        console.log('Figurinha criada:', {
+          id: figurinha.id,
+          nome: figurinha.nome,
+          raridade: figurinha.raridade
+        });
+
+        // Criar a relação com o usuário
+        const userFigurinha = await tx.userFigurinha.create({
+          data: {
+            userId: user.id,
+            figurinhaId: figurinha.id,
+            quantidade: 1,
+            nomeJogador: jogador.nome || '',
+            nomeTime: jogador.time?.nome || '',
+          }
+        });
+
+        console.log('UserFigurinha criada:', {
+          id: userFigurinha.id,
+          userId: userFigurinha.userId,
+          figurinhaId: userFigurinha.figurinhaId
+        });
+
+        figurinhasCriadas.push(figurinha);
+      }
+
+      // Marcar o pacote como aberto
+      await tx.pacote.update({
+        where: { id: pacote.id },
+        data: { aberto: true }
+      });
+
+      console.log('Pacote aberto com sucesso');
+      console.log('=== FIM DO PROCESSO DE ABRIR PACOTE ===');
+
+      return NextResponse.json({
+        message: 'Pacote aberto com sucesso',
+        figurinhas: figurinhasCriadas.map(figurinha => ({
+          id: figurinha.id,
+          jogador: {
+            id: figurinha.jogadorId,
+            nome: figurinha.nome,
+            posicao: figurinha.posicao,
+            time: {
+              id: jogadores.find(j => j.id === figurinha.jogadorId)?.timeId,
+              nome: jogadores.find(j => j.id === figurinha.jogadorId)?.time?.nome,
+              escudo: jogadores.find(j => j.id === figurinha.jogadorId)?.time?.escudo
+            }
+          },
+          quantidadeAtual: 1,
+          raridade: figurinha.raridade
+        }))
+      });
+    });
   } catch (error) {
     console.error('Erro ao abrir pacote:', error);
-    return NextResponse.json({ error: 'Erro ao abrir pacote' }, { status: 500 });
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Erro ao abrir pacote' },
+      { status: 500 }
+    );
   }
 } 

@@ -8,6 +8,7 @@ import { Pacote as PacoteType } from '@/types/pacote';
 import ProdutosFigurinha from '@/components/ProdutosFigurinha';
 import ModalConfirmacaoCompra from '@/components/ModalConfirmacaoCompra';
 import { prisma } from '@/lib/prisma';
+import { toast } from 'react-hot-toast';
 
 export const dynamic = 'force-dynamic';
 
@@ -128,46 +129,49 @@ function PacotesContent() {
     }
   };
 
-  const handleAbrirPacote = async (pacoteId: string) => {
-    if (abrindoPacote || showAnimation) return;
-    setAbrindoPacote(true);
-    setShowAnimation(true);
+  const fetchPacotes = async () => {
     try {
+      const response = await fetch('/api/pacotes');
+      if (!response.ok) {
+        throw new Error('Erro ao carregar pacotes');
+      }
+      const data = await response.json();
+      setPacotes(data);
+    } catch (error) {
+      console.error('Erro ao carregar pacotes:', error);
+      toast.error('Erro ao carregar pacotes');
+    }
+  };
+
+  const handleAbrirPacote = async (pacoteId: string) => {
+    try {
+      setLoading(true);
       setPacoteAbrindo(pacoteId);
-      const response = await fetch('/api/pacotes/abrir', {
+      setShowAnimation(true);
+      
+      const response = await fetch('/api/pacotes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.user?.email}`,
-          'Cache-Control': 'no-store',
         },
         body: JSON.stringify({ pacoteId }),
       });
+
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          setShowAnimation(false);
-          setAbrindoPacote(false);
-          return;
-        }
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.message || 'Erro ao abrir pacote';
-        setError(errorMessage);
-        setShowAnimation(false);
-        setAbrindoPacote(false);
-        return;
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao abrir pacote');
       }
+
       const data = await response.json();
       setFigurinhasAbertas(data.figurinhas);
-      setPacotes([]);
-      await carregarPacotes();
-    } catch (err) {
-      console.error('Erro ao abrir pacote:', err);
-      setError('Ocorreu um erro ao abrir o pacote. Tente novamente mais tarde.');
+      await fetchPacotes(); // Atualiza a lista de pacotes
+    } catch (error) {
+      console.error('Erro ao abrir pacote:', error);
+      toast.error(error instanceof Error ? error.message : 'Erro ao abrir pacote');
       setShowAnimation(false);
     } finally {
+      setLoading(false);
       setPacoteAbrindo(null);
-      setAbrindoPacote(false);
     }
   };
 

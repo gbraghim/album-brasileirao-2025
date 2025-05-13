@@ -90,9 +90,8 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
                 src={getImagemRaridade(produto.raridade)}
                 alt={produto.nome}
                 fill
-                className="object-contain bg-white"
-                priority
-                style={{objectPosition: 'center'}}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover rounded-lg"
               />
             </div>
             <div className="flex flex-col flex-1 w-full px-3 py-2 items-center">
