@@ -26,7 +26,7 @@ export function formatarNomeArquivo(nome: string): string[] {
   return Array.from(variantes);
 }
 
-export function formatarCaminhoImagem(time: string, nome: string): string[] {
+export function formatarCaminhoImagem(time: string, nome: string): string {
   // Remove espaços extras e normaliza espaços
   const nomeNormalizado = nome.trim().replace(/\s+/g, ' ');
   // Separa em palavras, coloca a primeira letra de cada palavra em maiúsculo e o resto em minúsculo, depois junta tudo
@@ -44,9 +44,7 @@ export function formatarCaminhoImagem(time: string, nome: string): string[] {
   }
 
   // Gera apenas o caminho correto
-  const caminho = `/players/${pastaTime}/${nomeFormatado}.jpg`;
-
-  return [caminho];
+  return `/players/${pastaTime}/${nomeFormatado}.jpg`;
 }
 
 export function getS3EscudoUrl(escudo: string) {
