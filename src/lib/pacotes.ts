@@ -285,7 +285,8 @@ export async function getPacotesDisponiveis(email: string) {
     // Depois, buscar os pacotes do usuário
     const pacotes = await prisma.pacote.findMany({
       where: {
-        userId: user.id
+        userId: user.id,
+        aberto: false // Adicionando filtro para buscar apenas pacotes não abertos
       },
       include: {
         figurinhas: {
@@ -303,7 +304,7 @@ export async function getPacotesDisponiveis(email: string) {
       }
     });
 
-    console.log(`Encontrados ${pacotes.length} pacotes para o usuário ${email}`);
+    console.log(`Encontrados ${pacotes.length} pacotes disponíveis para o usuário ${email}`);
     return pacotes;
   } catch (error) {
     console.error('Erro ao buscar pacotes:', error);
@@ -401,7 +402,10 @@ export async function criarPacoteInicial(userId: string) {
 
 export async function getPacotesDoUsuario(userId: string) {
   return prisma.pacote.findMany({
-    where: { userId },
+    where: { 
+      userId,
+      aberto: false // Adicionando filtro para buscar apenas pacotes não abertos
+    },
     orderBy: { createdAt: 'desc' }
   });
 }
