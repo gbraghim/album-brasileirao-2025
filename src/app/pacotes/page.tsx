@@ -165,7 +165,10 @@ function PacotesContent() {
 
       const data = await response.json();
       setFigurinhasAbertas(data.figurinhas);
-      await fetchPacotes(); // Atualiza a lista de pacotes
+      
+      // Atualizar a lista de pacotes removendo o pacote aberto
+      setPacotes(prevPacotes => prevPacotes.filter(p => p.id !== pacoteId));
+      
     } catch (error) {
       console.error('Erro ao abrir pacote:', error);
       toast.error(error instanceof Error ? error.message : 'Erro ao abrir pacote');
