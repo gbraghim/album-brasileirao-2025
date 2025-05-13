@@ -7,13 +7,16 @@ import { Prisma } from '@prisma/client';
 
 const FIGURINHAS_POR_PACOTE = 4;
 
+// Map para rastrear usuários que já estão sendo processados
+const usuariosEmProcessamento = new Map<string, Promise<any>>();
+
 export async function GET() {
   try {
-    console.log('Iniciando verificação de pacotes...');
+    console.log('[GET /api/pacotes] Iniciando verificação de pacotes...');
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      console.log('Usuário não autenticado');
+      console.log('[GET /api/pacotes] Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -23,48 +26,69 @@ export async function GET() {
     });
 
     if (!usuario) {
-      console.log('Usuário não encontrado');
+      console.log('[GET /api/pacotes] Usuário não encontrado');
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
-    console.log(`Verificando pacotes para usuário ${usuario.id} (${usuario.email})`);
+    console.log(`[GET /api/pacotes] Verificando pacotes para usuário ${usuario.id} (${usuario.email})`);
 
-    // Verificar e criar pacotes iniciais se necessário
-    try {
-      console.log('Verificando pacotes iniciais...');
-      await verificarPacotesIniciais(usuario.id);
-      console.log('Verificação de pacotes iniciais concluída');
-    } catch (err) {
-      console.error('Erro ao verificar/criar pacotes iniciais:', err);
-      // Não lançar erro, apenas logar
+    // Verificar se o usuário já está sendo processado
+    if (usuariosEmProcessamento.has(usuario.id)) {
+      console.log(`[GET /api/pacotes] Usuário ${usuario.id} já está sendo processado, aguardando...`);
+      await usuariosEmProcessamento.get(usuario.id);
     }
 
-    // Verificar e criar pacotes diários se necessário
-    try {
-      console.log('Verificando pacotes diários...');
-      await verificarPacotesDiarios(usuario.id);
-      console.log('Verificação de pacotes diários concluída');
-    } catch (err) {
-      console.error('Erro ao verificar/criar pacotes diários:', err);
-      // Não lançar erro, apenas logar
-    }
+    // Criar uma nova promessa para o processamento
+    const processamentoPromise = (async () => {
+      try {
+        // Verificar e criar pacotes iniciais se necessário
+        try {
+          console.log('[GET /api/pacotes] Verificando pacotes iniciais...');
+          const pacotesIniciais = await verificarPacotesIniciais(usuario.id);
+          console.log('[GET /api/pacotes] Verificação de pacotes iniciais concluída', pacotesIniciais);
+        } catch (err) {
+          console.error('[GET /api/pacotes] Erro ao verificar/criar pacotes iniciais:', err);
+          // Não lançar erro, apenas logar
+        }
 
-    // Buscar os pacotes do usuário
-    console.log('Buscando pacotes do usuário...');
-    const pacotes = await prisma.pacote.findMany({
-      where: {
-        userId: usuario.id,
-        aberto: false
-      },
-      orderBy: {
-        createdAt: 'desc'
+        // Verificar e criar pacotes diários se necessário
+        try {
+          console.log('[GET /api/pacotes] Verificando pacotes diários...');
+          const pacotesDiarios = await verificarPacotesDiarios(usuario.id);
+          console.log('[GET /api/pacotes] Verificação de pacotes diários concluída', pacotesDiarios);
+        } catch (err) {
+          console.error('[GET /api/pacotes] Erro ao verificar/criar pacotes diários:', err);
+          // Não lançar erro, apenas logar
+        }
+
+        // Buscar os pacotes do usuário
+        console.log('[GET /api/pacotes] Buscando pacotes do usuário...');
+        const pacotes = await prisma.pacote.findMany({
+          where: {
+            userId: usuario.id,
+            aberto: false
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        });
+
+        console.log(`[GET /api/pacotes] Encontrados ${pacotes.length} pacotes para o usuário`);
+        return pacotes;
+      } finally {
+        // Remover o usuário do Map após o processamento
+        usuariosEmProcessamento.delete(usuario.id);
       }
-    });
+    })();
 
-    console.log(`Encontrados ${pacotes.length} pacotes para o usuário`);
+    // Armazenar a promessa no Map
+    usuariosEmProcessamento.set(usuario.id, processamentoPromise);
+
+    // Aguardar o resultado
+    const pacotes = await processamentoPromise;
     return NextResponse.json(pacotes);
   } catch (error) {
-    console.error('Erro ao buscar pacotes:', error);
+    console.error('[GET /api/pacotes] Erro ao buscar pacotes:', error);
     return NextResponse.json(
       { error: 'Erro ao buscar pacotes' },
       { status: 500 }
