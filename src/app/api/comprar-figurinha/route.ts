@@ -23,7 +23,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const { jogadorId, raridade } = await request.json();
+    const body = await request.json();
+    console.log('Corpo da requisição:', body);
+    
+    const { jogadorId, raridade } = body;
     console.log('Dados recebidos:', { jogadorId, raridade });
 
     if (!jogadorId || !raridade) {
@@ -118,51 +121,69 @@ export async function POST(request: Request) {
       cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?canceled=true`
     });
 
-    // Criar sessão de checkout usando o stripe_price_id
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: produto.stripe_price_id,
-          quantity: 1,
+    try {
+      // Criar sessão de checkout usando o stripe_price_id
+      const checkoutSession = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: produto.stripe_price_id,
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?success=true&jogadorId=${jogadorId}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?canceled=true`,
+        metadata: {
+          userId: session.user.id,
+          jogadorId,
+          tipo: 'figurinha_especifica'
         },
-      ],
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?success=true&jogadorId=${jogadorId}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pacotes?canceled=true`,
-      metadata: {
-        userId: session.user.id,
-        jogadorId,
-        tipo: 'figurinha_especifica'
-      },
-    });
+      });
 
-    console.log('Sessão de checkout criada:', checkoutSession.id);
+      console.log('Sessão de checkout criada:', checkoutSession.id);
 
-    await prisma.notificacao.create({
-      data: {
-        usuarioId: session.user.id,
-        tipo: 'TROCA_RECEBIDA',
-        tipoNovo: 'FIGURINHA_NOVA',
-        mensagem: `🎉 Parabéns! Você acabou de adquirir a figurinha do ${jogador.nome}! Ela já está no seu álbum!`,
-        lida: false,
-      },
-    });
+      await prisma.notificacao.create({
+        data: {
+          usuarioId: session.user.id,
+          tipo: 'TROCA_RECEBIDA',
+          tipoNovo: 'FIGURINHA_NOVA',
+          mensagem: `🎉 Parabéns! Você acabou de adquirir a figurinha do ${jogador.nome}! Ela já está no seu álbum!`,
+          lida: false,
+        },
+      });
 
-    console.log('Notificação criada com sucesso');
+      console.log('Notificação criada com sucesso');
 
-    return NextResponse.json({ url: checkoutSession.url });
+      return NextResponse.json({ url: checkoutSession.url });
+    } catch (stripeError) {
+      console.error('Erro ao criar sessão do Stripe:', stripeError);
+      if (stripeError instanceof Stripe.errors.StripeError) {
+        console.error('Detalhes do erro do Stripe:', {
+          type: stripeError.type,
+          code: stripeError.code,
+          message: stripeError.message,
+          raw: stripeError.raw
+        });
+      }
+      throw stripeError;
+    }
   } catch (error) {
     console.error('Erro detalhado ao processar compra:', error);
     if (error instanceof Stripe.errors.StripeError) {
       console.error('Erro do Stripe:', {
         type: error.type,
         code: error.code,
-        message: error.message
+        message: error.message,
+        raw: error.raw
       });
     }
     return NextResponse.json(
-      { error: 'Erro ao processar compra', details: error instanceof Error ? error.message : 'Erro desconhecido' },
+      { 
+        error: 'Erro ao processar compra', 
+        details: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
