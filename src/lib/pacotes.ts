@@ -41,39 +41,40 @@ export async function verificarPacotesIniciais(userId: string) {
   try {
     console.log(`Verificando pacotes iniciais para usuário ${userId}`);
     
-    // Buscar o usuário para verificar se é primeiro acesso
-    const usuario = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { primeiroAcesso: true }
-    });
+    // Usar uma transação para garantir atomicidade
+    return await prisma.$transaction(async (tx) => {
+      // Buscar o usuário para verificar se é primeiro acesso
+      const usuario = await tx.user.findUnique({
+        where: { id: userId },
+        select: { primeiroAcesso: true }
+      });
 
-    if (!usuario) {
-      console.log('Usuário não encontrado');
-      return;
-    }
-
-    if (!usuario.primeiroAcesso) {
-      console.log('Usuário já recebeu pacotes iniciais anteriormente');
-      return;
-    }
-
-    // Verificar se já existem pacotes iniciais
-    const pacotesExistentes = await prisma.pacote.findMany({
-      where: {
-        userId,
-        tipo: TipoPacote.INICIAL
+      if (!usuario) {
+        console.log('Usuário não encontrado');
+        return;
       }
-    });
 
-    if (pacotesExistentes.length > 0) {
-      console.log(`Usuário ${userId} já possui ${pacotesExistentes.length} pacotes iniciais`);
-      return;
-    }
+      if (!usuario.primeiroAcesso) {
+        console.log('Usuário já recebeu pacotes iniciais anteriormente');
+        return;
+      }
 
-    console.log('Criando 3 pacotes iniciais...');
-    
-    // Criar 3 pacotes iniciais dentro de uma transação
-    await prisma.$transaction(async (tx) => {
+      // Verificar se já existem pacotes iniciais
+      const pacotesExistentes = await tx.pacote.findMany({
+        where: {
+          userId,
+          tipo: TipoPacote.INICIAL
+        }
+      });
+
+      if (pacotesExistentes.length > 0) {
+        console.log(`Usuário ${userId} já possui ${pacotesExistentes.length} pacotes iniciais`);
+        return;
+      }
+
+      console.log('Criando 3 pacotes iniciais...');
+      
+      // Criar 3 pacotes iniciais
       for (let i = 0; i < 3; i++) {
         const pacote = await tx.pacote.create({
           data: {
@@ -95,9 +96,9 @@ export async function verificarPacotesIniciais(userId: string) {
         where: { id: userId },
         data: { primeiroAcesso: false }
       });
-    });
 
-    console.log('Pacotes iniciais criados com sucesso');
+      console.log('Pacotes iniciais criados com sucesso');
+    });
   } catch (error) {
     console.error('Erro ao criar pacotes iniciais:', error);
     throw error;
@@ -107,40 +108,43 @@ export async function verificarPacotesIniciais(userId: string) {
 // Verifica e cria pacotes diários
 export async function verificarPacotesDiarios(userId: string) {
   try {
-    // Verifica se o usuário já recebeu os pacotes diários hoje
-    const pacotesDiarios = await prisma.pacote.findMany({
-      where: {
-        userId,
-        tipo: TipoPacote.DIARIO,
-        createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0))
-        }
-      }
-    });
-
-    if (pacotesDiarios.length > 0) {
-      console.log(`Usuário ${userId} já possui ${pacotesDiarios.length} pacotes diários hoje`);
-      return;
-    }
-
-    console.log(`Criando 3 pacotes diários para usuário ${userId}`);
-    
-    // Criar 3 pacotes diários
-    for (let i = 0; i < 3; i++) {
-      const pacote = await prisma.pacote.create({
-        data: {
+    // Usar uma transação para garantir atomicidade
+    return await prisma.$transaction(async (tx) => {
+      // Verifica se o usuário já recebeu os pacotes diários hoje
+      const pacotesDiarios = await tx.pacote.findMany({
+        where: {
           userId,
           tipo: TipoPacote.DIARIO,
-          aberto: false
+          createdAt: {
+            gte: new Date(new Date().setHours(0, 0, 0, 0))
+          }
         }
       });
 
-      console.log(`Pacote diário ${i + 1} criado:`, {
-        id: pacote.id,
-        tipo: pacote.tipo,
-        userId: pacote.userId
-      });
-    }
+      if (pacotesDiarios.length > 0) {
+        console.log(`Usuário ${userId} já possui ${pacotesDiarios.length} pacotes diários hoje`);
+        return;
+      }
+
+      console.log(`Criando 3 pacotes diários para usuário ${userId}`);
+      
+      // Criar 3 pacotes diários
+      for (let i = 0; i < 3; i++) {
+        const pacote = await tx.pacote.create({
+          data: {
+            userId,
+            tipo: TipoPacote.DIARIO,
+            aberto: false
+          }
+        });
+
+        console.log(`Pacote diário ${i + 1} criado:`, {
+          id: pacote.id,
+          tipo: pacote.tipo,
+          userId: pacote.userId
+        });
+      }
+    });
   } catch (error) {
     console.error('Erro ao verificar pacotes diários:', error);
     throw error;

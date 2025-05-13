@@ -6,9 +6,11 @@ import { verificarPacotesIniciais, verificarPacotesDiarios } from '@/lib/pacotes
 
 export async function GET() {
   try {
+    console.log('Iniciando verificação de pacotes...');
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
+      console.log('Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -18,12 +20,17 @@ export async function GET() {
     });
 
     if (!usuario) {
+      console.log('Usuário não encontrado');
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
+    console.log(`Verificando pacotes para usuário ${usuario.id} (${usuario.email})`);
+
     // Verificar e criar pacotes iniciais se necessário
     try {
+      console.log('Verificando pacotes iniciais...');
       await verificarPacotesIniciais(usuario.id);
+      console.log('Verificação de pacotes iniciais concluída');
     } catch (err) {
       console.error('Erro ao verificar/criar pacotes iniciais:', err);
       // Não lançar erro, apenas logar
@@ -31,13 +38,16 @@ export async function GET() {
 
     // Verificar e criar pacotes diários se necessário
     try {
+      console.log('Verificando pacotes diários...');
       await verificarPacotesDiarios(usuario.id);
+      console.log('Verificação de pacotes diários concluída');
     } catch (err) {
       console.error('Erro ao verificar/criar pacotes diários:', err);
       // Não lançar erro, apenas logar
     }
 
     // Buscar os pacotes do usuário
+    console.log('Buscando pacotes do usuário...');
     const pacotes = await prisma.pacote.findMany({
       where: {
         userId: usuario.id,
@@ -48,6 +58,7 @@ export async function GET() {
       }
     });
 
+    console.log(`Encontrados ${pacotes.length} pacotes para o usuário`);
     return NextResponse.json(pacotes);
   } catch (error) {
     console.error('Erro ao buscar pacotes:', error);
