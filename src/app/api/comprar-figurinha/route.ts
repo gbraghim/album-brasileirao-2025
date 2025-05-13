@@ -165,6 +165,17 @@ export async function POST(request: Request) {
           message: stripeError.message,
           raw: stripeError.raw
         });
+        return NextResponse.json(
+          { 
+            error: 'Erro ao criar sessão do Stripe',
+            details: {
+              type: stripeError.type,
+              code: stripeError.code,
+              message: stripeError.message
+            }
+          },
+          { status: 500 }
+        );
       }
       throw stripeError;
     }
@@ -180,9 +191,12 @@ export async function POST(request: Request) {
     }
     return NextResponse.json(
       { 
-        error: 'Erro ao processar compra', 
-        details: error instanceof Error ? error.message : 'Erro desconhecido',
-        stack: error instanceof Error ? error.stack : undefined
+        error: 'Erro ao processar compra',
+        details: error instanceof Error ? {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        } : 'Erro desconhecido'
       },
       { status: 500 }
     );

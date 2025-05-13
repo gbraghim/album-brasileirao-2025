@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ModalComprarFigurinha from './ModalComprarFigurinha';
+import { toast } from 'react-hot-toast';
 
 interface Produto {
   id: string;
@@ -50,14 +51,24 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Erro ao processar compra');
+        throw new Error(data.error || 'Erro ao processar compra');
       }
 
-      const { url } = await response.json();
-      router.push(url);
+      if (data.url) {
+        router.push(data.url);
+      } else {
+        throw new Error('URL de redirecionamento não encontrada');
+      }
     } catch (error) {
       console.error('Erro ao processar compra:', error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Erro ao processar compra');
+      }
     }
   };
 
@@ -83,7 +94,6 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
                 priority
                 style={{objectPosition: 'center'}}
               />
-
             </div>
             <div className="flex flex-col flex-1 w-full px-3 py-2 items-center">
               <h3 className="text-base font-bold text-brasil-blue mb-0 text-center truncate w-full">
