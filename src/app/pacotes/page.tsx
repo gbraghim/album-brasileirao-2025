@@ -24,6 +24,7 @@ interface Jogador {
 interface Pacote extends Omit<PacoteType, 'figurinhas'> {
   id: string;
   figurinhas?: Array<{ id: string }>;
+  aberto: boolean;
 }
 
 interface AlbumResponse {
@@ -408,17 +409,25 @@ function PacotesContent() {
               <h2 className={sectionTitle}>Pacotes Diários</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
                 {pacotesDiarios.map((pacote) => (
-                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all bg-white-80 duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all bg-white-80 duration-300 scale-75 hover:scale-80" onClick={() => !pacote.aberto && handleAbrirPacote(pacote.id)}>
                     <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg bg-white-80 overflow-hidden">
-                      <Image src="/pacoteTransparente.png" alt="Pacote Diário" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" />
-                      <div className="absolute inset-0 flex items-center  justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button
-                          disabled={abrindoPacote || showAnimation}
-                          className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                        >
-                          Abrir Pacote
-                        </button>
-                      </div>
+                      <Image 
+                        src={pacote.aberto ? "/pacoteaberto.jpg" : "/pacoteTransparente.png"} 
+                        alt={pacote.aberto ? "Pacote Aberto" : "Pacote Diário"} 
+                        fill 
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
+                        className="object-contain" 
+                      />
+                      {!pacote.aberto && (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                          <button
+                            disabled={abrindoPacote || showAnimation}
+                            className="bg-brasil-yellow text-brasil-blue font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                          >
+                            Abrir Pacote
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -435,17 +444,25 @@ function PacotesContent() {
               <h2 className={sectionTitle}>Pacotes Extras</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
                 {pacotesPremiumUser.map((pacote) => (
-                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => !pacote.aberto && handleAbrirPacote(pacote.id)}>
                     <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                      <Image src="/IndividualPremium.png" alt="Pacote Premium" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button
-                          disabled={abrindoPacote || showAnimation}
-                          className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                        >
-                          Abrir Pacote
-                        </button>
-                      </div>
+                      <Image 
+                        src={pacote.aberto ? "/pacoteaberto.jpg" : "/IndividualPremium.png"} 
+                        alt={pacote.aberto ? "Pacote Aberto" : "Pacote Premium"} 
+                        fill 
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
+                        className="object-contain p-4" 
+                      />
+                      {!pacote.aberto && (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                          <button
+                            disabled={abrindoPacote || showAnimation}
+                            className="bg-brasil-blue text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                          >
+                            Abrir Pacote
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -462,17 +479,25 @@ function PacotesContent() {
               <h2 className={sectionTitle}>Pacotes de Boas-vindas</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
                 {pacotesIniciais.map((pacote) => (
-                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => handleAbrirPacote(pacote.id)}>
+                  <div key={pacote.id} className="relative group cursor-pointer bg-white/80 shadow-lg transform transition-all duration-300 scale-75 hover:scale-80" onClick={() => !pacote.aberto && handleAbrirPacote(pacote.id)}>
                     <div className="relative w-full h-[300px] backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-                      <Image src="/pacoteTransparente.png" alt="Pacote de Boas-vindas" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain p-4" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                        <button
-                          disabled={abrindoPacote || showAnimation}
-                          className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
-                        >
-                          Abrir Pacote
-                        </button>
-                      </div>
+                      <Image 
+                        src={pacote.aberto ? "/pacoteaberto.jpg" : "/pacoteTransparente.png"} 
+                        alt={pacote.aberto ? "Pacote Aberto" : "Pacote de Boas-vindas"} 
+                        fill 
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
+                        className="object-contain p-4" 
+                      />
+                      {!pacote.aberto && (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                          <button
+                            disabled={abrindoPacote || showAnimation}
+                            className="bg-brasil-green text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:scale-110 transition-transform"
+                          >
+                            Abrir Pacote
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
