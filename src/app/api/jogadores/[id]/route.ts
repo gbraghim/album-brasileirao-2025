@@ -1,13 +1,11 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function GET(req: Request) {
   try {
+    const id = req.url.split('/').pop();
     const jogador = await prisma.jogador.findUnique({
-      where: { id: context.params.id },
+      where: { id },
       select: {
         id: true,
         nome: true,
