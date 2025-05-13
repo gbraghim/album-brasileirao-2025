@@ -46,13 +46,23 @@ export async function verificarPacotesIniciais(userId: string) {
       // Buscar o usuário para verificar se é primeiro acesso
       const usuario = await tx.user.findUnique({
         where: { id: userId },
-        select: { primeiroAcesso: true }
+        select: { 
+          id: true,
+          primeiroAcesso: true,
+          email: true
+        }
       });
 
       if (!usuario) {
         console.error(`[verificarPacotesIniciais] Usuário ${userId} não encontrado`);
         throw new Error('Usuário não encontrado');
       }
+
+      console.log(`[verificarPacotesIniciais] Usuário encontrado:`, {
+        id: usuario.id,
+        email: usuario.email,
+        primeiroAcesso: usuario.primeiroAcesso
+      });
 
       if (!usuario.primeiroAcesso) {
         console.log(`[verificarPacotesIniciais] Usuário ${userId} já recebeu pacotes iniciais anteriormente`);
@@ -115,15 +125,20 @@ export async function verificarPacotesDiarios(userId: string) {
     // Usar uma transação para garantir atomicidade
     return await prisma.$transaction(async (tx) => {
       // Verifica se o usuário já recebeu os pacotes diários hoje
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      
       const pacotesDiarios = await tx.pacote.findMany({
         where: {
           userId,
           tipo: 'DIARIO' as TipoPacote,
           createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0))
+            gte: hoje
           }
         }
       });
+
+      console.log(`[verificarPacotesDiarios] Pacotes diários encontrados hoje: ${pacotesDiarios.length}`);
 
       if (pacotesDiarios.length > 0) {
         console.log(`[verificarPacotesDiarios] Usuário ${userId} já possui ${pacotesDiarios.length} pacotes diários hoje`);

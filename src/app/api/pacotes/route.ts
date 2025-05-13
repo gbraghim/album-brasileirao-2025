@@ -22,7 +22,12 @@ export async function GET() {
 
     // Buscar o usuário pelo email
     const usuario = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
+      select: { 
+        id: true,
+        email: true,
+        primeiroAcesso: true
+      }
     });
 
     if (!usuario) {
@@ -31,6 +36,7 @@ export async function GET() {
     }
 
     console.log(`[GET /api/pacotes] Verificando pacotes para usuário ${usuario.id} (${usuario.email})`);
+    console.log(`[GET /api/pacotes] Primeiro acesso: ${usuario.primeiroAcesso}`);
 
     // Verificar se o usuário já está sendo processado
     if (usuariosEmProcessamento.has(usuario.id)) {
@@ -48,7 +54,7 @@ export async function GET() {
           console.log('[GET /api/pacotes] Verificação de pacotes iniciais concluída', pacotesIniciais);
         } catch (err) {
           console.error('[GET /api/pacotes] Erro ao verificar/criar pacotes iniciais:', err);
-          // Não lançar erro, apenas logar
+          throw err; // Propagar o erro para ser tratado
         }
 
         // Verificar e criar pacotes diários se necessário
@@ -58,7 +64,7 @@ export async function GET() {
           console.log('[GET /api/pacotes] Verificação de pacotes diários concluída', pacotesDiarios);
         } catch (err) {
           console.error('[GET /api/pacotes] Erro ao verificar/criar pacotes diários:', err);
-          // Não lançar erro, apenas logar
+          throw err; // Propagar o erro para ser tratado
         }
 
         // Buscar os pacotes do usuário
@@ -75,6 +81,9 @@ export async function GET() {
 
         console.log(`[GET /api/pacotes] Encontrados ${pacotes.length} pacotes para o usuário`);
         return pacotes;
+      } catch (error) {
+        console.error('[GET /api/pacotes] Erro durante o processamento:', error);
+        throw error;
       } finally {
         // Remover o usuário do Map após o processamento
         usuariosEmProcessamento.delete(usuario.id);
