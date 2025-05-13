@@ -3,11 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request) {
   try {
+    const id = request.url.split('/').pop();
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -18,7 +16,7 @@ export async function GET(
     }
 
     const compra = await prisma.compra_figurinha.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!compra) {

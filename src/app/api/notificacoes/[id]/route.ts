@@ -3,11 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: Request) {
   try {
+    const id = request.url.split('/').pop();
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -15,7 +13,7 @@ export async function PATCH(
     }
 
     const notificacao = await prisma.notificacao.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!notificacao) {
@@ -27,7 +25,7 @@ export async function PATCH(
     }
 
     const notificacaoAtualizada = await prisma.notificacao.update({
-      where: { id: params.id },
+      where: { id },
       data: { lida: true }
     });
 
