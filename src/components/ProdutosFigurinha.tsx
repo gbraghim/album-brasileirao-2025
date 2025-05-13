@@ -87,11 +87,11 @@ export default function ProdutosFigurinha({ produtos, compraEmProgresso }: Produ
           >
             <div className="relative w-full flex justify-center items-center bg-gradient-to-b from-white to-blue-50" style={{height: '160px', marginTop: '18px'}}>
               <Image
-                src={getImagemRaridade(produto.raridade)}
+                src={produto.imagem || getImagemRaridade(produto.raridade)}
                 alt={produto.nome}
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover rounded-lg"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-contain bg-white"
               />
             </div>
             <div className="flex flex-col flex-1 w-full px-3 py-2 items-center">

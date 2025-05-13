@@ -24,33 +24,33 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Busca todos os usuários
-    const usuarios = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      }
+    // Busca o total de figurinhas por usuário em uma única query
+    const totais = await prisma.userFigurinha.groupBy({
+      by: ['userId'],
+      _sum: { quantidade: true }
     });
+    console.log('Ranking totais:', totais);
 
-    // Para cada usuário, busca a soma das quantidades de figurinhas atuais
-    const rankingPromises = usuarios.map(async usuario => {
-      const userFigurinhas = await prisma.userFigurinha.findMany({
-        where: { userId: usuario.id },
-        select: { quantidade: true }
-      });
-      const totalFigurinhas = userFigurinhas.reduce((acc, uf) => acc + uf.quantidade, 0);
+    // Busca os dados dos usuários que têm figurinhas
+    const userIds = totais.map(t => t.userId);
+    const usuarios = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, name: true, email: true }
+    });
+    console.log('Ranking usuarios:', usuarios);
+
+    // Monta o ranking
+    const rankingArray = totais.map(t => {
+      const usuario = usuarios.find(u => u.id === t.userId);
       return {
-        id: usuario.id,
-        nome: usuario.name || '',
-        email: usuario.email || '',
-        totalFigurinhas
+        id: t.userId,
+        nome: usuario?.name || '',
+        email: usuario?.email || '',
+        totalFigurinhas: t._sum.quantidade || 0
       };
     });
 
-    const rankingArray = await Promise.all(rankingPromises);
-
-    // Ordena pelo total de figurinhas (incluindo repetidas)
+    // Ordena e monta o ranking final
     const rankingCompleto = rankingArray
       .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas)
       .map((usuario, index) => ({
@@ -58,17 +58,18 @@ export async function GET() {
         posicao: index + 1
       }));
 
-    // Encontra a posição do usuário atual
     const usuarioAtual = rankingCompleto.find(u => u.email === session.user?.email);
-
-    // Limita o ranking aos 20 primeiros
     const rankingLimitado = rankingCompleto.slice(0, 20);
 
-    // Se o usuário atual não está no top 20 e existe, adiciona sua posição
+    // Se não houver ninguém no ranking, retorna mensagem amigável
+    if (rankingLimitado.length === 0) {
+      return NextResponse.json({ ranking: [], mensagem: 'Nenhum colecionador com figurinhas ainda.' });
+    }
+
     const response: RankingResponse = {
       ranking: rankingLimitado,
-      usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email) 
-        ? usuarioAtual 
+      usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email)
+        ? usuarioAtual
         : undefined
     };
 
