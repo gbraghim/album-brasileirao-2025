@@ -3,17 +3,22 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: Request) {
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   try {
-    const id = req.url.split('/').pop();
+    const id = params.id;
+    console.log('1. ID da troca recebido:', id);
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
+      console.log('2. Usuário não autenticado');
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { status } = await req.json();
+    console.log('3. Status recebido:', status);
 
     if (!status || !['ACEITA', 'RECUSADA'].includes(status)) {
+      console.log('4. Status inválido:', status);
       return NextResponse.json({ error: 'Status inválido' }, { status: 400 });
     }
 
@@ -27,8 +32,10 @@ export async function POST(req: Request) {
         }
       }
     });
+    console.log('5. Troca encontrada:', troca?.id);
 
     if (!troca) {
+      console.log('6. Troca não encontrada');
       return NextResponse.json({ error: 'Troca não encontrada' }, { status: 404 });
     }
 
@@ -47,6 +54,7 @@ export async function POST(req: Request) {
         }
       }
     });
+    console.log('7. Troca atualizada:', trocaAtualizada.id);
 
     // Cria uma notificação para o usuário que propôs a troca
     await prisma.notificacao.create({
@@ -59,6 +67,7 @@ export async function POST(req: Request) {
         trocaId: troca.id
       }
     });
+    console.log('8. Notificação criada');
 
     return NextResponse.json(trocaAtualizada);
   } catch (error) {

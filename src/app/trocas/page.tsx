@@ -400,7 +400,7 @@ export default function Trocas() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ aceitar: aceitar === 'aceitar' }),
+        body: JSON.stringify({ status: aceitar === 'aceitar' ? 'ACEITA' : 'RECUSADA' }),
       });
 
       if (!response.ok) {
