@@ -40,6 +40,7 @@ interface RankingItem {
 interface RankingData {
   ranking: RankingItem[];
   usuarioAtual?: RankingItem;
+  totalUsuarios?: number;
 }
 
 export default function Dashboard() {
@@ -300,7 +301,12 @@ export default function Dashboard() {
 
         {/* Ranking de Colecionadores */}
         <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6 border border-brasil-yellow/20">
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-brasil-blue">Ranking de Colecionadores</h2>
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <h2 className="text-xl md:text-2xl font-bold text-brasil-blue">Ranking de Colecionadores</h2>
+            <span className="text-sm md:text-base text-gray-600">
+              {rankingData?.totalUsuarios ? `${rankingData.totalUsuarios} colecionadores` : ''}
+            </span>
+          </div>
           {loadingRanking ? (
             <div className="flex justify-center items-center space-x-2">
               <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>

@@ -14,6 +14,7 @@ interface RankingItem {
 interface RankingResponse {
   ranking: RankingItem[];
   usuarioAtual?: RankingItem;
+  totalUsuarios: number;
 }
 
 export async function GET() {
@@ -70,7 +71,8 @@ export async function GET() {
       ranking: rankingLimitado,
       usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email)
         ? usuarioAtual
-        : undefined
+        : undefined,
+      totalUsuarios: rankingCompleto.length
     };
 
     return NextResponse.json(response);
