@@ -3,18 +3,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
-
 export async function POST(
   request: NextRequest,
-  context: RouteContext
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = context.params.id;
+    const { id } = await params;
     console.log('1. ID da troca recebido:', id);
 
     const session = await getServerSession(authOptions);
