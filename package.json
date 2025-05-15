@@ -15,7 +15,8 @@
     "populate:gremio": "node scripts/populate-gremio.js",
     "import-times": "node scripts/import-times.js",
     "import-jogadores": "node scripts/import-jogadores.js",
-    "migrate:notificacoes": "node prisma/execute-migration.js"
+    "migrate:notificacoes": "node prisma/execute-migration.js",
+    "adicionar-repetidas": "node src/scripts/adicionar-figurinhas-repetidas.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",

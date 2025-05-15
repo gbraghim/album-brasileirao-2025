@@ -11,11 +11,7 @@ export default function Footer() {
             <p className="text-sm text-gray-400">Colecione, troque e complete seu álbum!</p>
           </div>
 
-
-
           <div className="flex space-x-6 z-10">
-
-            
             <a 
               href="https://www.instagram.com/albumebrasileirao/" 
               target="_blank" 
@@ -25,7 +21,6 @@ export default function Footer() {
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-10 h-10">
                 <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm6 1.25a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
               </svg>
-
               <span className="font-extrabold">Instagram</span>
             </a>
             <a
@@ -39,8 +34,17 @@ export default function Footer() {
               </svg>
               <span className="font-extrabold">Facebook</span>
             </a>
-            
-
+            <a
+              href="https://www.tiktok.com/@ebrasileiro7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-black via-gray-800 to-gray-600 text-white font-extrabold rounded-2xl shadow-2xl hover:scale-110 transition-transform text-xl border-4 border-white z-10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-10 h-10">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
+              <span className="font-extrabold">TikTok</span>
+            </a>
           </div>
         </div>
         
