@@ -929,7 +929,7 @@ export default function Trocas() {
 
                       {/* Figurinha Solicitada */}
                       <div className="flex-1 min-w-[140px] max-w-[170px] flex flex-col items-center">
-                        <span className="block text-xs font-semibold text-gray-500 mb-1">Eles querem</span>
+                        <span className="block text-xs font-semibold text-gray-500 mb-1">Você ganhará</span>
                         <div className={`relative w-32 h-100 rounded-lg overflow-hidden border-4 ${getRaridadeStyle(troca.figurinhaSolicitada.jogador.raridade)}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           {renderFigurinha({...troca.figurinhaSolicitada, size: 'lg', hideName: true})}
                         </div>
