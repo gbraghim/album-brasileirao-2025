@@ -67,12 +67,15 @@ export async function GET() {
       return NextResponse.json({ ranking: [], mensagem: 'Nenhum colecionador com figurinhas ainda.' });
     }
 
+    // Buscar o total de usuários no sistema
+    const totalUsuarios = await prisma.user.count();
+
     const response: RankingResponse = {
       ranking: rankingLimitado,
       usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email)
         ? usuarioAtual
         : undefined,
-      totalUsuarios: rankingCompleto.length
+      totalUsuarios: totalUsuarios
     };
 
     return NextResponse.json(response);
