@@ -3,84 +3,145 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-interface RankingItem {
-  id: string;
-  nome: string;
-  totalFigurinhas: number;
-  email: string;
-  posicao: number;
-}
-
-interface RankingResponse {
-  ranking: RankingItem[];
-  usuarioAtual?: RankingItem;
-  totalUsuarios: number;
-}
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Busca o total de figurinhas por usuário em uma única query
-    const totais = await prisma.userFigurinha.groupBy({
+    // Busca otimizada: total de figurinhas (incluindo repetidas)
+    const totalFigurinhas = await prisma.userFigurinha.groupBy({
       by: ['userId'],
-      _sum: { quantidade: true }
+      _sum: { quantidade: true },
     });
-    console.log('Ranking totais:', totais);
+    const users = await prisma.user.findMany({ select: { id: true, name: true, image: true } });
+    const userMap = Object.fromEntries(users.filter(u => !!u.id).map(u => [u.id, u]));
+    const totalFigurinhasRanking = totalFigurinhas.filter(tf => !!tf.userId).map(tf => ({
+      nome: userMap[tf.userId]?.name || 'Desconhecido',
+      valor: tf._sum.quantidade || 0,
+      foto: userMap[tf.userId]?.image,
+      userId: tf.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    // Busca os dados dos usuários que têm figurinhas
-    const userIds = totais.map(t => t.userId);
-    const usuarios = await prisma.user.findMany({
-      where: { id: { in: userIds } },
-      select: { id: true, name: true, email: true }
+    // Figurinhas únicas
+    const unicas = await prisma.userFigurinha.groupBy({
+      by: ['userId'],
+      _count: { figurinhaId: true },
     });
-    console.log('Ranking usuarios:', usuarios);
+    const figurinhasUnicasRanking = unicas.filter(u => !!u.userId).map(u => ({
+      nome: userMap[u.userId]?.name || 'Desconhecido',
+      valor: u._count.figurinhaId,
+      foto: userMap[u.userId]?.image,
+      userId: u.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    // Monta o ranking
-    const rankingArray = totais.map(t => {
-      const usuario = usuarios.find(u => u.id === t.userId);
-      return {
-        id: t.userId,
-        nome: usuario?.name || '',
-        email: usuario?.email || '',
-        totalFigurinhas: t._sum.quantidade || 0
-      };
+    // Figurinhas Lendárias
+    const lendarias = await prisma.userFigurinha.groupBy({
+      by: ['userId'],
+      where: { figurinha: { jogador: { raridade: 'Lendário' } } },
+      _sum: { quantidade: true },
     });
+    const figurinhasLendariasRanking = lendarias.filter(u => !!u.userId).map(u => ({
+      nome: userMap[u.userId]?.name || 'Desconhecido',
+      valor: u._sum.quantidade || 0,
+      foto: userMap[u.userId]?.image,
+      userId: u.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    // Ordena e monta o ranking final
-    const rankingCompleto = rankingArray
-      .sort((a, b) => b.totalFigurinhas - a.totalFigurinhas)
-      .map((usuario, index) => ({
-        ...usuario,
-        posicao: index + 1
-      }));
+    // Figurinhas Ouro
+    const ouros = await prisma.userFigurinha.groupBy({
+      by: ['userId'],
+      where: { figurinha: { jogador: { raridade: 'Ouro' } } },
+      _sum: { quantidade: true },
+    });
+    const figurinhasOuroRanking = ouros.filter(u => !!u.userId).map(u => ({
+      nome: userMap[u.userId]?.name || 'Desconhecido',
+      valor: u._sum.quantidade || 0,
+      foto: userMap[u.userId]?.image,
+      userId: u.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    const usuarioAtual = rankingCompleto.find(u => u.email === session.user?.email);
-    const rankingLimitado = rankingCompleto.slice(0, 20);
+    // Figurinhas Prata
+    const pratas = await prisma.userFigurinha.groupBy({
+      by: ['userId'],
+      where: { figurinha: { jogador: { raridade: 'Prata' } } },
+      _sum: { quantidade: true },
+    });
+    const figurinhasPrataRanking = pratas.filter(u => !!u.userId).map(u => ({
+      nome: userMap[u.userId]?.name || 'Desconhecido',
+      valor: u._sum.quantidade || 0,
+      foto: userMap[u.userId]?.image,
+      userId: u.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    // Se não houver ninguém no ranking, retorna mensagem amigável
-    if (rankingLimitado.length === 0) {
-      return NextResponse.json({ ranking: [], mensagem: 'Nenhum colecionador com figurinhas ainda.' });
-    }
+    // Trocas realizadas (aceitas)
+    const trocas = await prisma.troca.findMany({
+      where: { status: 'ACEITA' },
+      select: { usuarioEnviaId: true, usuarioRecebeId: true }
+    });
+    const trocasPorUsuario: Record<string, number> = {};
+    trocas.forEach(t => {
+      if (t.usuarioEnviaId) {
+        trocasPorUsuario[t.usuarioEnviaId] = (trocasPorUsuario[t.usuarioEnviaId] || 0) + 1;
+      }
+      if (t.usuarioRecebeId) {
+        trocasPorUsuario[t.usuarioRecebeId] = (trocasPorUsuario[t.usuarioRecebeId] || 0) + 1;
+      }
+    });
+    const trocasRanking = users.map(u => ({
+      nome: u.name || 'Desconhecido',
+      valor: trocasPorUsuario[u.id] || 0,
+      foto: u.image,
+      userId: u.id
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    // Buscar o total de usuários no sistema
-    const totalUsuarios = await prisma.user.count();
+    // Pacotes abertos
+    const pacotes = await prisma.pacote.groupBy({
+      by: ['userId'],
+      _count: { id: true },
+    });
+    const pacotesRanking = pacotes.filter(p => !!p.userId).map(p => ({
+      nome: userMap[p.userId]?.name || 'Desconhecido',
+      valor: p._count.id,
+      foto: userMap[p.userId]?.image,
+      userId: p.userId
+    })).sort((a, b) => b.valor - a.valor).map((item, idx) => ({ ...item, posicao: idx + 1 }));
 
-    const response: RankingResponse = {
-      ranking: rankingLimitado,
-      usuarioAtual: usuarioAtual && !rankingLimitado.find(u => u.email === usuarioAtual.email)
-        ? usuarioAtual
-        : undefined,
-      totalUsuarios: totalUsuarios
+    // Pacotes comprados (apenas tipo 'COMPRADO')
+    const pacotesComprados = await prisma.pacote.groupBy({
+      by: ['userId'],
+      where: { tipo: 'COMPRADO' },
+      _count: { id: true },
+    });
+    const pacotesCompradosRanking = pacotesComprados
+      .filter(p => !!p.userId && p._count.id > 0)
+      .map(p => ({
+        nome: userMap[p.userId]?.name || 'Desconhecido',
+        valor: p._count.id,
+        foto: userMap[p.userId]?.image,
+        userId: p.userId
+      }))
+      .sort((a, b) => b.valor - a.valor)
+      .map((item, idx) => ({ ...item, posicao: idx + 1 }));
+
+    const rankings = {
+      totalFigurinhas: totalFigurinhasRanking,
+      figurinhasUnicas: figurinhasUnicasRanking,
+      figurinhasLendarias: figurinhasLendariasRanking,
+      figurinhasOuro: figurinhasOuroRanking,
+      figurinhasPrata: figurinhasPrataRanking,
+      trocasRealizadas: trocasRanking,
+      pacotesAbertos: pacotesRanking,
+      pacotesComprados: pacotesCompradosRanking
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(rankings);
   } catch (error) {
-    console.error('Erro ao buscar ranking:', error);
-    return NextResponse.json({ error: 'Erro ao buscar ranking' }, { status: 500 });
+    console.error('Erro ao buscar rankings:', error);
+    return NextResponse.json(
+      { error: 'Erro ao buscar rankings' },
+      { status: 500 }
+    );
   }
 } 

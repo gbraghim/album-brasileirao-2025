@@ -20,6 +20,7 @@ export default function Header() {
     { href: '/pacotes', label: 'Pacotes' },
     { href: '/meu-album', label: 'Meu Álbum' },
     { href: '/trocas', label: 'Trocas' },
+    { href: '/ranking', label: 'Ranking' },
     { href: '/feed', label: 'Feed' },
     { href: '/perfil', label: 'Perfil' }
   ];
