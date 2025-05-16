@@ -87,7 +87,7 @@ function MeuAlbumContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalJogadoresTime, setTotalJogadoresTime] = useState<TotalJogadoresTime>({});
-  const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A);
+  const [timesOrdenados, setTimesOrdenados] = useState<Time[]>(TIMES_SERIE_A.sort((a, b) => a.nome.localeCompare(b.nome)));
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [escudoErrors, setEscudoErrors] = useState<Record<string, boolean>>({});
@@ -162,25 +162,6 @@ function MeuAlbumContent() {
       }
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    // Reordena os times quando um time é selecionado
-    if (timeSelecionado) {
-      console.log('Reordenando times - Time selecionado:', timeSelecionado.nome);
-      
-      const timesRestantes = TIMES_SERIE_A
-        .filter(time => time.id !== timeSelecionado.id)
-        .sort((a, b) => a.nome.localeCompare(b.nome));
-      
-      const novaOrdem = [timeSelecionado, ...timesRestantes];
-      console.log('Nova ordem dos times:', novaOrdem.map(t => t.nome));
-      
-      setTimesOrdenados(novaOrdem);
-    } else {
-      console.log('Nenhum time selecionado, ordenando alfabeticamente');
-      setTimesOrdenados([...TIMES_SERIE_A].sort((a, b) => a.nome.localeCompare(b.nome)));
-    }
-  }, [timeSelecionado]);
 
   const fetchJogadores = async () => {
     try {
@@ -460,8 +441,6 @@ function MeuAlbumContent() {
                             <FigurinhaCard
                               jogador={jogador}
                               jogadorColetado={jogadorColetado}
-                              currentImageIndex={currentIndex}
-                              onImageError={() => handleImageError(jogador.id, jogador.time.nome, jogador.nome)}
                               onAdicionarRepetida={() => {}}
                             />
                           </div>

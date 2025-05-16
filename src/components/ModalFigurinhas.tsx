@@ -80,6 +80,20 @@ const getRaridadeStyle = (raridade: string) => {
   }
 };
 
+// Função para obter a imagem baseada na raridade
+const getRaridadeImage = (raridade: string) => {
+  switch (raridade) {
+    case 'Lendário':
+      return '/raridadeLendario.png';
+    case 'Ouro':
+      return '/raridadeOuro.png';
+    case 'Prata':
+      return '/raridadePrata.png';
+    default:
+      return '/raridadePrata.png';
+  }
+};
+
 export default function ModalFigurinhas({ 
   isOpen, 
   onClose, 
@@ -149,165 +163,48 @@ export default function ModalFigurinhas({
   }, [figurinhas]);
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        </Transition.Child>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="relative z-50"
+    >
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
-        <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/90 backdrop-blur-sm px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6">
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                  <button
-                    type="button"
-                    className="rounded-md bg-white/50 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                    onClick={onClose}
-                  >
-                    <span className="sr-only">Fechar</span>
-                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
+      <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
+        <Dialog.Panel className="mx-auto w-full max-w-3xl bg-white rounded-xl shadow-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+          <Dialog.Title className="text-xl sm:text-2xl font-bold text-brasil-blue mb-4 sm:mb-6">
+            Suas Figurinhas
+          </Dialog.Title>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
+            {figurinhas.map((figurinha) => (
+              <div
+                key={figurinha.id}
+                className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-gray-200"
+              >
+                <Image
+                  src={getRaridadeImage(figurinha.raridade)}
+                  alt={figurinha.jogador.nome}
+                  fill
+                  className="object-contain p-2"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-1 text-xs text-center">
+                  {figurinha.jogador.nome}
                 </div>
-                
-                <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-brasil-blue mb-4 text-center">
-                  Figurinhas do Pacote
-                </Dialog.Title>
-                
-                {!temMaisPacotes && (
-                  <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                    <p className="text-yellow-800 font-medium">
-                      Você não tem mais pacotes disponíveis! 
-                    </p>
-                    <p className="text-yellow-700 text-sm mt-1">
-                      Compre mais pacotes para completar seu álbum mais rápido e aumentar suas chances de encontrar figurinhas lendárias!
-                    </p>
-                  </div>
-                )}
-                
-                <div className="mt-2">
-                  <div className="grid grid-cols-2 gap-4 justify-items-center">
-                    {figurinhas.map((figurinha) => {
-                      const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
-                      const isLendaria = figurinha.raridade === 'Lendário';
-                      const isOuro = figurinha.raridade === 'Ouro';
-                      return (
-                        <div key={figurinha.jogador.id} className="relative">
-                          <div className={`relative w-44 h-60 rounded-lg border-4 ${getRaridadeStyle(figurinha.raridade)} shadow-lg overflow-hidden transition-all duration-300 hover:scale-105 ${isLendaria ? 'lendaria-glow' : ''} ${isOuro ? 'ouro-glow' : ''}`}>
-                            {/* Label Nova/Repetida */}
-                            <div className={`absolute top-2 left-2 z-30 px-2 py-0.5 rounded text-xs font-bold shadow ${userFigurinhas.has(figurinha.jogador.id) ? 'bg-gray-300 text-gray-700' : 'bg-brasil-green text-white'}`}>
-                              {userFigurinhas.has(figurinha.jogador.id) ? 'Repetida' : 'Nova'}
-                            </div>
-                            {isLendaria && (
-                              <div className="absolute inset-0 pointer-events-none z-20 animate-pulse-lendaria">
-                                <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-glow-lendaria"></div>
-                              </div>
-                            )}
-                            {isOuro && !isLendaria && (
-                              <div className="absolute inset-0 pointer-events-none z-10 animate-glow-ouro">
-                                <div className="absolute inset-0 rounded-lg border-4 border-yellow-400 animate-glow-ouro"></div>
-                              </div>
-                            )}
-                            <div className="relative w-full h-44 z-10">
-                              <Image
-                                src={imageErrors[figurinha.jogador.id] ? '/placeholder.jpg' : (cachedSrcs[figurinha.jogador.id] || caminhos[0])}
-                                alt={figurinha.jogador.nome}
-                                fill
-                                className="object-fill"
-                                onError={() => handleImageError(figurinha.jogador.id, figurinha.jogador.time.nome, figurinha.jogador.nome)}
-                              />
-                              <div className="absolute top-1 right-1">
-                                <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                  figurinha.raridade === 'Lendário'
-                                    ? 'bg-purple-600/80 text-white'
-                                    : figurinha.raridade === 'Ouro'
-                                      ? 'bg-yellow-500/80 text-black'
-                                      : figurinha.raridade === 'Prata'
-                                        ? 'bg-gray-400/80 text-black'
-                                        : 'bg-gray-400/80 text-black'
-                                }`}>
-                                  {figurinha.raridade}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-full bg-white/90 p-2 text-center z-10 flex flex-col items-center justify-center" style={{minHeight: '60px'}}>
-                              <span className="text-sm font-bold text-black text-center leading-tight break-words">{figurinha.jogador.nome}</span>
-                              {/* Escudo e nome do time lado a lado */}
-                              <div className="flex items-center justify-center gap-1 mt-1">
-                                {figurinha.jogador.time?.escudo && (
-                                  <Image
-                                    src={getS3EscudoUrl(figurinha.jogador.time.escudo)}
-                                    alt={`Escudo do ${figurinha.jogador.time.nome}`}
-                                    width={15}
-                                    height={15}
-                                    className="mb-0.5"
-                                  />
-                                )}
-                                <span className="text-xs text-center text-brasil-blue font-semibold">{figurinha.jogador.time?.nome}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                
-                <div className="mt-5 sm:mt-4">
-                  {temMaisPacotes && onAbrirOutroPacote ? (
-                    <div className="flex flex-col gap-2">
-                      <button
-                        type="button"
-                        className="w-full justify-center rounded-lg bg-brasil-green px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brasil-green/80 transition-colors"
-                        onClick={() => {
-                          if (onAbrirOutroPacote) {
-                            onAbrirOutroPacote();
-                          }
-                        }}
-                      >
-                        Abrir Outro Pacote
-                      </button>
-                      <button
-                        type="button"
-                        className="w-full justify-center rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-200 transition-colors"
-                        onClick={onClose}
-                      >
-                        Fechar
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex justify-center">
-                      <button
-                        type="button"
-                        className="w-full justify-center rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-200 transition-colors sm:w-auto"
-                        onClick={onClose}
-                      >
-                        Fechar
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
+              </div>
+            ))}
           </div>
-        </div>
-      </Dialog>
-    </Transition.Root>
+
+          <div className="mt-6 sm:mt-8 flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 sm:px-6 py-2 rounded-lg bg-brasil-blue text-white hover:bg-brasil-blue/90 text-sm sm:text-base"
+            >
+              Fechar
+            </button>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 } 

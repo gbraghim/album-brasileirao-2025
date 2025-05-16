@@ -26,19 +26,6 @@ interface FigurinhaCardProps {
   priority?: boolean;
 }
 
-const getRaridadeStyle = (raridade: string) => {
-  switch (raridade) {
-    case 'Lendário':
-      return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
-    case 'Ouro':
-      return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
-    case 'Prata':
-      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-    default:
-      return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
-  }
-};
-
 export default function FigurinhaCard({ 
   jogador, 
   jogadorColetado, 
@@ -51,31 +38,39 @@ export default function FigurinhaCard({
   const [currentPath, setCurrentPath] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [cachedSrc, setCachedSrc] = useState<string | null>(null);
-  const caminhos = formatarCaminhoImagem(jogador.time.nome, jogador.nome);
 
-  const handleImageError = () => {
-    setImageError(true);
-    if (onImageError) {
-      onImageError();
+  // Função para obter a imagem baseada na raridade
+  const getRaridadeImage = (raridade: string) => {
+    switch (raridade) {
+      case 'Lendário':
+        return '/raridadeLendario.png';
+      case 'Ouro':
+        return '/raridadeOuro.png';
+      case 'Prata':
+        return '/raridadePrata.png';
+      default:
+        return '/raridadePrata.png';
     }
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    if (!imageError && caminhos[0]) {
-      getCachedImage(caminhos[0]).then(base64 => {
-        if (isMounted) setCachedSrc(base64);
-      }).catch(() => setCachedSrc(null));
+  // Função para definir o estilo da borda baseado na raridade
+  const getRaridadeStyle = (raridade: string) => {
+    switch (raridade) {
+      case 'Lendário':
+        return 'border-purple-600 shadow-purple-600 bg-gradient-to-br from-purple-600/20 to-purple-900/20';
+      case 'Ouro':
+        return 'border-yellow-500 shadow-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-700/20';
+      case 'Prata':
+        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
+      default:
+        return 'border-gray-400 shadow-gray-400 bg-gradient-to-br from-gray-400/20 to-gray-600/20';
     }
-    return () => { isMounted = false; };
-  }, [caminhos, imageError]);
+  };
 
-  // LOG DE DEBUG PARA DEPURAÇÃO
-  // console.log('DEBUG jogador:', {
-  //   timeNome: jogador.time?.nome,
-  //   jogadorNome: jogador.nome,
-  //   s3Url: getS3PlayerUrl(jogador.time?.nome, jogador.nome)
-  // });
+  const handleImageError = () => {
+    setImageError(true);
+    onImageError();
+  };
 
   return (
     <div className={`relative group`}>
@@ -83,10 +78,10 @@ export default function FigurinhaCard({
         <div className="relative w-full h-full">
           {jogadorColetado ? (
             <Image
-              src={imageError ? '/placeholder.jpg' : (cachedSrc || caminhos[0])}
+              src={getRaridadeImage(jogador.raridade)}
               alt={jogador.nome}
               fill
-              className="object-cover"
+              className="object-contain p-4"
               onError={handleImageError}
               loading={priority ? "eager" : "lazy"}
               priority={priority}

@@ -8,6 +8,7 @@ import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
 import Image from 'next/image';
 import Header from '@/components/Header';
+import Modal from '@/components/Modal';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,29 +30,14 @@ interface UserStats {
   }>;
 }
 
-interface RankingItem {
-  id: string;
-  nome: string;
-  totalFigurinhas: number;
-  email: string;
-  posicao: number;
-}
-
-interface RankingData {
-  ranking: RankingItem[];
-  usuarioAtual?: RankingItem;
-  totalUsuarios?: number;
-}
-
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [stats, setStats] = useState<UserStats | null>(null);
-  const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [loadingRanking, setLoadingRanking] = useState(true);
   const [showMVPModal, setShowMVPModal] = useState(false);
   const [showTimesAccordion, setShowTimesAccordion] = useState(false);
+  const [showLegalNotice, setShowLegalNotice] = useState(true);
   const timesDetalhados = stats?.timesDetalhados || [];
   const timesCompletos = timesDetalhados.filter((t: { completo: boolean }) => t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
   const timesIncompletos = timesDetalhados.filter((t: { completo: boolean }) => !t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
@@ -62,44 +48,21 @@ export default function Dashboard() {
     
     if (status === 'authenticated') {
       console.log('4. Usuário autenticado, buscando dados...');
-      // Carrega as estatísticas primeiro
       fetchStats();
     }
   }, [status]);
 
-  // Carrega o ranking após as estatísticas serem carregadas
+  // Verifica se o usuário já viu o aviso
   useEffect(() => {
-    if (!loadingStats && status === 'authenticated') {
-      console.log('Carregando ranking após estatísticas...');
-      fetchRanking();
+    if (status === 'authenticated') {
+      setShowLegalNotice(true);
     }
-  }, [loadingStats, status]);
+  }, [status]);
 
-  // Após carregar rankingData e stats, garantir que o totalFigurinhas do usuário logado seja igual ao exibido no dashboard
-  useEffect(() => {
-    if (rankingData && stats && session?.user?.email) {
-      setRankingData((prev) => {
-        if (!prev) return prev;
-        // Atualiza o totalFigurinhas do usuário logado
-        let novoRanking = prev.ranking.map((item) =>
-          item.email === session.user.email
-            ? { ...item, totalFigurinhas: stats.totalFigurinhas + stats.figurinhasRepetidas }
-            : item
-        );
-        // Reordena o ranking em ordem decrescente de totalFigurinhas
-        novoRanking = novoRanking.sort((a, b) => b.totalFigurinhas - a.totalFigurinhas);
-        // Atualiza a posição de cada usuário
-        novoRanking = novoRanking.map((item, idx) => ({ ...item, posicao: idx + 1 }));
-        return {
-          ...prev,
-          ranking: novoRanking,
-          usuarioAtual: prev.usuarioAtual && prev.usuarioAtual.email === session.user.email
-            ? { ...prev.usuarioAtual, totalFigurinhas: stats.totalFigurinhas + stats.figurinhasRepetidas }
-            : prev.usuarioAtual
-        };
-      });
-    }
-  }, [stats, session?.user?.email]);
+  // Salva no localStorage quando o usuário fecha o modal
+  const handleCloseNotice = () => {
+    setShowLegalNotice(false);
+  };
 
   const fetchStats = async () => {
     try {
@@ -117,46 +80,6 @@ export default function Dashboard() {
       setLoadingStats(false);
     }
   };
-
-  const fetchRanking = async () => {
-    try {
-      console.log('11. Iniciando fetchRanking');
-      const response = await fetch('/api/ranking');
-      if (!response.ok) {
-        throw new Error('Erro ao buscar ranking');
-      }
-      const data = await response.json();
-      setRankingData(data);
-    } catch (error) {
-      console.error('Erro ao buscar ranking:', error);
-    } finally {
-      setLoadingRanking(false);
-    }
-  };
-
-  // Função para agrupar usuários empatados
-  function agruparPorFigurinhas(ranking: RankingItem[] | undefined) {
-    if (!ranking) return [];
-    const grupos = [];
-    let posicao = 1;
-    let i = 0;
-    while (i < ranking.length && grupos.length < 10) {
-      if (posicao <= 3) {
-        // Agrupa empatados apenas para top 1, 2 e 3
-        const grupo = ranking.filter((u: RankingItem) => u.totalFigurinhas === ranking[i].totalFigurinhas && ranking.findIndex(r => r === u) >= i);
-        grupos.push({ posicao, usuarios: grupo });
-        i += grupo.length;
-        posicao += grupo.length;
-      } else {
-        // A partir do 4º, cada usuário é um grupo separado
-        grupos.push({ posicao, usuarios: [ranking[i]] });
-        i += 1;
-        posicao += 1;
-      }
-    }
-    return grupos;
-  }
-  const gruposRanking = agruparPorFigurinhas(rankingData?.ranking);
 
   // Calcular corretamente o total de figurinhas para exibição
   const totalFigurinhasExibido = stats ? (stats.totalFigurinhas + stats.figurinhasRepetidas) : 0;
@@ -199,6 +122,59 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
+      {/* Modal de Aviso Legal */}
+      {showLegalNotice && (
+        <Modal
+          isOpen={showLegalNotice}
+          onClose={handleCloseNotice}
+          title="Bem-vindo ao Álbum Virtual!"
+        >
+          <div className="text-center py-4 md:py-6 bg-white rounded-lg">
+            <div className="mb-4 md:mb-6 px-4 md:px-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 md:h-16 md:w-16 text-brasil-blue mx-auto mb-3 md:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-lg md:text-xl font-bold text-brasil-blue mb-3 md:mb-4">Aviso Importante</h3>
+              <p className="text-sm md:text-base text-gray-700 mb-3 md:mb-4">
+                Para garantir uma experiência legal e divertida, estamos usando representações genéricas dos jogadores em nosso álbum virtual. Isso não diminui em nada a diversão e o desafio de completar sua coleção!
+              </p>
+              <p className="text-sm md:text-base text-gray-700 mb-3 md:mb-4">
+                O verdadeiro espírito do álbum está em:
+              </p>
+              <ul className="text-left text-sm md:text-base text-gray-700 mb-4 md:mb-6 space-y-2">
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 md:h-5 md:w-5 text-brasil-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Colecionar todas as figurinhas
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 md:h-5 md:w-5 text-brasil-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Trocar com outros colecionadores
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 md:h-5 md:w-5 text-brasil-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Completar seu álbum virtual
+                </li>
+              </ul>
+              <p className="text-sm md:text-base text-gray-700 mb-4 md:mb-6">
+                A emoção de encontrar uma figurinha rara, a alegria de completar uma página e a satisfação de ajudar outros colecionadores continuam as mesmas! Vamos juntos nessa jornada de colecionador?
+              </p>
+              <button
+                onClick={handleCloseNotice}
+                className="w-full md:w-auto bg-brasil-blue hover:bg-brasil-blue/90 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base"
+              >
+                Entendi! Vamos começar!
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-brasil-blue">Seja bem-vindo, {session?.user?.name}!</h1>
         

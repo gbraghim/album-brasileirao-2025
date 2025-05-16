@@ -38,6 +38,20 @@ export default function Figurinha({ figurinha, onClick, className = '', priority
     return null;
   }
 
+  // Função para obter a imagem baseada na raridade
+  const getRaridadeImage = (raridade: string) => {
+    switch (raridade) {
+      case 'Lendário':
+        return '/raridadeLendario.png';
+      case 'Ouro':
+        return '/raridadeOuro.png';
+      case 'Prata':
+        return '/raridadePrata.png';
+      default:
+        return '/raridadePrata.png';
+    }
+  };
+
   return (
     <div
       className={`relative group cursor-pointer ${className}`}
