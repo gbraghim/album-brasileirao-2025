@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { getTimesComCache } from '@/lib/cache'
 import { Time } from '@/lib/api-futebol'
 import Image from 'next/image'
+import Loading from '@/components/loading'
 
 export default function TimesPage() {
   const [times, setTimes] = useState<Time[]>([])
@@ -27,11 +28,7 @@ export default function TimesPage() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
+    return <Loading />
   }
 
   if (error) {

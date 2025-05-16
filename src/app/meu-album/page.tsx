@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { formatarCaminhoImagem, getS3EscudoUrl } from '@/lib/utils';
 import FigurinhaCard from '@/components/FigurinhaCard';
 import ProdutosFigurinha from '@/components/ProdutosFigurinha';
+import Loading from '@/components/loading';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +71,7 @@ interface TotalJogadoresTime {
 
 export default function MeuAlbum() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <Suspense fallback={<Loading />}>
       <MeuAlbumContent />
     </Suspense>
   );
@@ -308,11 +309,7 @@ function MeuAlbumContent() {
   const totalJogadores = timeSelecionado ? (totalJogadoresTime[timeSelecionado.id] || 0) : 0;
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {

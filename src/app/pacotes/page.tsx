@@ -9,6 +9,7 @@ import ProdutosFigurinha from '@/components/ProdutosFigurinha';
 import ModalConfirmacaoCompra from '@/components/ModalConfirmacaoCompra';
 import { prisma } from '@/lib/prisma';
 import { toast } from 'react-hot-toast';
+import Loading from '@/components/loading';
 
 export const dynamic = 'force-dynamic';
 
@@ -287,11 +288,7 @@ function PacotesContent() {
   const sectionDivider = <div className="w-full h-0.5 bg-brasil-blue/10 my-10 rounded-full" />;
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brasil-blue"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -323,7 +320,7 @@ function PacotesContent() {
             </div>
           </div>
         )}
-        <Suspense fallback={<div className="flex justify-center items-center h-16"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div></div>}>
+        <Suspense fallback={<Loading />}>
         </Suspense>
 
         <Modal
@@ -585,14 +582,14 @@ function PacotesContent() {
           </>
         )}
 
-        <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+        <Suspense fallback={<Loading />}>
           <PacoteAnimation
             isOpen={showAnimation}
             onAnimationComplete={handleAnimationComplete}
           />
         </Suspense>
 
-        <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+        <Suspense fallback={<Loading />}>
           <ModalFigurinhas
             isOpen={modalAberto}
             onClose={handleFecharModal}
@@ -620,11 +617,7 @@ function PacotesContent() {
 
 export default function PacotesPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    }>
+    <Suspense fallback={<Loading />}>
       <PacotesContent />
     </Suspense>
   );

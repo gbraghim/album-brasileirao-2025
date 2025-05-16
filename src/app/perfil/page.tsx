@@ -126,10 +126,7 @@ export default function PerfilPage() {
                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'Não disponível'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 md:p-4 bg-brasil-yellow/10 rounded-lg">
-                  <span className="text-sm md:text-base text-brasil-blue font-medium">Total de Figurinhas</span>
-                  <span className="text-sm md:text-base text-brasil-yellow font-bold">{stats?.totalFigurinhas}</span>
-                </div>
+
               </div>
             </div>
           </div>

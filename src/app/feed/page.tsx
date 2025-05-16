@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import Loading from '@/components/loading';
 
 interface EventoFeed {
   id: string;
@@ -64,6 +65,10 @@ export default function FeedPage() {
       if (loader.current) observer.unobserve(loader.current);
     };
   }, [nextCursor, hasMore, loading, fetchEventos]);
+
+  if (eventos.length === 0 && loading) {
+    return <Loading />;
+  }
 
   return (
     <main className="w-full min-h-[80vh] py-10 px-2 md:px-8 lg:px-32 bg-gradient-to-br from-white/80 via-blue-100/60 to-blue-200/80">

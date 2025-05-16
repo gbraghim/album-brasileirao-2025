@@ -65,6 +65,7 @@ export default function Trocas() {
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingFigurinha, setLoadingFigurinha] = useState<string | null>(null);
   const [cachedEscudos, setCachedEscudos] = useState<Record<string, string>>({});
+  const [jogadoresUsuario, setJogadoresUsuario] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -222,6 +223,20 @@ export default function Trocas() {
     }
     cacheEscudos();
   }, [repetidas, minhasTrocas, trocasDisponiveis, propostasRecebidas, ofertasEnviadas]);
+
+  useEffect(() => {
+    const fetchJogadoresUsuario = async () => {
+      try {
+        const response = await fetch('/api/meu-album');
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data && Array.isArray(data.jogadores)) {
+          setJogadoresUsuario(data.jogadores.map((j: any) => j.id));
+        }
+      } catch (e) {}
+    };
+    fetchJogadoresUsuario();
+  }, []);
 
   const fetchTrocas = async () => {
     try {
@@ -728,6 +743,13 @@ export default function Trocas() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
                 {trocasDisponiveis
                   .filter((troca: Troca) => troca.usuarioEnvia.id !== session?.user?.id)
+                  .filter((troca: Troca) => !jogadoresUsuario.includes(troca.figurinhaOferta.jogador.id))
+                  .sort((a: Troca, b: Troca) => {
+                    const ordem: Record<string, number> = { 'Ouro': 1, 'Prata': 2 };
+                    const raridadeA = ordem[a.figurinhaOferta.jogador.raridade] ?? 99;
+                    const raridadeB = ordem[b.figurinhaOferta.jogador.raridade] ?? 99;
+                    return raridadeA - raridadeB;
+                  })
                   .map((troca) => (
                     <div key={troca.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-4 flex flex-col items-center justify-center">
                       {renderFigurinha(troca.figurinhaOferta)}

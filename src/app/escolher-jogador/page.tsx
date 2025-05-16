@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import EscolherJogador from '@/components/EscolherJogador';
+import Loading from '@/components/loading';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,11 +97,7 @@ export default function EscolherJogadorPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500">
       <Header />
-      <Suspense fallback={
-        <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      }>
+      <Suspense fallback={<Loading />}>
         <EscolherJogadorContent />
       </Suspense>
     </div>
