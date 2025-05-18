@@ -102,66 +102,6 @@ export default function ModalFigurinhas({
   onAbrirOutroPacote,
   temMaisPacotes = false
 }: ModalFigurinhasProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
-  const [cachedSrcs, setCachedSrcs] = useState<Record<string, string>>({});
-
-  const handleImageError = (jogadorId: string, time: string, nome: string) => {
-    if (loadedImages[jogadorId]) {
-      console.log(`Imagem já carregada para ${nome} do ${time}, parando busca`);
-      return;
-    }
-
-    const caminhos = formatarCaminhoImagem(time, nome);
-    const currentIndex = currentImageIndex[jogadorId] || 0;
-    
-    if (currentIndex < caminhos.length - 1) {
-      const nextPath = caminhos[currentIndex + 1];
-      console.log(`Tentando próximo formato para ${nome} do ${time}: ${nextPath}`);
-      setCurrentImageIndex(prev => ({
-        ...prev,
-        [jogadorId]: currentIndex + 1
-      }));
-    } else {
-      console.error(`Todos os formatos falharam para ${nome} do ${time}. Caminhos tentados:`, caminhos);
-      setImageErrors(prev => ({
-        ...prev,
-        [jogadorId]: true
-      }));
-    }
-  };
-
-  const handleImageLoad = (jogadorId: string, caminho: string) => {
-    console.log(`Imagem carregada com sucesso para jogador ${jogadorId}: ${caminho}`);
-    setLoadedImages(prev => ({
-      ...prev,
-      [jogadorId]: true
-    }));
-    setImageErrors(prev => ({
-      ...prev,
-      [jogadorId]: false
-    }));
-  };
-
-  useEffect(() => {
-    async function cacheImages() {
-      const updates: Record<string, string> = {};
-      for (const figurinha of figurinhas) {
-        const caminhos = formatarCaminhoImagem(figurinha.jogador.time.nome, figurinha.jogador.nome);
-        try {
-          const cachedSrc = await getCachedImage(caminhos[0]);
-          updates[figurinha.jogador.id] = cachedSrc;
-          console.log(`Cache de imagem bem sucedido para ${figurinha.jogador.nome}`);
-        } catch (error) {
-          console.error(`Erro ao fazer cache da imagem para ${figurinha.jogador.nome}:`, error);
-        }
-      }
-      setCachedSrcs(updates);
-    }
-    cacheImages();
-  }, [figurinhas]);
-
   return (
     <Dialog
       open={isOpen}
@@ -188,6 +128,7 @@ export default function ModalFigurinhas({
                     alt={figurinha.jogador.nome}
                     fill
                     className="object-contain p-2"
+                    unoptimized
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
@@ -202,6 +143,7 @@ export default function ModalFigurinhas({
                       width={32}
                       height={32}
                       className="w-full h-full object-contain"
+                      unoptimized
                     />
                   </div>
                 </div>
