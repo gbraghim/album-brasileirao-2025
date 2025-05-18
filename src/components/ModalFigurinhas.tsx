@@ -180,16 +180,30 @@ export default function ModalFigurinhas({
             {figurinhas.map((figurinha) => (
               <div
                 key={figurinha.id}
-                className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-gray-200"
+                className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 ${getRaridadeStyle(figurinha.raridade)}`}
               >
-                <Image
-                  src={getRaridadeImage(figurinha.raridade)}
-                  alt={figurinha.jogador.nome}
-                  fill
-                  className="object-contain p-2"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-1 text-xs text-center">
-                  {figurinha.jogador.nome}
+                <div className="relative w-full h-full">
+                  <Image
+                    src={getRaridadeImage(figurinha.raridade)}
+                    alt={figurinha.jogador.nome}
+                    fill
+                    className="object-contain p-2"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="font-bold text-lg text-white drop-shadow-lg">{figurinha.jogador.nome}</p>
+                      <p className="text-sm text-white/90 drop-shadow-lg">{figurinha.jogador.time.nome}</p>
+                    </div>
+                  </div>
+                  <div className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full p-1 shadow-lg">
+                    <Image
+                      src={figurinha.jogador.time.escudo || `/escudos/${figurinha.jogador.time.nome.toLowerCase().replace(/\s+/g, '_')}.png`}
+                      alt={`Escudo ${figurinha.jogador.time.nome}`}
+                      width={32}
+                      height={32}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
