@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
 
 interface Notificacao {
   id: string;
@@ -25,25 +26,54 @@ interface Notificacao {
   };
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function Notificacoes() {
   const { data: session } = useSession();
-  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (session) {
-      fetchNotificacoes();
-    }
-  }, [session]);
+  // SWR para notificações
+  const { data: notificacoes = [], isLoading, mutate } = useSWR<Notificacao[]>(
+    session ? '/api/notificacoes' : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
-  useEffect(() => {
-    if (isOpen && notificacoes.some(n => !n.lida)) {
+  // Marcar como lida
+  const marcarComoLida = async (id: string) => {
+    try {
+      const response = await fetch(`/api/notificacoes/${id}/lida`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (response.ok) mutate();
+    } catch (error) {
+      // erro silencioso
+    }
+  };
+
+  // Marcar todas como lidas
+  const marcarTodasComoLidas = async () => {
+    try {
+      const response = await fetch('/api/notificacoes/lidas', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (response.ok) mutate();
+    } catch (error) {
+      // erro silencioso
+    }
+  };
+
+  // Marcar todas como lidas ao abrir dropdown
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen && notificacoes.some(n => !n.lida)) {
       marcarTodasComoLidas();
     }
-  }, [isOpen]);
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -58,88 +88,12 @@ export default function Notificacoes() {
     };
   }, []);
 
-  const fetchNotificacoes = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/notificacoes');
-      if (response.ok) {
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) {
-          setNotificacoes([]);
-          return;
-        }
-        setNotificacoes(data.map(notificacao => ({
-          id: notificacao.id || '',
-          mensagem: notificacao.mensagem || '',
-          lida: notificacao.lida || false,
-          tipo: notificacao.tipo || '',
-          createdAt: notificacao.createdAt || '',
-          troca: notificacao.troca ? {
-            id: notificacao.troca.id || '',
-            status: notificacao.troca.status || '',
-            figurinhaOferta: {
-              jogador: {
-                nome: notificacao.troca.figurinhaOferta?.jogador?.nome || '',
-                posicao: notificacao.troca.figurinhaOferta?.jogador?.posicao || '',
-                numero: notificacao.troca.figurinhaOferta?.jogador?.numero || 0
-              }
-            },
-            usuarioEnvia: {
-              name: notificacao.troca.usuarioEnvia?.name || ''
-            }
-          } : undefined
-        })));
-      }
-    } catch (error) {
-      console.error('Erro ao buscar notificações:', error);
-      setNotificacoes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const marcarComoLida = async (id: string) => {
-    try {
-      const response = await fetch(`/api/notificacoes/${id}/lida`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        setNotificacoes(notificacoes.map(n => 
-          n.id === id ? { ...n, lida: true } : n
-        ));
-      }
-    } catch (error) {
-      console.error('Erro ao marcar notificação como lida:', error);
-    }
-  };
-
-  const marcarTodasComoLidas = async () => {
-    try {
-      const response = await fetch('/api/notificacoes/lidas', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        setNotificacoes(notificacoes.map(n => ({ ...n, lida: true })));
-      }
-    } catch (error) {
-      console.error('Erro ao marcar todas as notificações como lidas:', error);
-    }
-  };
-
   const notificacoesNaoLidas = notificacoes.filter(n => !n.lida).length;
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleOpen}
         className="relative p-2 rounded-full hover:bg-green-700"
       >
         <Bell className="w-6 h-6 text-white" />
@@ -153,8 +107,7 @@ export default function Notificacoes() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 max-w-xs sm:max-w-sm md:max-w-md lg:w-96 bg-white rounded-lg shadow-lg p-4 z-50 min-w-[220px] sm:min-w-[320px] w-full sm:w-80 md:w-96" style={{maxWidth: '95vw'}}>
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Notificações</h3>
-          
-          {loading ? (
+          {isLoading ? (
             <p className="text-gray-500">Carregando...</p>
           ) : notificacoes.length === 0 ? (
             <p className="text-gray-500 text-center py-4">Você ainda não tem notificações</p>

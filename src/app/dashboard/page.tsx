@@ -2,13 +2,14 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import UserStats from '@/components/UserStats';
 import type { UserStats as UserStatsType } from '@/types/stats';
 import Image from 'next/image';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
+import useSWR from 'swr';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,61 +31,35 @@ interface UserStats {
   }>;
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function Dashboard() {
   const { data: session, status } = useSession();
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadingStats, setLoadingStats] = useState(true);
   const [showMVPModal, setShowMVPModal] = useState(false);
   const [showTimesAccordion, setShowTimesAccordion] = useState(false);
   const [showLegalNotice, setShowLegalNotice] = useState(true);
+
+  // SWR para buscar stats
+  const { data: stats, error, isLoading } = useSWR<UserStats>('/api/stats', fetcher, { revalidateOnFocus: false });
+
+  // Memoização das listas derivadas
   const timesDetalhados = stats?.timesDetalhados || [];
-  const timesCompletos = timesDetalhados.filter((t: { completo: boolean }) => t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
-  const timesIncompletos = timesDetalhados.filter((t: { completo: boolean }) => !t.completo).sort((a: { nome: string }, b: { nome: string }) => a.nome.localeCompare(b.nome));
-  const timesOrdenados = [...timesCompletos, ...timesIncompletos];
+  const timesCompletos = useMemo(() =>
+    timesDetalhados.filter(t => t.completo).sort((a, b) => a.nome.localeCompare(b.nome)), [timesDetalhados]);
+  const timesIncompletos = useMemo(() =>
+    timesDetalhados.filter(t => !t.completo).sort((a, b) => a.nome.localeCompare(b.nome)), [timesDetalhados]);
+  const timesOrdenados = useMemo(() =>
+    [...timesCompletos, ...timesIncompletos], [timesCompletos, timesIncompletos]);
 
-  useEffect(() => {
-    console.log('3. useEffect executado - status:', status);
-    
-    if (status === 'authenticated') {
-      console.log('4. Usuário autenticado, buscando dados...');
-      fetchStats();
-    }
-  }, [status]);
-
-  // Verifica se o usuário já viu o aviso
-  useEffect(() => {
-    if (status === 'authenticated') {
-      setShowLegalNotice(true);
-    }
-  }, [status]);
-
-  // Salva no localStorage quando o usuário fecha o modal
+  // Modal de aviso legal
   const handleCloseNotice = () => {
     setShowLegalNotice(false);
-  };
-
-  const fetchStats = async () => {
-    try {
-      console.log('5. Iniciando fetchStats');
-      console.log('6. Fazendo requisição para /api/stats');
-      const response = await fetch('/api/stats');
-      if (!response.ok) {
-        throw new Error('Erro ao buscar estatísticas');
-      }
-      const data = await response.json();
-      setStats(data);
-    } catch (error) {
-      console.error('Erro ao buscar estatísticas:', error);
-    } finally {
-      setLoadingStats(false);
-    }
   };
 
   // Calcular corretamente o total de figurinhas para exibição
   const totalFigurinhasExibido = stats ? (stats.totalFigurinhas + stats.figurinhasRepetidas) : 0;
 
-  if (status === 'loading' || loadingStats) {
+  if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-100 to-blue-500 flex flex-col items-center justify-center">
         <div className="text-center">
@@ -94,6 +69,7 @@ export default function Dashboard() {
             width={200}
             height={200}
             className="animate-pulse mb-8"
+            priority
           />
           <div className="flex items-center justify-center space-x-2">
             <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -181,7 +157,7 @@ export default function Dashboard() {
         {/* Seção de Estatísticas */}
         <div className="bg-white shadow rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Minhas Estatísticas</h2>
-          {loadingStats ? (
+          {isLoading ? (
             <div className="flex justify-center items-center space-x-2">
               <div className="w-3 h-3 bg-brasil-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
               <div className="w-3 h-3 bg-brasil-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>

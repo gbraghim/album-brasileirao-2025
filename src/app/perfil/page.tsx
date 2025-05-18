@@ -23,7 +23,6 @@ type User = {
 export default function PerfilPage() {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState(session?.user?.image || '/default-avatar.png');
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
@@ -50,18 +49,6 @@ export default function PerfilPage() {
     };
 
     fetchUser();
-  }, [session]);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (session?.user?.email) {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-        setStats(data);
-      }
-    };
-
-    fetchStats();
   }, [session]);
 
   const handleTrocarSenha = async (e: React.FormEvent) => {

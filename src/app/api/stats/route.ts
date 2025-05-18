@@ -6,154 +6,94 @@ import type { UserStats } from '@/types/stats';
 export async function GET() {
   try {
     const session = await getServerSession();
-    
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: {
-        id: true,
-        qtdFigurinhasLendarias: true,
-        qtdFigurinhasOuro: true,
-        qtdFigurinhasPrata: true,
-        pacotes: true
-      }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      );
-    }
-
-    // Calcula as estatísticas básicas
-    const totalPacotes = user.pacotes.length;
-
-    // Busca todas as figurinhas do usuário, incluindo repetidas e dados do jogador
-    const userFigurinhasComJogador = await prisma.userFigurinha.findMany({
-      where: {
-        userId: user.id
-      },
-      include: {
-        figurinha: {
-          include: {
-            jogador: true
-          }
-        }
-      }
-    });
-
-    // Total de figurinhas únicas (desconsiderando repetidas)
-    const totalFigurinhas = userFigurinhasComJogador.length;
-
-    // Busca figurinhas repetidas (quantidade > 1)
-    const figurinhasRepetidasQuery = await prisma.userFigurinha.findMany({
-      where: {
-        userId: user.id,
-        quantidade: {
-          gt: 1
-        }
-      }
-    });
-
-    console.log('API Stats - Figurinhas repetidas encontradas:', 
-      figurinhasRepetidasQuery.map(f => ({
-        figurinhaId: f.figurinhaId,
-        quantidade: f.quantidade
-      }))
-    );
-
-    // Calcula o total de repetidas (número de figurinhas com quantidade > 1)
-    const figurinhasRepetidas = figurinhasRepetidasQuery.length;
-
-    console.log('API Stats - Resumo:', {
-      totalFigurinhasUnicas: totalFigurinhas,
-      figurinhasRepetidas,
-      userFigurinhas: userFigurinhasComJogador.map(f => ({
-        figurinhaId: f.figurinhaId,
-        quantidade: f.quantidade
-      }))
-    });
-
-    // Calcula times completos
-    const timesFigurinhas = await prisma.userFigurinha.findMany({
-      where: {
-        userId: user.id,
-        quantidade: {
-          gt: 0
-        }
-      },
+    // Busca todas as figurinhas do usuário, incluindo jogador e time
+    const userFigurinhas = await prisma.userFigurinha.findMany({
+      where: { user: { email: session.user.email } },
       include: {
         figurinha: {
           include: {
             jogador: {
-              select: {
-                timeId: true
-              }
+              select: { id: true, timeId: true, raridade: true }
             }
           }
         }
       }
     });
 
-    const jogadoresPorTime = new Map();
-    timesFigurinhas.forEach(uf => {
-      const timeId = uf.figurinha.jogador?.timeId;
-      if (!timeId) return;
-      
-      if (!jogadoresPorTime.has(timeId)) {
-        jogadoresPorTime.set(timeId, new Set());
-      }
-      jogadoresPorTime.get(timeId).add(uf.figurinha.jogadorId);
-    });
+    // Busca todos os times e jogadores (para saber o total de jogadores por time)
+    const [allTimes, allJogadores] = await Promise.all([
+      prisma.time.findMany({ select: { id: true, nome: true } }),
+      prisma.jogador.findMany({ select: { id: true, timeId: true } })
+    ]);
 
-    // Para cada time, verifica se o usuário possui todos os jogadores
-    const timesCompletos = await Promise.all(
-      Array.from(jogadoresPorTime.keys()).map(async (timeId) => {
-        const totalJogadoresTime = await prisma.jogador.count({
-          where: { timeId }
-        });
-        const jogadoresPossuidos = jogadoresPorTime.get(timeId).size;
-        return jogadoresPossuidos === totalJogadoresTime;
-      })
-    ).then(results => results.filter(Boolean).length);
-
-    // Busca o total de times no banco de dados
-    const totalTimes = await prisma.time.count();
-
-    // Busca o total de jogadores no banco de dados
-    const totalJogadoresBase = await prisma.jogador.count();
-
-    // Mapear jogadores únicos do usuário (por jogadorId)
-    const jogadoresUnicos = new Map();
-    userFigurinhasComJogador.forEach(uf => {
-      const jogador = uf.figurinha.jogador;
-      if (jogador && !jogadoresUnicos.has(jogador.id)) {
-        jogadoresUnicos.set(jogador.id, jogador.raridade || 'Prata');
-      }
-    });
-
-    // Contar jogadores únicos por raridade
+    // Mapas auxiliares
+    const jogadoresPorTime: Record<string, Set<string>> = {};
+    const jogadoresUnicos: Record<string, string> = {};
+    let figurinhasRepetidas = 0;
     let figurinhasLendarias = 0;
     let figurinhasOuro = 0;
     let figurinhasPrata = 0;
-    for (const raridade of jogadoresUnicos.values()) {
-      if (raridade === 'Lendário') figurinhasLendarias++;
-      else if (raridade === 'Ouro') figurinhasOuro++;
-      else figurinhasPrata++;
-    }
+    let totalFigurinhas = 0;
+    let totalPacotes = 0;
 
-    // Corrigir totalFigurinhas para ser igual ao total de jogadores únicos
-    const totalFigurinhasUnicas = figurinhasLendarias + figurinhasOuro + figurinhasPrata;
+    userFigurinhas.forEach(uf => {
+      const jogador = uf.figurinha.jogador;
+      if (!jogador) return;
+      totalFigurinhas++;
+      if (!jogadoresUnicos[jogador.id]) {
+        jogadoresUnicos[jogador.id] = jogador.raridade || 'Prata';
+      }
+      if (!jogadoresPorTime[jogador.timeId]) {
+        jogadoresPorTime[jogador.timeId] = new Set();
+      }
+      jogadoresPorTime[jogador.timeId].add(jogador.id);
+      if (uf.quantidade > 1) figurinhasRepetidas++;
+    });
+
+    // Contar raridades
+    Object.values(jogadoresUnicos).forEach(raridade => {
+      if (raridade === 'Lendário') {
+        figurinhasLendarias++;
+        totalFigurinhasLendarias: figurinhasLendarias;
+      }
+      else if (raridade === 'Ouro') {
+        figurinhasOuro++;
+        totalFigurinhasOuro: figurinhasOuro;
+      }
+      else figurinhasPrata++;
+    });
+
+    // Calcular times completos
+    const timesDetalhados = allTimes.map(time => {
+      const totalJogadoresTime = allJogadores.filter(j => j.timeId === time.id).length;
+      const jogadoresPossuidos = jogadoresPorTime[time.id]?.size || 0;
+      return {
+        nome: time.nome,
+        completo: jogadoresPossuidos === totalJogadoresTime && totalJogadoresTime > 0,
+        figurinhasObtidas: jogadoresPossuidos,
+        totalFigurinhas: totalJogadoresTime
+      };
+    });
+    const timesCompletos = timesDetalhados.filter(t => t.completo).length;
+
+    // Totais
+    const totalTimes = allTimes.length;
+    const totalJogadoresBase = allJogadores.length;
+    const totalFigurinhasUnicas = Object.keys(jogadoresUnicos).length;
+
+    // Busca pacotes do usuário (apenas para contar)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { pacotes: true }
+    });
+    totalPacotes = user?.pacotes?.length ?? 0;
 
     const stats: UserStats = {
-      totalPacotes: user?.pacotes?.length ?? 0,
+      totalPacotes,
       totalFigurinhas: totalFigurinhasUnicas,
       figurinhasRepetidas,
       timesCompletos,
@@ -164,42 +104,13 @@ export async function GET() {
       figurinhasOuro,
       totalFigurinhasOuro: figurinhasOuro,
       figurinhasPrata,
-      totalFigurinhasPrata: figurinhasPrata
+      totalFigurinhasPrata: figurinhasPrata,
+      timesDetalhados
     };
 
-    console.log('API - Estatísticas finais:', {
-      ...stats,
-      figurinhasRepetidasDetalhes: figurinhasRepetidasQuery.map(f => ({
-        id: f.figurinhaId,
-        quantidade: f.quantidade
-      }))
-    });
-
-    // Buscar todos os times
-    const allTimes = await prisma.time.findMany({
-      select: { id: true, nome: true }
-    });
-
-    // Para cada time, verificar se está completo e retornar também as quantidades
-    const timesDetalhados = await Promise.all(
-      allTimes.map(async (time) => {
-        const totalJogadoresTime = await prisma.jogador.count({ where: { timeId: time.id } });
-        const jogadoresPossuidos = jogadoresPorTime.get(time.id)?.size || 0;
-        return {
-          nome: time.nome,
-          completo: jogadoresPossuidos === totalJogadoresTime,
-          figurinhasObtidas: jogadoresPossuidos,
-          totalFigurinhas: totalJogadoresTime,
-        };
-      })
-    );
-
-    return NextResponse.json({ ...stats, timesDetalhados });
+    return NextResponse.json(stats);
   } catch (error) {
     console.error('Erro ao buscar estatísticas:', error);
-    return NextResponse.json(
-      { error: 'Erro ao buscar estatísticas' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao buscar estatísticas' }, { status: 500 });
   }
 } 
