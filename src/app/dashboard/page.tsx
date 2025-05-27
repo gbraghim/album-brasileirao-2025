@@ -29,6 +29,7 @@ interface UserStats {
     figurinhasObtidas: number;
     totalFigurinhas: number;
   }>;
+  totalUsuarios: number;
 }
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -164,7 +165,7 @@ export default function Dashboard() {
               <div className="w-3 h-3 bg-brasil-green rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
           ) : stats ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-blue-800">Total de Figurinhas</h3>
                 <p className="text-3xl font-bold text-blue-600">{totalFigurinhasExibido}</p>
@@ -176,6 +177,10 @@ export default function Dashboard() {
               <div className="bg-purple-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-purple-800">Pacotes Obtidos</h3>
                 <p className="text-3xl font-bold text-purple-600">{stats.totalPacotes}</p>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-yellow-800">Total de Usuários</h3>
+                <p className="text-3xl font-bold text-yellow-600">{stats.totalUsuarios}</p>
               </div>
             </div>
           ) : (

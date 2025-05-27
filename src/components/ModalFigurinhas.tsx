@@ -132,7 +132,7 @@ export default function ModalFigurinhas({
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <p className="font-bold text-lg text-white drop-shadow-lg">{figurinha.jogador.nome}</p>
+                      <p className="font-bold text-lg text-brasil-blue drop-shadow-lg">{figurinha.jogador.nome}</p>
                       <p className="text-sm text-white/90 drop-shadow-lg">{figurinha.jogador.time.nome}</p>
                     </div>
                   </div>
@@ -151,7 +151,15 @@ export default function ModalFigurinhas({
             ))}
           </div>
 
-          <div className="mt-6 sm:mt-8 flex justify-end">
+          <div className="mt-6 sm:mt-8 flex justify-end gap-2">
+            {temMaisPacotes && onAbrirOutroPacote && (
+              <button
+                onClick={onAbrirOutroPacote}
+                className="px-4 sm:px-6 py-2 rounded-lg bg-brasil-green text-white hover:bg-brasil-green/90 text-sm sm:text-base"
+              >
+                Abrir outro pacote
+              </button>
+            )}
             <button
               onClick={onClose}
               className="px-4 sm:px-6 py-2 rounded-lg bg-brasil-blue text-white hover:bg-brasil-blue/90 text-sm sm:text-base"

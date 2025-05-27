@@ -92,6 +92,9 @@ export async function GET() {
     });
     totalPacotes = user?.pacotes?.length ?? 0;
 
+    // Buscar total de usuários cadastrados
+    const totalUsuarios = await prisma.user.count();
+
     const stats: UserStats = {
       totalPacotes,
       totalFigurinhas: totalFigurinhasUnicas,
@@ -105,7 +108,8 @@ export async function GET() {
       totalFigurinhasOuro: figurinhasOuro,
       figurinhasPrata,
       totalFigurinhasPrata: figurinhasPrata,
-      timesDetalhados
+      timesDetalhados,
+      totalUsuarios
     };
 
     return NextResponse.json(stats);
