@@ -132,7 +132,7 @@ export default function ModalFigurinhas({
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <p className="font-bold text-lg text-brasil-blue drop-shadow-lg">{figurinha.jogador.nome}</p>
+                      <p className="font-bold text-lg text-black drop-shadow-lg">{figurinha.jogador.nome}</p>
                       <p className="text-sm text-white/90 drop-shadow-lg">{figurinha.jogador.time.nome}</p>
                     </div>
                   </div>
